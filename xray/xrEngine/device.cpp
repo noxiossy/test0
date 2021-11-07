@@ -10,7 +10,7 @@
 #define MMNOJOY
 #include <mmsystem.h>
 // d3dx9.h
-#include <d3dx9.h>
+#include <d3dx/d3dx9.h>
 #pragma warning(default:4995)
 
 #include "x_ray.h"
@@ -27,8 +27,6 @@
 
 #include "xrSash.h"
 #include "igame_persistent.h"
-
-#pragma comment( lib, "d3dx9.lib"		)
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API BOOL g_bRendering = FALSE; 

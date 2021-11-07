@@ -1,11 +1,8 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "Environment.h"
 #include "xr_efflensflare.h"
 #include "thunderbolt.h"
 #include "rain.h"
-
 #include "IGame_Level.h"
 #include "../xrServerEntities/object_broker.h"
 #include "../xrServerEntities/LevelGameDef.h"

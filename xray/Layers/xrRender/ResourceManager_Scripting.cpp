@@ -1,7 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
 
-#include <lua/library_linkage.h>
 
 #include	"../../xrEngine/Render.h"
 #include	"ResourceManager.h"

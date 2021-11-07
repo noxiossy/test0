@@ -11,23 +11,19 @@
 #include "level.h"
 #include "xr_level_controller.h"
 #include "game_cl_base.h"
+#include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "Inventory.h"
 #include "xrServer.h"
 #include "autosave_manager.h"
-
 #include "actor.h"
 #include "huditem.h"
 #include "ui/UIDialogWnd.h"
 #include "../xrEngine/xr_input.h"
 #include "saved_game_wrapper.h"
-
 #include "../Include/xrRender/DebugRender.h"
-
 #ifdef DEBUG
 #	include "ai/monsters/BaseMonster/base_monster.h"
-
-// Lain: add
 #   include "level_debug.h"
 #endif
 

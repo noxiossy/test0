@@ -27,10 +27,7 @@
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "Grenade.h"
 #include "Torch.h"
-
-// breakpoints
 #include "../xrEngine/xr_input.h"
-//
 #include "Actor.h"
 #include "ActorAnimation.h"
 #include "actor_anim_defs.h"
@@ -65,9 +62,7 @@
 #include "InventoryBox.h"
 #include "location_manager.h"
 #include "player_hud.h"
-
 #include "../Include/xrRender/UIRender.h"
-
 #include "ai_object_location.h"
 
 const u32		patch_frames	= 50;

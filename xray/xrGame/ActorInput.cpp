@@ -4,11 +4,9 @@
 #include "Torch.h"
 #include "trade.h"
 #include "../xrEngine/CameraBase.h"
-
 #ifdef DEBUG
 #	include "PHDebug.h"
 #endif
-
 #include "hit.h"
 #include "PHDestroyable.h"
 #include "Car.h"
@@ -39,7 +37,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
 	if(hud_adj_mode && pInput->iGetAsyncKeyState(DIK_LSHIFT))	return;
 
 	if (Remote())		return;
-
 	if (IsTalking())	return;
 	if (m_input_external_handler && !m_input_external_handler->authorized(cmd))	return;
 	
@@ -267,7 +264,6 @@ void CActor::IR_OnKeyboardHold(int cmd)
 
 void CActor::IR_OnMouseMove(int dx, int dy)
 {
-
 	if(hud_adj_mode)
 	{
 		g_player_hud->tune	(Ivector().set(dx,dy,0));
@@ -460,7 +456,8 @@ void	CActor::OnNextWeaponSlot()
 		ActiveSlot = KNIFE_SLOT;
 	
 	u32 NumSlotsToCheck = sizeof(SlotsToCheck)/sizeof(u32);	
-	for (u32 CurSlot=0; CurSlot<NumSlotsToCheck; CurSlot++)
+	u32 CurSlot = 0;
+	for (; CurSlot<NumSlotsToCheck; CurSlot++)
 	{
 		if (SlotsToCheck[CurSlot] == ActiveSlot) break;
 	};
@@ -490,7 +487,8 @@ void	CActor::OnPrevWeaponSlot()
 		ActiveSlot = KNIFE_SLOT;
 
 	u32 NumSlotsToCheck = sizeof(SlotsToCheck)/sizeof(u32);	
-	for (u32 CurSlot=0; CurSlot<NumSlotsToCheck; CurSlot++)
+	u32 CurSlot = 0;
+	for (; CurSlot<NumSlotsToCheck; CurSlot++)
 	{
 		if (SlotsToCheck[CurSlot] == ActiveSlot) break;
 	};

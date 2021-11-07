@@ -14,7 +14,6 @@
 #include "../xrEngine/StatGraph.h"
 #include "PhraseDialogManager.h"
 #include "ui_defs.h"
-
 #include "step_manager.h"
 #include "script_export_space.h"
 

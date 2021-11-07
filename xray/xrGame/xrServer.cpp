@@ -13,13 +13,11 @@
 #include "ai_space.h"
 #include "../xrEngine/IGame_Persistent.h"
 #include "string_table.h"
-
 #include "../xrEngine/XR_IOConsole.h"
 //#include "script_engine.h"
 #include "ui/UIInventoryUtilities.h"
 #include "file_transfer.h"
 #include "screenshot_server.h"
-
 #pragma warning(push)
 #pragma warning(disable:4995)
 #include <malloc.h>

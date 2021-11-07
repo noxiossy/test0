@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
+
 
 #include "xr_input.h"
 #include "IInputReceiver.h"
@@ -206,7 +206,7 @@ void CInput::KeyUpdate	( )
 		}
 	}
 
-	for ( i = 0; i < COUNT_KB_BUTTONS; i++ )
+	for ( u32 i = 0; i < COUNT_KB_BUTTONS; i++ )
 		if (KBState[i]) 
 			cbStack.back()->IR_OnKeyboardHold( i );
 

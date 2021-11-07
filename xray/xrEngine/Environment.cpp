@@ -1,28 +1,18 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #ifndef _EDITOR
     #include "render.h"
 #endif
-
 #include "Environment.h"
 #include "xr_efflensflare.h"
 #include "rain.h"
 #include "thunderbolt.h"
 #include "xrHemisphere.h"
 #include "perlin.h"
-
 #include "xr_input.h"
-
-//#include "resourcemanager.h"
-
 #ifndef _EDITOR
 	#include "IGame_Level.h"
 #endif
-
-//#include "D3DUtils.h"
 #include "../xrcore/xrCore.h"
-
 #include "../Include/xrRender/EnvironmentRender.h"
 #include "../Include/xrRender/LensFlareRender.h"
 #include "../Include/xrRender/RainRender.h"
