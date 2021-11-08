@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "cpuid.h"
 
 #ifdef _M_AMD64

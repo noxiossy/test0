@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
+
 
 #include "fs_internal.h"
 
@@ -335,7 +335,10 @@ IReader*	IReader::open_chunk(u32 ID)
 	} else return 0;
 };
 void	IReader::close()
-{	xr_delete((IReader*)this); }
+{
+	IReader* temp = this;
+	xr_delete(temp);
+}
 
 #include "FS_impl.h"
 

@@ -1,9 +1,6 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "xrdebug.h"
 #include "os_clipboard.h"
-
 #include "../../3rd party/DxErr/src/dxerr.h"
 
 #pragma warning(push)
@@ -27,20 +24,16 @@ extern bool shared_str_initialized;
     #	define DEBUG_INVOKE	__asm int 3
         static BOOL			bException	= FALSE;
 #endif
-
 #ifndef USE_BUG_TRAP
 #	include <exception>
 #endif // #ifndef USE_BUG_TRAP
-
 #include <dbghelp.h>						// MiniDump flags
-
 #ifdef USE_BUG_TRAP
 #	include "../../3rd party/bugtrap/bugtrap/bugtrap.h"						// for BugTrap functionality
     #ifdef __BORLANDC__
         #	pragma comment(lib,"BugTrapB.lib")		// Link to ANSI DLL
     #endif
 #endif // USE_BUG_TRAP
-
 #include <new.h>							// for _set_new_mode
 #include <signal.h>							// for signals
 
@@ -427,7 +420,7 @@ please Submit Bug or save report and email it manually (button More...).\
 #endif // #ifndef MASTER_GOLD
 
 	BT_SetDumpType			(minidump_flags);
-	BT_SetSupportEMail		("cs-crash-report@stalker-game.com");
+//	BT_SetSupportEMail		("cs-crash-report@stalker-game.com");
 //	BT_SetSupportServer		("localhost", 9999);
 //	BT_SetSupportURL		("www.gsc-game.com");
 }
