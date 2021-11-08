@@ -15,7 +15,7 @@
 #pragma warning(disable:4237)
 
 #include "d3d10_1.h"
-#include <D3Dx10core.h>
+#include <d3dx/D3Dx10core.h>
 
 #include "../xrRender/xrD3DDefs.h"
 
