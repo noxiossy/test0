@@ -12,10 +12,7 @@
 #include "blender_ssao.h"
 #include "dx10MinMaxSMBlender.h"
 #include "../xrRenderDX10/msaa/dx10MSAABlender.h"
-
 #include "../xrRenderDX10/DX10 Rain/dx10RainBlender.h"
-
-
 #include "../xrRender/dxRenderDeviceRender.h"
 
 #include <d3dx/D3DX10Tex.h>
@@ -876,7 +873,7 @@ CRenderTarget::CRenderTarget		()
 			descHBAO.CPUAccessFlags = 0;
 			descHBAO.MiscFlags = 0;
 			
-			it = TEX_jitter_count-1;
+			int it = TEX_jitter_count - 1;
 			subData[it].pSysMem = tempDataHBAO;
 			subData[it].SysMemPitch = descHBAO.Width*sampleSize * sizeof(float);
 			
