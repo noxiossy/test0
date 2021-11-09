@@ -21,10 +21,6 @@ after_build:
 
     IF "%COR_PLAT%" == "Win32" set COR_PLAT=x86
 
-    set BUGTRAP=BugTrap-%COR_PLAT%.dll
-
-    IF "%COR_PLAT%" == "x86" set BUGTRAP=BugTrap.dll
-
     set APPVEYOR_VERSION=%APPVEYOR_BUILD_VERSION%_%COR_PLAT%
 
     echo %APPVEYOR_VERSION%
@@ -43,8 +39,6 @@ after_build:
 
     copy intermediate\%PLATFORM%-%CONFIGURATION%\*.dll dist\engine\bin_%COR_PLAT%\
 
-    copy SDK\binaries\%COR_PLAT%\%BUGTRAP% dist\engine\bin_%COR_PLAT%\
-    
     echo appveyor PushArtifact cs_%APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z release
 
     cd dist\engine
