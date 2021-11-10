@@ -37,9 +37,9 @@ public:
 protected:
 	int				scroll_delta;
 
-	CGameFont*		pFont;
-	CGameFont*		pFont2;
-	IConsoleRender*	m_pRender;
+	CGameFont*		pFont = nullptr;
+	CGameFont*		pFont2 = nullptr;
+	IConsoleRender*	m_pRender = nullptr;
 
 	POINT			m_mouse_pos;
 
@@ -84,7 +84,7 @@ public:
 	Fvector*		GetFVectorPtr		( LPCSTR cmd );
 
 protected:
-	text_editor::line_editor*			m_editor;
+	text_editor::line_editor*			m_editor = nullptr;
 	text_editor::line_edit_control&		ec();
 
 	enum Console_mark // (int)=char

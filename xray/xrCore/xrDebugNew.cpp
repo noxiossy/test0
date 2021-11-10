@@ -8,7 +8,7 @@
 #include <malloc.h>
 #include <direct.h>
 #pragma warning(pop)
-
+#include <intrin.h>
 extern bool shared_str_initialized;
 
 #ifdef __BORLANDC__
@@ -21,7 +21,7 @@ extern bool shared_str_initialized;
     #   define USE_BUG_TRAP
 #else
     #   define USE_BUG_TRAP
-    #	define DEBUG_INVOKE	__asm int 3
+    #	define DEBUG_INVOKE	__debugbreak()
         static BOOL			bException	= FALSE;
 #endif
 #ifndef USE_BUG_TRAP

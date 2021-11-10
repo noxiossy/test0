@@ -22,7 +22,7 @@
     <ProjectGuid>{7A19CBB1-FF90-44BD-9112-C2A269D9C280}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DxErr</RootNamespace>
-    <WindowsTargetPlatformVersion>10</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
