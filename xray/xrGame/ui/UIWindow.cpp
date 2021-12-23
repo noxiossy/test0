@@ -8,6 +8,11 @@
 
 #include "../Include/xrRender/DebugRender.h"
 #include "../Include/xrRender/UIRender.h"
+#ifdef _WIN64
+poolSS< _24b, 128>	ui_allocator;
+#else
+poolSS< _12b, 128>	ui_allocator;
+#endif
 
 //#define LOG_ALL_WNDS
 #ifdef LOG_ALL_WNDS
