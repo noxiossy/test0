@@ -112,7 +112,8 @@ Global
 		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release_Dedicated|x64.Build.0 = Release|Win32
 		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|Win32.ActiveCfg = Release|Win32
 		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|Win32.Build.0 = Release|Win32
-		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|x64.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|x64.ActiveCfg = Release|x64
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|x64.Build.0 = Release|x64
 		{893279CB-0805-405F-B484-9BB728A18261}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
 		{893279CB-0805-405F-B484-9BB728A18261}.Debug_Dedicated|x64.ActiveCfg = Release|Win32
 		{893279CB-0805-405F-B484-9BB728A18261}.Debug_Dedicated|x64.Build.0 = Release|Win32
@@ -131,7 +132,8 @@ Global
 		{893279CB-0805-405F-B484-9BB728A18261}.Release_Dedicated|x64.Build.0 = Release|Win32
 		{893279CB-0805-405F-B484-9BB728A18261}.Release|Win32.ActiveCfg = Release|Win32
 		{893279CB-0805-405F-B484-9BB728A18261}.Release|Win32.Build.0 = Release|Win32
-		{893279CB-0805-405F-B484-9BB728A18261}.Release|x64.ActiveCfg = Release|Win32
+		{893279CB-0805-405F-B484-9BB728A18261}.Release|x64.ActiveCfg = Release|x64
+		{893279CB-0805-405F-B484-9BB728A18261}.Release|x64.Build.0 = Release|x64
 		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
 		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Debug_Dedicated|x64.ActiveCfg = Release|Win32
 		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Debug_Dedicated|x64.Build.0 = Release|Win32
@@ -150,7 +152,8 @@ Global
 		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Release_Dedicated|x64.Build.0 = Release|Win32
 		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Release|Win32.ActiveCfg = Release|Win32
 		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Release|Win32.Build.0 = Release|Win32
-		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Release|x64.ActiveCfg = Release|Win32
+		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Release|x64.ActiveCfg = Release|x64
+		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9}.Release|x64.Build.0 = Release|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.Debug_Dedicated|x64.ActiveCfg = Release|Win32
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.Debug_Dedicated|x64.Build.0 = Release|Win32
