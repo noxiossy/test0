@@ -172,7 +172,12 @@ void LuaError(lua_State* L)
 // export
 void	CResourceManager::LS_Load			()
 {
+#ifndef _WIN64
 	LSVM			= lua_newstate(lua_alloc, NULL);
+#else
+	LSVM			= luaL_newstate();
+#endif
+
 	if (!LSVM)		{
 		Msg			("! ERROR : Cannot initialize LUA VM!");
 		return;
