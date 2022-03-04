@@ -12,9 +12,6 @@
 #include "xr_level_controller.h"
 #include "profiler.h"
 
-#include "lua/library_linkage.h"
-#include "luabind/library_linkage.h"
-
 extern "C" {
 	DLL_API DLL_Pure*	__cdecl xrFactory_Create		(CLASS_ID clsid)
 	{
