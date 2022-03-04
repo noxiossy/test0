@@ -406,6 +406,7 @@
     <ProjectReference Include="..\luajit\src\luajit.vcxproj">
       <Project>{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}</Project>
     </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
