@@ -440,7 +440,7 @@ LPCTSTR __stdcall GetFaultReason ( EXCEPTION_POINTERS * pExPtrs )
                             pExPtrs->ExceptionRecord->ExceptionAddress);
     #else
         iCurr += wsprintf ( g_szBuff + iCurr                ,
-                            _T ( " at %04X:%08X" )          ,
+                            _T ( " at %04X:%08p" )          ,
                             pExPtrs->ContextRecord->SegCs   ,
                             pExPtrs->ExceptionRecord->ExceptionAddress);
     #endif
@@ -449,7 +449,7 @@ LPCTSTR __stdcall GetFaultReason ( EXCEPTION_POINTERS * pExPtrs )
 
         // Start looking up the exception address.
         PIMAGEHLP_SYMBOL pSym = (PIMAGEHLP_SYMBOL)&g_stSymbol ;
-        FillMemory ( pSym , NULL , SYM_BUFF_SIZE ) ;
+        FillMemory ( pSym , SYM_BUFF_SIZE, NULL ) ;
         pSym->SizeOfStruct = sizeof ( IMAGEHLP_SYMBOL ) ;
         pSym->MaxNameLength = SYM_BUFF_SIZE - sizeof ( IMAGEHLP_SYMBOL);
 
@@ -605,7 +605,7 @@ LPCTSTR  __stdcall
     // function.
 
     // Initialize the STACKFRAME structure.
-    ZeroMemory ( &g_stFrame , sizeof ( STACKFRAME ) ) ;
+    ZeroMemory ( &g_stFrame , sizeof (g_stFrame) ) ;
 
 #if defined(_X86_)
     g_stFrame.AddrPC.Offset       = pExPtrs->ContextRecord->Eip ;

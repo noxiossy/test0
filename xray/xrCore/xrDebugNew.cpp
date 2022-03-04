@@ -29,7 +29,7 @@ extern bool shared_str_initialized;
 #endif // #ifndef USE_BUG_TRAP
 #include <dbghelp.h>						// MiniDump flags
 #ifdef USE_BUG_TRAP
-#	include "../../3rd party/bugtrap/bugtrap/bugtrap.h"						// for BugTrap functionality
+#	include <BugTrap/BugTrap.h>				// for BugTrap functionality
     #ifdef __BORLANDC__
         #	pragma comment(lib,"BugTrapB.lib")		// Link to ANSI DLL
     #endif
@@ -186,10 +186,15 @@ void xrDebug::backend	(const char *expression, const char *description, const ch
 #ifdef XRCORE_STATIC
 	MessageBox			(NULL,assertion_info,"X-Ray error",MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
 #else
+	HWND wnd = GetActiveWindow();
+	if (wnd == NULL)
+		wnd = GetForegroundWindow();
+	ShowWindow(wnd, SW_MINIMIZE);
+	while (ShowCursor(TRUE) < 0);
 #	ifdef USE_OWN_ERROR_MESSAGE_WINDOW
 		int					result = 
 			MessageBox(
-				GetTopWindow(NULL),
+				wnd,
 				assertion_info,
 				"Fatal Error",
 				MB_CANCELTRYCONTINUE|MB_ICONERROR|MB_SYSTEMMODAL
@@ -218,8 +223,16 @@ void xrDebug::backend	(const char *expression, const char *description, const ch
 #		ifdef USE_BUG_TRAP
 			BT_SetUserMessage	(assertion_info);
 #		endif // USE_BUG_TRAP
+#       ifndef DEBUG
+			if (strstr(GetCommandLine(),"-show_log"))
+				ShellExecute(nullptr, nullptr, logFullName(), nullptr, nullptr, SW_SHOWNORMAL);
+			//TerminateProcess(GetCurrentProcess(), 1);
+			DEBUG_INVOKE;
+#       else
 		DEBUG_INVOKE;
+#       endif
 #	endif // USE_OWN_ERROR_MESSAGE_WINDOW
+	ShowCursor(FALSE);
 #endif
 
 	if (get_on_dialog())
@@ -345,7 +358,7 @@ void CALLBACK PreErrorHandler	(INT_PTR)
 	if (*g_bug_report_file)
 		BT_AddLogFile		(g_bug_report_file);
 
-	BT_MakeSnapshot			( 0 );
+	BT_SaveSnapshot			( 0 );
 #endif // USE_BUG_TRAP
 }
 
