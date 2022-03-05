@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <IncludePath>$(SolutionDir)SDK\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK\libraries\x64;$(SolutionDir)3rd party/luajit/bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)SDK\libraries\$(Platform);$(SolutionDir)3rd party/luajit/bin;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)intermediate\$(Platform)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(Platform)-$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -12,6 +12,9 @@
     <ClCompile>
       <DisableSpecificWarnings>4456;4457;4458;4459;4577;4595</DisableSpecificWarnings>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rd party/luajit/bin/$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
