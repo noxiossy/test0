@@ -161,7 +161,7 @@ str_value*	str_container::dock		(str_c value)
 #endif //DEBUG
 		) {
 
-		result					= (str_value*)Memory.mem_alloc(HEADER+s_len_with_zero
+		result					= (str_value*)Memory.mem_alloc(sizeof(str_value) + s_len_with_zero
 #ifdef DEBUG_MEMORY_NAME
 			, "storage: sstring"
 #endif // DEBUG_MEMORY_NAME
