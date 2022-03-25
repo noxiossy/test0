@@ -13,7 +13,7 @@
       <DisableSpecificWarnings>4456;4457;4458;4459;4577;4595</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rd party/luajit/bin/$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rd party/luajit/bin/$(Platform);$(SolutionDir)SDK\libraries\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
