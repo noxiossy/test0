@@ -2,6 +2,25 @@
 #include "cpuid.h"
 #include <intrin.h>
 
+#include <array>
+#include <bitset>
+#include <memory>
+
+DWORD countSetBits(ULONG_PTR bitMask)
+{
+	DWORD LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
+	DWORD bitSetCount = 0;
+	ULONG_PTR bitTest = static_cast<ULONG_PTR>(1) << LSHIFT;
+	DWORD i;
+
+	for (i = 0; i <= LSHIFT; ++i) {
+		bitSetCount += ((bitMask & bitTest) ? 1 : 0);
+		bitTest /= 2;
+	}
+
+	return bitSetCount;
+}
+
 _processor_info::_processor_info()
 {
 	int cpinfo[4];
@@ -54,8 +73,40 @@ _processor_info::_processor_info()
 		m_f7_EBX[5] = 0;
 	}
 
-	// Number of processors
-	SYSTEM_INFO siSysInfo;
-	GetSystemInfo(&siSysInfo);
-	threadCount = siSysInfo.dwNumberOfProcessors;
+	// Calculate available processors
+	ULONG_PTR pa_mask_save, sa_mask_stub = 0;
+	GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
+
+	DWORD returnedLength = 0;
+	DWORD byteOffset = 0;
+	GetLogicalProcessorInformation(nullptr, &returnedLength);
+
+	auto buffer = std::make_unique<u8[]>(returnedLength);
+	auto ptr = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION>(buffer.get());
+	GetLogicalProcessorInformation(ptr, &returnedLength);
+
+	auto processorCoreCount = 0u;
+	auto logicalProcessorCount = 0u;
+
+	while (byteOffset + sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION) <= returnedLength) {
+		switch (ptr->Relationship) {
+		case RelationProcessorCore:
+			processorCoreCount++;
+
+			// A hyperthreaded core supplies more than one logical processor.
+			logicalProcessorCount += countSetBits(ptr->ProcessorMask);
+			break;
+
+		default:
+			break;
+		}
+
+		byteOffset += sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
+		ptr++;
+	}
+
+	// All logical processors
+	coresCount = processorCoreCount;
+	affinity_mask = pa_mask_save;
+	threadCount = logicalProcessorCount;
 }

@@ -199,7 +199,7 @@ namespace CPU
 		}
 		qpc_overhead		/=	256;
 
-		SetPriorityClass	(GetCurrentProcess(),NORMAL_PRIORITY_CLASS);
+		SetPriorityClass	(GetCurrentProcess(),HIGH_PRIORITY_CLASS);
 
 		clk_per_second	-=	clk_overhead;
 		clk_per_milisec	=	clk_per_second/1000;
@@ -222,10 +222,10 @@ namespace CPU
 bool g_initialize_cpu_called = false;
 
 //------------------------------------------------------------------------------------
-void _initialize_cpu	(void) 
+void _initialize_cpu()
 {
-	Msg("* Detected CPU: %s %s, F%d/M%d/S%d, %.2f mhz, %d-clk 'rdtsc'",
-		CPU::ID.vendor, CPU::ID.brand,
+    Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, %.2f mhz, %d-clk 'rdtsc'",
+		CPU::ID.brand, CPU::ID.vendor,
 		CPU::ID.family, CPU::ID.model, CPU::ID.stepping,
 		float(CPU::clk_per_second/u64(1000000)),
 		u32(CPU::clk_overhead)
@@ -239,9 +239,11 @@ void _initialize_cpu	(void)
 	string256	features;
 	strcpy_s(features, sizeof(features), "RDTSC");
 	if (CPU::ID.hasMMX()) strcat(features, ", MMX");
+	if (CPU::ID.has3DNOWExt()) strcat(features, ", 3DNowExt!");
 	if (CPU::ID.has3DNOW()) strcat(features, ", 3DNow!");
 	if (CPU::ID.hasSSE()) strcat(features, ", SSE");
 	if (CPU::ID.hasSSE2()) strcat(features, ", SSE2");
+	R_ASSERT(CPU::ID.hasSSE2());
 	if (CPU::ID.hasSSE3()) strcat(features, ", SSE3");
 	if (CPU::ID.hasMWAIT()) strcat(features, ", MONITOR/MWAIT");
 	if (CPU::ID.hasSSSE3()) strcat(features, ", SSSE3");
@@ -251,7 +253,8 @@ void _initialize_cpu	(void)
 	if (CPU::ID.hasAVX()) strcat(features, ", AVX");
 	if (CPU::ID.hasAVX2()) strcat(features, ", AVX2");
 	Msg("* CPU features: %s", features);
-	Msg("* CPU threads: %d\n", CPU::ID.threadCount);
+	Msg("* CPU cores: [%u], threads: [%u]", CPU::ID.coresCount, CPU::ID.threadCount);
+
 
 	Fidentity.identity		();	// Identity matrix
 	Didentity.identity		();	// Identity matrix

@@ -1,5 +1,4 @@
-#ifndef VECTOR3D_EXT_INCLUDED
-#define VECTOR3D_EXT_INCLUDED
+#pragma once
 
 #include "_vector3d.h"
 
@@ -108,4 +107,3 @@ ICF	Fvector   cr_vectorHP (float h, float p)
 	return r;
 }
 
-#endif // VECTOR3D_EXT_INCLUDED

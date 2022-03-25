@@ -44,24 +44,7 @@ void CEngineAPI::Initialize(void)
 {
 	//////////////////////////////////////////////////////////////////////////
 	// render
-	LPCSTR			r1_name	= "xrRender_R1.dll";
-
-#ifndef DEDICATED_SERVER
 	LPCSTR			r2_name	= "xrRender_R2.dll";
-	LPCSTR			r3_name	= "xrRender_R3.dll";
-
-	if (psDeviceFlags.test(rsR3))
-	{
-		// try to initialize R3
-		Log				("Loading DLL:",	r3_name);
-		hRender			= LoadLibrary		(r3_name);
-		if (0==hRender)	
-		{
-			// try to load R1
-			Msg			("! ...Failed - incompatible hardware/pre-Vista OS.");
-			psDeviceFlags.set	(rsR2,TRUE);
-		}
-	}
 
 	if (psDeviceFlags.test(rsR2))	
 	{
@@ -75,17 +58,16 @@ void CEngineAPI::Initialize(void)
 			Msg			("! ...Failed - incompatible hardware.");
 		}
 	}
-#endif
 
 	if (0==hRender)		
 	{
 		// try to load R1
 		psDeviceFlags.set	(rsR3,FALSE);
-		psDeviceFlags.set	(rsR2,FALSE);
+		//psDeviceFlags.set	(rsR2,FALSE);
 		renderer_value		= 0; //con cmd
 
-		Log				("Loading DLL:",	r1_name);
-		hRender			= LoadLibrary		(r1_name);
+		Log				("Loading DLL:",	r2_name);
+		hRender			= LoadLibrary		(r2_name);
 		if (0==hRender)	R_CHK				(GetLastError());
 		R_ASSERT		(hRender);
 	}
@@ -139,16 +121,13 @@ void CEngineAPI::CreateRendererList()
 	if(vid_quality_token != NULL)		return;
 	bool bSupports_r2 = false;
 	bool bSupports_r2_5 = false;
-	bool bSupports_r3 = false;
 
 	LPCSTR			r2_name	= "xrRender_R2.dll";
-	LPCSTR			r3_name	= "xrRender_R3.dll";
 
 	if (strstr(Core.Params,"-perfhud_hack"))
 	{
 		bSupports_r2 = true;
 		bSupports_r2_5 = true;
-		bSupports_r3 = true;
 	}
 	else
 	{
@@ -163,21 +142,6 @@ void CEngineAPI::CreateRendererList()
 			bSupports_r2_5 = test_rendering();
 			FreeLibrary(hRender);
 		}
-
-		// try to initialize R3
-		Log				("Loading DLL:",	r3_name);
-		//	Hide "d3d10.dll not found" message box for XP
-		SetErrorMode(SEM_FAILCRITICALERRORS);
-		hRender			= LoadLibrary		(r3_name);
-		//	Restore error handling
-		SetErrorMode(0);
-		if (hRender)	
-		{
-			SupportsDX10Rendering *test_dx10_rendering = (SupportsDX10Rendering*) GetProcAddress(hRender,"SupportsDX10Rendering");
-			R_ASSERT(test_dx10_rendering);
-			bSupports_r3 = test_dx10_rendering();
-			FreeLibrary(hRender);
-		}
 	}
 
 	hRender = 0;
@@ -185,7 +149,7 @@ void CEngineAPI::CreateRendererList()
 	xr_vector<LPCSTR>			_tmp;
 	u32 i						= 0;
 	bool bBreakLoop = false;
-	for(; i<5; ++i)
+	for(; i<4; ++i)
 	{
 		switch (i)
 		{
@@ -195,10 +159,6 @@ void CEngineAPI::CreateRendererList()
 			break;
 		case 3:		//"renderer_r2.5"
 			if (!bSupports_r2_5)
-				bBreakLoop = true;
-			break;
-		case 4:		//"renderer_r_dx10"
-			if (!bSupports_r3)
 				bBreakLoop = true;
 			break;
 		default:	;
@@ -214,7 +174,6 @@ void CEngineAPI::CreateRendererList()
 		case 1: val ="renderer_r2a";		break;
 		case 2: val ="renderer_r2";			break;
 		case 3: val ="renderer_r2.5";		break;
-		case 4: val ="renderer_r3";			break; //  -)
 		}
 		if (bBreakLoop) break;
 		_tmp.back()					= xr_strdup(val);

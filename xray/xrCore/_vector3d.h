@@ -1,6 +1,4 @@
-#ifndef __V3D__
-#define __V3D__
-
+#pragma once
 // Inline call
 #ifndef IC
 #define IC __forceinline
@@ -82,7 +80,7 @@ public:
 	}
 
 	// Clamp vector3
-	IC	SelfRef	clamp(const Self &min, const Self max) 
+    IC SelfRef clamp(const Self& min, const Self& max)
 	{
 		::clamp(x,min.x,max.x);
 		::clamp(y,min.y,max.y);
@@ -507,5 +505,3 @@ aa2_largest:	// aa2 is largest
 }
 IC BOOL	exact_normalize	(Fvector3& a)	{	return exact_normalize(&a.x);	}
 #pragma warning(pop)
-
-#endif

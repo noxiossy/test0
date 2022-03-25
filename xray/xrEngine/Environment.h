@@ -1,5 +1,4 @@
-#ifndef EnvironmentH
-#define EnvironmentH
+#pragma once
 
 // refs
 class ENGINE_API	IRender_Visual;
@@ -364,4 +363,3 @@ public:
 ENGINE_API extern Flags32	psEnvFlags;
 ENGINE_API extern float		psVisDistance;
 
-#endif //EnvironmentH
