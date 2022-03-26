@@ -67,7 +67,8 @@ extern ECORE_API	float		ps_r1_fog_luminance;	//1.f r1-only
 
 enum
 {
-    RFLAG_NO_RAM_TEXTURES = (1 << 0),
+	R1FLAG_DLIGHTS				= (1<<0),
+	RFLAG_NO_RAM_TEXTURES			= (2 << 0),
 };
 
 extern ECORE_API Flags32 ps_r__common_flags;
