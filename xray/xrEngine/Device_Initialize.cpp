@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "resource.h"
-#include "dedicated_server_only.h"
 
 #ifdef INGAME_EDITOR
 #	include "../include/editor/ide.hpp"
@@ -36,7 +35,7 @@ void CRenderDevice::initialize_editor	()
 }
 #endif // #ifdef INGAME_EDITOR
 
-PROTECT_API void CRenderDevice::Initialize			()
+void CRenderDevice::Initialize			()
 {
 	Log("Initializing Engine...");
 	TimerGlobal.Start			();
@@ -80,14 +79,5 @@ PROTECT_API void CRenderDevice::Initialize			()
     m_dwWindowStyle = GetWindowLong( m_hWnd, GWL_STYLE );
     GetWindowRect	( m_hWnd, &m_rcWindowBounds );
     GetClientRect	( m_hWnd, &m_rcWindowClient );
-
-	/*
-	if (strstr(lpCmdLine,"-gpu_sw")!=NULL)		HW.Caps.bForceGPU_SW		= TRUE;
-	else										HW.Caps.bForceGPU_SW		= FALSE;
-	if (strstr(lpCmdLine,"-gpu_nopure")!=NULL)	HW.Caps.bForceGPU_NonPure	= TRUE;
-	else										HW.Caps.bForceGPU_NonPure	= FALSE;
-	if (strstr(lpCmdLine,"-gpu_ref")!=NULL)		HW.Caps.bForceGPU_REF		= TRUE;
-	else										HW.Caps.bForceGPU_REF		= FALSE;
-	*/
 }
 

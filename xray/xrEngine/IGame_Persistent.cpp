@@ -13,15 +13,13 @@
 #	include "CustomHUD.h"
 #endif
 
-#ifdef _EDITOR
-	bool g_dedicated_server	= false;
-#endif
-
 #ifdef INGAME_EDITOR
 #	include "editor_environment_manager.hpp"
 #endif // INGAME_EDITOR
 
 ENGINE_API	IGame_Persistent*		g_pGamePersistent	= NULL;
+
+bool IsMainMenuActive() { return  g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive(); }
 
 IGame_Persistent::IGame_Persistent	()
 {

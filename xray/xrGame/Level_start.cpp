@@ -251,11 +251,9 @@ bool CLevel::net_start6				()
 		{
 			DEL_INSTANCE	(g_pGameLevel);
 			Console->Execute("main_menu on");
-
-			MainMenu()->OnLoadError("BattlEye/BEServer.dll");
 		}
 		else
-		if (m_connect_server_err==xrServer::ErrConnect&&!psNET_direct_connect && !g_dedicated_server) 
+		if (m_connect_server_err==xrServer::ErrConnect&&!psNET_direct_connect) 
 		{
 			DEL_INSTANCE	(g_pGameLevel);
 			Console->Execute("main_menu on");
@@ -278,11 +276,8 @@ bool CLevel::net_start6				()
 			DEL_INSTANCE	(g_pGameLevel);
 			Console->Execute("main_menu on");
 
-			if	(!g_dedicated_server)
-			{
-				MainMenu()->SwitchToMultiplayerMenu();
-				MainMenu()->Show_DownloadMPMap(dialog_string, download_url);
-			}
+			MainMenu()->SwitchToMultiplayerMenu();
+			MainMenu()->Show_DownloadMPMap(dialog_string, download_url);
 		}
 		else
 		if (map_data.IsInvalidClientChecksum())
@@ -300,11 +295,8 @@ bool CLevel::net_start6				()
 			g_pGameLevel->net_Stop();
 			DEL_INSTANCE	(g_pGameLevel);
 			Console->Execute("main_menu on");
-			if	(!g_dedicated_server)
-			{
-				MainMenu()->SwitchToMultiplayerMenu();
-				MainMenu()->Show_DownloadMPMap(dialog_string, download_url);
-			}
+			MainMenu()->SwitchToMultiplayerMenu();
+			MainMenu()->Show_DownloadMPMap(dialog_string, download_url);
 		}
 		else 
 		{
@@ -315,11 +307,8 @@ bool CLevel::net_start6				()
 		return true;
 	}
 
-	if	(!g_dedicated_server)
-	{
-		if (g_hud)
-			HUD().GetUI()->OnConnected();
-	}
+	if (g_hud)
+		HUD().GetUI()->OnConnected();
 
 	return true;
 }

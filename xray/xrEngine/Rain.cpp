@@ -127,11 +127,24 @@ void	CEffect_Rain::OnFrame	()
 #endif
 	// Parse states
 	float	factor				= g_pGamePersistent->Environment().CurrentEnv->rain_density;
-	float	hemi_factor			= 1.f;
+	static float hemi_factor	= 0.f;
 #ifndef _EDITOR
 	CObject* E 					= g_pGameLevel->CurrentViewEntity();
 	if (E&&E->renderable_ROS())
-		hemi_factor				= 1.f-2.0f*(0.3f-_min(_min(1.f,E->renderable_ROS()->get_luminocity_hemi()),0.3f));
+	{
+//		hemi_factor				= 1.f-2.0f*(0.3f-_min(_min(1.f,E->renderable_ROS()->get_luminocity_hemi()),0.3f));
+		float* hemi_cube		= E->renderable_ROS()->get_luminocity_hemi_cube();
+		float hemi_val			= _max(hemi_cube[0],hemi_cube[1]);
+		hemi_val				= _max(hemi_val, hemi_cube[2]);
+		hemi_val				= _max(hemi_val, hemi_cube[3]);
+		hemi_val				= _max(hemi_val, hemi_cube[5]);
+		
+//		float f					= 0.9f*hemi_factor + 0.1f*hemi_val;
+		float f					= hemi_val;
+		float t					= Device.fTimeDelta;
+		clamp					(t, 0.001f, 1.0f);
+		hemi_factor				= hemi_factor*(1.0f-t) + f*t;
+	}
 #endif
 
 	switch (state)
@@ -140,6 +153,7 @@ void	CEffect_Rain::OnFrame	()
 		if (factor<EPS_L)		return;
 		state					= stWorking;
 		snd_Ambient.play		(0,sm_Looped);
+		snd_Ambient.set_position(Fvector().set(0,0,0));
 		snd_Ambient.set_range	(source_offset,source_offset*2.f);
 	break;
 	case stWorking:

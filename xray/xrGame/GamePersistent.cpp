@@ -256,7 +256,7 @@ void CGamePersistent::OnGameEnd	()
 
 void CGamePersistent::WeathersUpdate()
 {
-	if (g_pGameLevel && !g_dedicated_server)
+	if (g_pGameLevel)
 	{
 		CActor* actor				= smart_cast<CActor*>(Level().CurrentViewEntity());
 		BOOL bIndoor				= TRUE;

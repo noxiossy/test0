@@ -208,46 +208,25 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
 	if (!Device.b_is_Ready)			return;
-	if ((psDeviceFlags.test(rsFullscreen)) == 0) {
-		Log("~ Can't capture screen while in windowed mode...");
-		return;
-	}
 
 	// Create temp-surface
 	IDirect3DSurface9*	pFB;
 	D3DLOCKED_RECT		D;
 	HRESULT				hr;
-	hr					= HW.pDevice->CreateOffscreenPlainSurface(Device.dwWidth,Device.dwHeight,D3DFMT_A8R8G8B8,D3DPOOL_SYSTEMMEM,&pFB,NULL);
-	if(hr!=D3D_OK)		return;
-
-	hr					= HW.pDevice->GetFrontBufferData(0,pFB);
-	if(hr!=D3D_OK)		return;
-
-	
-	hr					= pFB->LockRect(&D,0,D3DLOCK_NOSYSLOCK);
-	if(hr!=D3D_OK)		return;
+	hr = HW.pDevice->CreateOffscreenPlainSurface(Device.dwWidth, Device.dwHeight, HW.DevPP.BackBufferFormat,
+		D3DPOOL_SYSTEMMEM, &pFB, NULL);
+	if (FAILED(hr))
+		return;
+	hr = HW.pDevice->GetRenderTargetData(HW.pBaseRT, pFB);
+	if (FAILED(hr))
+		goto _end_;
+	hr = pFB->LockRect(&D, 0, D3DLOCK_NOSYSLOCK);
+	if (FAILED(hr))
+		goto _end_;
 
 	// Image processing (gamma-correct)
 	u32* pPixel		= (u32*)D.pBits;
 	u32* pEnd		= pPixel+(Device.dwWidth*Device.dwHeight);
-	//	IGOR: Remove inverse color correction and kill alpha
-	/*
-	D3DGAMMARAMP	G;
-	dxRenderDeviceRender::Instance().gammaGenLUT(G);
-	for (int i=0; i<256; i++) {
-		G.red	[i]	/= 256;
-		G.green	[i]	/= 256;
-		G.blue	[i]	/= 256;
-	}
-	for (;pPixel!=pEnd; pPixel++)	{
-		u32 p = *pPixel;
-		*pPixel = color_xrgb	(
-			G.red	[color_get_R(p)],
-			G.green	[color_get_G(p)],
-			G.blue	[color_get_B(p)]
-			);
-	}
-	*/
 
 	//	Kill alpha
 	for (;pPixel!=pEnd; pPixel++)	

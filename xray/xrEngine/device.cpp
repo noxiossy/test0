@@ -30,33 +30,13 @@
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API BOOL g_bRendering = FALSE; 
+u32 g_dwFPSlimit = 60;
 
 BOOL		g_bLoaded = FALSE;
 ref_light	precache_light = 0;
 
 BOOL CRenderDevice::Begin	()
 {
-#ifndef DEDICATED_SERVER
-
-	/*
-	HW.Validate		();
-	HRESULT	_hr		= HW.pDevice->TestCooperativeLevel();
-    if (FAILED(_hr))
-	{
-		// If the device was lost, do not render until we get it back
-		if		(D3DERR_DEVICELOST==_hr)		{
-			Sleep	(33);
-			return	FALSE;
-		}
-
-		// Check if the device is ready to be reset
-		if		(D3DERR_DEVICENOTRESET==_hr)
-		{
-			Reset	();
-		}
-	}
-	*/
-
 	switch (m_pRender->GetDeviceState())
 	{
 	case IRenderDeviceRender::dsOK:
@@ -79,17 +59,9 @@ BOOL CRenderDevice::Begin	()
 
 	m_pRender->Begin();
 
-	/*
-	CHK_DX					(HW.pDevice->BeginScene());
-	RCache.OnFrameBegin		();
-	RCache.set_CullMode		(CULL_CW);
-	RCache.set_CullMode		(CULL_CCW);
-	if (HW.Caps.SceneMode)	overdrawBegin	();
-	*/
-
 	FPU::m24r	();
 	g_bRendering = 	TRUE;
-#endif
+
 	return		TRUE;
 }
 
@@ -111,8 +83,6 @@ extern void CheckPrivilegySlowdown();
 
 void CRenderDevice::End		(void)
 {
-#ifndef DEDICATED_SERVER
-
 	//	Moved to m_pRenderEnd()
 	//VERIFY	(HW.pDevice);
 
@@ -179,7 +149,6 @@ void CRenderDevice::End		(void)
 		if (load_finished && m_editor)
 			m_editor->on_load_finished	();
 #	endif // #ifdef INGAME_EDITOR
-#endif
 }
 
 
@@ -216,9 +185,6 @@ void CRenderDevice::PreCache	(u32 amount)
 {
 	//if (HW.Caps.bForceGPU_REF)	amount=0;
 	if (m_pRender->GetForceGPU_REF()) amount=0;
-#ifdef DEDICATED_SERVER
-	amount = 0;
-#endif
 	// Msg			("* PCACHE: start for %d...",amount);
 	dwPrecacheFrame	= dwPrecacheTotal = amount;
 	if (amount && !precache_light && g_pGameLevel && g_loading_events.empty()) {
@@ -243,9 +209,18 @@ void CRenderDevice::on_idle		()
 		return;
 	}
 
-#ifdef DEDICATED_SERVER
-	u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
-#endif
+	// FPS Lock
+	constexpr u32 menuFPSlimit = 60, pauseFPSlimit = 60;
+	u32 curFPSLimit = IsMainMenuActive() ? menuFPSlimit : Device.Paused() ? pauseFPSlimit : g_dwFPSlimit;
+	if (curFPSLimit > 0)
+	{
+		static DWORD dwLastFrameTime = 0;
+		DWORD dwCurrentTime = timeGetTime();
+		if (dwCurrentTime - dwLastFrameTime < 1000 / (curFPSLimit + 1))
+			return;
+		dwLastFrameTime = dwCurrentTime;
+	}
+
 	if (psDeviceFlags.test(rsStatistic))	g_bEnableStatGather	= TRUE;
 	else									g_bEnableStatGather	= FALSE;
 	if(g_loading_events.size())
@@ -289,7 +264,6 @@ void CRenderDevice::on_idle		()
 	mt_csEnter.Leave			();
 	Sleep						(0);
 
-#ifndef DEDICATED_SERVER
 	Statistic->RenderTOTAL_Real.FrameStart	();
 	Statistic->RenderTOTAL_Real.Begin		();
 	if (b_is_Active)							{
@@ -307,7 +281,7 @@ void CRenderDevice::on_idle		()
 	Statistic->RenderTOTAL_Real.End			();
 	Statistic->RenderTOTAL_Real.FrameEnd	();
 	Statistic->RenderTOTAL.accum	= Statistic->RenderTOTAL_Real.accum;
-#endif // #ifndef DEDICATED_SERVER
+
 	// *** Suspend threads
 	// Capture startup point
 	// Release end point - allow thread to wait for startup point
@@ -321,36 +295,6 @@ void CRenderDevice::on_idle		()
 		Device.seqParallel.clear_not_free	();
 		seqFrameMT.Process					(rp_Frame);
 	}
-
-#ifdef DEDICATED_SERVER
-	u32 FrameEndTime = TimerGlobal.GetElapsed_ms();
-	u32 FrameTime = (FrameEndTime - FrameStartTime);
-	/*
-	string1024 FPS_str = "";
-	string64 tmp;
-	strcat(FPS_str, "FPS Real - ");
-	if (dwTimeDelta != 0)
-		strcat(FPS_str, ltoa(1000/dwTimeDelta, tmp, 10));
-	else
-		strcat(FPS_str, "~~~");
-
-	strcat(FPS_str, ", FPS Proj - ");
-	if (FrameTime != 0)
-		strcat(FPS_str, ltoa(1000/FrameTime, tmp, 10));
-	else
-		strcat(FPS_str, "~~~");
-	
-*/
-	u32 DSUpdateDelta = 1000/g_svDedicateServerUpdateReate;
-	if (FrameTime < DSUpdateDelta)
-	{
-		Sleep(DSUpdateDelta - FrameTime);
-//		Msg("sleep for %d", DSUpdateDelta - FrameTime);
-//		strcat(FPS_str, ", sleeped for ");
-//		strcat(FPS_str, ltoa(DSUpdateDelta - FrameTime, tmp, 10));
-	}
-//	Msg(FPS_str);
-#endif // #ifdef DEDICATED_SERVER
 
 	if (!b_is_Active)
 		Sleep		(1);
@@ -494,8 +438,6 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 //	Msg("pause [%s] timer=[%s] sound=[%s] reason=%s",bOn?"ON":"OFF", bTimer?"ON":"OFF", bSound?"ON":"OFF", reason);
 #endif // DEBUG
 
-#ifndef DEDICATED_SERVER	
-
 	if(bOn)
 	{
 		if(!Paused())						
@@ -538,8 +480,6 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 		}
 	}
 
-#endif
-
 }
 
 BOOL CRenderDevice::Paused()
@@ -549,9 +489,9 @@ BOOL CRenderDevice::Paused()
 
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
 {
-	u16 fActive						= LOWORD(wParam);
-	BOOL fMinimized					= (BOOL) HIWORD(wParam);
-	BOOL bActive					= ((fActive!=WA_INACTIVE) && (!fMinimized))?TRUE:FALSE;
+	const u16 fActive						= LOWORD(wParam);
+	const BOOL fMinimized					= (BOOL) HIWORD(wParam);
+	const BOOL bActive					= ((fActive!=WA_INACTIVE) && (!fMinimized))?TRUE:FALSE;
 	
 	if (bActive!=Device.b_is_Active)
 	{
@@ -560,12 +500,11 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
 		if (Device.b_is_Active)	
 		{
 			Device.seqAppActivate.Process(rp_AppActivate);
-#ifndef DEDICATED_SERVER
+
 #	ifdef INGAME_EDITOR
 			if (!editor())
 #	endif // #ifdef INGAME_EDITOR
 				ShowCursor			(FALSE);
-#endif // #ifndef DEDICATED_SERVER
 		}else	
 		{
 			Device.seqAppDeactivate.Process(rp_AppDeactivate);

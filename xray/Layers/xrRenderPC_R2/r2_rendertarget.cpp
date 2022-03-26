@@ -13,6 +13,8 @@
 #include "blender_ssao.h"
 
 #include "../xrRender/dxRenderDeviceRender.h"
+#include "../../xrEngine/igame_persistent.h"
+#include "../../xrEngine/environment.h"
 
 void	CRenderTarget::u_setrt			(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb)
 {
@@ -187,7 +189,7 @@ CRenderTarget::CRenderTarget		()
 	param_noise_fps		= 25.f;
 	param_noise_scale	= 1.f;
 
-	im_noise_time		= 1/100;
+	im_noise_time		= 1.0f/100.0f;
 	im_noise_shift_w	= 0;
 	im_noise_shift_h	= 0;
 
@@ -686,4 +688,19 @@ void CRenderTarget::increment_light_marker()
 	//if (dwLightMarkerID>10)
 	if (dwLightMarkerID>255)
 		reset_light_marker(true);
+}
+
+bool CRenderTarget::need_to_render_sunshafts()
+{
+	if ( ! (RImplementation.o.advancedpp && ps_r_sun_shafts) )
+		return false;
+
+	{
+		CEnvDescriptor&	E = *g_pGamePersistent->Environment().CurrentEnv;
+		Fcolor sun_color= ((light*)RImplementation.Lights.sun_adapted._get())->color; //dsh:
+		float fValue = E.m_fSunShaftsIntensity * u_diffuse2s(sun_color.r,sun_color.g,sun_color.b);
+		if (fValue<EPS) return false;
+	}
+
+	return true;
 }

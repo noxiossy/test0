@@ -211,7 +211,9 @@ public:
 	void						phase_accumulator		();
 	void						phase_vol_accumulator	();
 	void						shadow_direct			(light* L, u32 dls_phase);
-	
+
+	bool						need_to_render_sunshafts();
+
 	BOOL						enable_scissor			(light* L);		// true if intersects near plane
 	void						enable_dbt_bounds		(light* L);
 

@@ -54,14 +54,8 @@ void CHW::Reset		(HWND hwnd)
 	_RELEASE			(pBaseRT);
 
 #ifndef _EDITOR
-//#ifndef DEDICATED_SERVER
-//	BOOL	bWindowed		= !psDeviceFlags.is	(rsFullscreen);
-//#else
-//	BOOL	bWindowed		= TRUE;
-//#endif
 	BOOL	bWindowed		= TRUE;
-	if (!g_dedicated_server)
-		bWindowed		= !psDeviceFlags.is	(rsFullscreen);
+	bWindowed		= !psDeviceFlags.is	(rsFullscreen);
 
 	selectResolution		(DevPP.BackBufferWidth, DevPP.BackBufferHeight, bWindowed);
 	// Windoze
@@ -95,18 +89,10 @@ void CHW::Reset		(HWND hwnd)
 
 void CHW::CreateD3D	()
 {
-//#ifndef DEDICATED_SERVER
-//	LPCSTR		_name			= "d3d9.dll";
-//#else
-//	LPCSTR		_name			= "xrd3d9-null.dll";
-//#endif
 
 	LPCSTR		_name			= "xrd3d9-null.dll";
 
-#ifndef _EDITOR
-	if (!g_dedicated_server)
-#endif    
-		_name			= "d3d9.dll";
+	_name			= "d3d9.dll";
 
 
 	hD3D            			= LoadLibrary(_name);
@@ -181,14 +167,6 @@ void	CHW::DestroyDevice	()
 void	CHW::selectResolution	(u32 &dwWidth, u32 &dwHeight, BOOL bWindowed)
 {
 	fill_vid_mode_list			(this);
-#ifndef _EDITOR
-	if (g_dedicated_server)
-	{
-		dwWidth		= 640;
-		dwHeight	= 480;
-	}
-	else
-#endif
 	{
 		if(bWindowed)
 		{
@@ -211,7 +189,6 @@ void	CHW::selectResolution	(u32 &dwWidth, u32 &dwHeight, BOOL bWindowed)
 #endif
 		}
 	}
-//#endif
 
 }
 
@@ -221,17 +198,11 @@ void		CHW::CreateDevice		(HWND m_hWnd, bool move_window)
 	CreateD3D				();
 
 	// General - select adapter and device
-//#ifdef DEDICATED_SERVER
-//	BOOL  bWindowed			= TRUE;
-//#else
-//	BOOL  bWindowed			= !psDeviceFlags.is(rsFullscreen);
-//#endif
 
 	BOOL  bWindowed			= TRUE;
 	
 #ifndef _EDITOR
-	if (!g_dedicated_server)
-		bWindowed			= !psDeviceFlags.is(rsFullscreen);
+	bWindowed			= !psDeviceFlags.is(rsFullscreen);
 #else
 	bWindowed				= 1;
 #endif        
@@ -313,7 +284,10 @@ void		CHW::CreateDevice		(HWND m_hWnd, bool move_window)
 	}
 
 	if ((D3DFMT_UNKNOWN==fTarget) || (D3DFMT_UNKNOWN==fTarget))	{
-		Msg					("Failed to initialize graphics hardware.\nPlease try to restart the game.");
+		Msg					("Failed to initialize graphics hardware.\n"
+							 "Please try to restart the game.\n"
+							 "Can not find matching format for back buffer."
+							 );
 		FlushLog			();
 		MessageBox			(NULL,"Failed to initialize graphics hardware.\nPlease try to restart the game.","Error!",MB_OK|MB_ICONERROR);
 		TerminateProcess	(GetCurrentProcess(),0);
@@ -371,7 +345,9 @@ void		CHW::CreateDevice		(HWND m_hWnd, bool move_window)
 	}
 	if (D3DERR_DEVICELOST==R)	{
 		// Fatal error! Cannot create rendering device AT STARTUP !!!
-		Msg					("Failed to initialize graphics hardware.\nPlease try to restart the game.");
+		Msg					("Failed to initialize graphics hardware.\n"
+							 "Please try to restart the game.\n"
+							 "CreateDevice returned 0x%08x(D3DERR_DEVICELOST)", R);
 		FlushLog			();
 		MessageBox			(NULL,"Failed to initialize graphics hardware.\nPlease try to restart the game.","Error!",MB_OK|MB_ICONERROR);
 		TerminateProcess	(GetCurrentProcess(),0);
@@ -472,17 +448,9 @@ BOOL	CHW::support	(D3DFORMAT fmt, DWORD type, DWORD usage)
 
 void	CHW::updateWindowProps	(HWND m_hWnd)
 {
-//	BOOL	bWindowed				= strstr(Core.Params,"-dedicated") ? TRUE : !psDeviceFlags.is	(rsFullscreen);
-//#ifndef DEDICATED_SERVER
-//	BOOL	bWindowed				= !psDeviceFlags.is	(rsFullscreen);
-//#else
-//	BOOL	bWindowed				= TRUE;
-//#endif
-
 	BOOL	bWindowed				= TRUE;
 #ifndef _EDITOR
-	if (!g_dedicated_server)
-		bWindowed			= !psDeviceFlags.is(rsFullscreen);
+	bWindowed			= !psDeviceFlags.is(rsFullscreen);
 #endif	
 
 	u32		dwWindowStyle			= 0;
@@ -507,8 +475,7 @@ void	CHW::updateWindowProps	(HWND m_hWnd)
 			if (strstr(Core.Params, "-center_screen"))	bCenter = TRUE;
 
 #ifndef _EDITOR
-			if (g_dedicated_server)
-				bCenter		= TRUE;
+			bCenter		= TRUE;
 #endif
 
 			if(bCenter){
@@ -546,7 +513,6 @@ void	CHW::updateWindowProps	(HWND m_hWnd)
 	}
 
 #ifndef _EDITOR
-	if (!g_dedicated_server)
 	{
 		ShowCursor	(FALSE);
 		SetForegroundWindow( m_hWnd );
@@ -564,79 +530,6 @@ struct _uniq_mode
 
 #ifndef _EDITOR
 
-/*
-void free_render_mode_list()
-{
-	for( int i=0; vid_quality_token[i].name; i++ )
-	{
-		xr_free					(vid_quality_token[i].name);
-	}
-	xr_free						(vid_quality_token);
-	vid_quality_token			= NULL;
-}
-*/
-/*
-void	fill_render_mode_list()
-{
-	if(vid_quality_token != NULL)		return;
-
-	D3DCAPS9					caps;
-	CHW							_HW;
-	_HW.CreateD3D				();
-	_HW.pD3D->GetDeviceCaps		(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,&caps);
-	_HW.DestroyD3D				();
-	u16		ps_ver_major		= u16 ( u32(u32(caps.PixelShaderVersion)&u32(0xf << 8ul))>>8 );
-
-	xr_vector<LPCSTR>			_tmp;
-	u32 i						= 0;
-	for(; i<5; ++i)
-	{
-		bool bBreakLoop = false;
-		switch (i)
-		{
-		case 3:		//"renderer_r2.5"
-			if (ps_ver_major < 3)
-				bBreakLoop = true;
-			break;
-		case 4:		//"renderer_r_dx10"
-			bBreakLoop = true;
-			break;
-		default:	;
-		}
-
-		if (bBreakLoop) break;
-
-		_tmp.push_back				(NULL);
-		LPCSTR val					= NULL;
-		switch (i)
-		{
-			case 0: val ="renderer_r1";			break;
-			case 1: val ="renderer_r2a";		break;
-			case 2: val ="renderer_r2";			break;
-			case 3: val ="renderer_r2.5";		break;
-			case 4: val ="renderer_r_dx10";		break; //  -)
-		}
-		_tmp.back()					= xr_strdup(val);
-	}
-	u32 _cnt								= _tmp.size()+1;
-	vid_quality_token						= xr_alloc<xr_token>(_cnt);
-
-	vid_quality_token[_cnt-1].id			= -1;
-	vid_quality_token[_cnt-1].name			= NULL;
-
-#ifdef DEBUG
-	Msg("Available render modes[%d]:",_tmp.size());
-#endif // DEBUG
-	for(u32 i=0; i<_tmp.size();++i)
-	{
-		vid_quality_token[i].id				= i;
-		vid_quality_token[i].name			= _tmp[i];
-#ifdef DEBUG
-		Msg							("[%s]",_tmp[i]);
-#endif // DEBUG
-	}
-}
-*/
 void free_vid_mode_list()
 {
 	for( int i=0; vid_mode_token[i].name; i++ )

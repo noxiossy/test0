@@ -1,9 +1,3 @@
-// Blender_Recorder.h: interface for the CBlender_Recorder class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_BLENDER_RECORDER_H__1F549674_8674_4EB2_95E6_E6BC19218A6C__INCLUDED_)
-#define AFX_BLENDER_RECORDER_H__1F549674_8674_4EB2_95E6_E6BC19218A6C__INCLUDED_
 #pragma once
 
 #include "..\tss.h"
@@ -104,6 +98,7 @@ public:
 	void				i_Filter_Mip		(u32 s, u32		f);
 	void				i_Filter_Mag		(u32 s, u32		f);
 	void				i_Filter			(u32 s, u32 _min, u32 _mip, u32 _mag);
+	void				i_BorderColor		(u32 s, u32	color);
 #endif	//	USE_DX10
 
 	// R1/R2-compiler	[programmable]		- templates
@@ -139,5 +134,3 @@ public:
 	ShaderElement* 		_lua_Compile		(LPCSTR namesp, LPCSTR name);
 };
 #pragma pack(pop)
-
-#endif // !defined(AFX_BLENDER_RECORDER_H__1F549674_8674_4EB2_95E6_E6BC19218A6C__INCLUDED_)

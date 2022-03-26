@@ -60,10 +60,6 @@ void CRenderDevice::Reset		(bool precache)
 
 	ShowCursor				(TRUE);
 	u32 tm_start			= TimerAsync();
-	if (g_pGamePersistent){
-
-//.		g_pGamePersistent->Environment().OnDeviceDestroy();
-	}
 
 	m_pRender->Reset( m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
@@ -82,9 +78,7 @@ void CRenderDevice::Reset		(bool precache)
 	//	TODO: Remove this! It may hide crash
 	Memory.mem_compact();
 
-#ifndef DEDICATED_SERVER
 	ShowCursor	(FALSE);
-#endif
 		
 	seqDeviceReset.Process(rp_DeviceReset);
 
