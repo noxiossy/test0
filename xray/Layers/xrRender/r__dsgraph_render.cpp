@@ -530,6 +530,8 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 // strict-sorted render
 void	R_dsgraph_structure::r_dsgraph_render_sorted	()
 {
+	extern ENGINE_API float		psHUD_FOV;
+
 	// Sorted (back to front)
 	mapSorted.traverseRL	(sorted_L1);
 	mapSorted.clear			();
