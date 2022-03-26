@@ -51,7 +51,7 @@ void	uber_deffer	(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BO
 		strcat(ps,"_aref");	
 	}
 
-	if	(!bump)		
+	if	(!bump || ::Render->is_simple_static())		
 	{
 		fnameA[0] = fnameB[0] = 0;
 		strcat			(vs,"_flat");
@@ -86,7 +86,7 @@ void	uber_deffer	(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BO
 	}
 
 	// HQ
-	if (bump && hq)
+	if (bump && hq && !::Render->is_simple_static())
 	{
 		strcat			(vs,"-hq");
 		strcat			(ps,"-hq");

@@ -9,6 +9,9 @@ extern ECORE_API	xr_token	qsun_shafts_token[];
 extern ECORE_API	u32			ps_r_ssao;			//	=	0;
 extern ECORE_API	xr_token	qssao_token[];
 
+extern ECORE_API	u32			ps_r_ssao_mode;
+extern ECORE_API	xr_token	qssao_mode_token[];
+
 extern ECORE_API	u32			ps_r_sun_quality;	//	=	0;
 extern ECORE_API	xr_token	qsun_quality_token[];
 
@@ -166,24 +169,20 @@ enum
 
 	R2FLAG_DETAIL_BUMP			= (1<<25),
 
-	R3FLAG_DYN_WET_SURF			= (1<<26),
-	R3FLAG_VOLUMETRIC_SMOKE		= (1<<27),
-
-	//R3FLAG_MSAA					= (1<<28),
-	R3FLAG_MSAA_HYBRID			= (1<<28),
-	R3FLAG_MSAA_OPT				= (1<<29),
-	R3FLAG_GBUFFER_OPT			= (1<<30),
-	R3FLAG_USE_DX10_1			= (1<<31),
-	//R3FLAG_MSAA_ALPHATEST		= (1<<31),
 };
 
 enum
 {
-	R2FLAGEXT_SSAO_BLUR			= (1<<0),
-	R2FLAGEXT_SSAO_OPT_DATA		= (1<<1),
-	R2FLAGEXT_SSAO_HALF_DATA	= (1<<2),
-	R2FLAGEXT_SSAO_HBAO			= (1<<3),
-	R2FLAGEXT_SSAO_HDAO			= (1<<4)
+	R2FLAGEXT_SSAO_BLUR				= (1<<0),
+	R2FLAGEXT_SSAO_OPT_DATA			= (1<<1),
+	R2FLAGEXT_SSAO_HALF_DATA		= (1<<2),
+	R2FLAGEXT_SSAO_HBAO				= (1<<3),
+	R2FLAGEXT_SSAO_HDAO				= (1<<4),
+	R2FLAGEXT_ENABLE_TESSELLATION	= (1<<5),
+	R2FLAGEXT_WIREFRAME				= (1<<6),
+	R_FLAGEXT_HOM_DEPTH_DRAW		= (1<<7),
+	R2FLAGEXT_SUN_ZCULLING			= (1<<8),
+	R2FLAGEXT_SUN_OLD				= (1<<9),
 };
 
 extern void						xrRender_initconsole	();

@@ -49,6 +49,9 @@
     <Filter Include="Core_Target">
       <UniqueIdentifier>{40ecda0a-db97-457e-b158-c23202d03dea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core_Target\ColorMap">
+      <UniqueIdentifier>{801a4b85-5cb6-466a-942c-f8f7452720c1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Refactored">
       <UniqueIdentifier>{0b56ffbd-5c9d-478b-8ef2-68749e61435e}</UniqueIdentifier>
     </Filter>
@@ -192,6 +195,9 @@
     <ClInclude Include="..\xrRender\r__pixel_calculator.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\r_sun_cascades.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="doug_lea_memory_allocator.h">
       <Filter>Core\memory</Filter>
     </ClInclude>
@@ -268,6 +274,9 @@
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="blender_light_direct.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="blender_light_direct_cascade.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="blender_light_mask.h">
@@ -353,6 +362,9 @@
     </ClInclude>
     <ClInclude Include="r2_rendertarget_wallmarks.h">
       <Filter>Core_Target</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ColorMapManager.h">
+      <Filter>Core_Target\ColorMap</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\HW.h">
       <Filter>Refactored\HW</Filter>
@@ -779,6 +791,9 @@
     <ClCompile Include="blender_light_direct.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
+    <ClCompile Include="blender_light_direct_cascade.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
     <ClCompile Include="blender_light_mask.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
@@ -922,6 +937,9 @@
     </ClCompile>
     <ClCompile Include="r2_rendertarget_phase_ssao.cpp">
       <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ColorMapManager.cpp">
+      <Filter>Core_Target\ColorMap</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\HW.cpp">
       <Filter>Refactored\HW</Filter>

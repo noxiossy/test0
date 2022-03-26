@@ -273,7 +273,11 @@ void dxEnvironmentRender::RenderSky(CEnvironment &env)
 
 	// Sun
 	::Render->rmNormal			();
-	env.eff_LensFlare->Render		(TRUE,FALSE,FALSE);
+	RCache.set_Z(FALSE);
+	RCache.set_Z(TRUE);
+ 	env.eff_LensFlare->Render		(TRUE,FALSE,FALSE);
+	RCache.set_Z(FALSE);
+
 }
 
 void dxEnvironmentRender::RenderClouds(CEnvironment &env)

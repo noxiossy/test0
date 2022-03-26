@@ -11,7 +11,7 @@ before_build:
 
     echo %CONFIGURATION%
 
-    echo cs_%APPVEYOR_REPO_TAG_NAME%_%PLATFORM%.7z
+    echo %APPVEYOR_REPO_TAG_NAME%_%PLATFORM%.7z
 build:
   project: ./engine.sln
   verbosity: minimal
@@ -39,19 +39,21 @@ after_build:
 
     copy intermediate\%PLATFORM%-%CONFIGURATION%\*.dll dist\engine\bin_%COR_PLAT%\
 
-    echo appveyor PushArtifact cs_%APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z release
+    copy SDK\binaries\%PLATFORM%\*.dll dist\engine\bin_%COR_PLAT%\
+
+    echo appveyor PushArtifact %APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z release
 
     cd dist\engine
 
-    7z a ..\..\cs_%APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z
+    7z a ..\..\%APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z
 
     cd ..\..
 
-    echo appveyor PushArtifact cs_%APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z release
+    echo appveyor PushArtifact %APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z release
 
-    copy cs_%APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z cs_%APPVEYOR_VERSION%.7z
+    copy %APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z %APPVEYOR_VERSION%.7z
 
-    appveyor PushArtifact cs_%APPVEYOR_VERSION%.7z
+    appveyor PushArtifact %APPVEYOR_VERSION%.7z
 artifacts:
-- path: .\cs_$(appveyor_repo_tag_name)_$(cor_plat).7z
+- path: .\$(appveyor_repo_tag_name)_$(cor_plat).7z
   name: release
