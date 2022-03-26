@@ -83,6 +83,8 @@ xr_token							qminmax_sm_token					[ ]={
 extern int			psSkeletonUpdate;
 extern float		r__dtex_range;
 
+Flags32 ps_r__common_flags = { RFLAG_NO_RAM_TEXTURES }; // All renders
+
 //int		ps_r__Supersample			= 1		;
 int			ps_r__LightSleepFrames		= 10	;
 
@@ -304,9 +306,6 @@ class CCC_Screenshot : public IConsole_Command
 public:
 	CCC_Screenshot(LPCSTR N) : IConsole_Command(N)  { };
 	virtual void Execute(LPCSTR args) {
-		if (g_dedicated_server)
-			return;
-
 		string_path	name;	name[0]=0;
 		sscanf		(args,"%s",	name);
 		LPCSTR		image	= xr_strlen(name)?name:0;
@@ -640,6 +639,8 @@ void		xrRender_initconsole	()
 	CMD4(CCC_Vector3,	"r__d_tree_wave",		&ps_r__Tree_Wave,			tw_min, tw_max	);
 #endif // DEBUG
 
+    CMD3(CCC_Mask, 		"r__no_ram_textures", 	&ps_r__common_flags, 		RFLAG_NO_RAM_TEXTURES);
+
 	CMD2(CCC_tf_Aniso,	"r__tf_aniso",			&ps_r__tf_Anisotropic		); //	{1..16}
 
 	// R1
@@ -737,6 +738,8 @@ void		xrRender_initconsole	()
 	CMD4(CCC_Float,		"r2_dhemi_light_scale",	&ps_r2_dhemi_light_scale,	0,		100.f	);
 	CMD4(CCC_Float,		"r2_dhemi_light_flow",	&ps_r2_dhemi_light_flow,	0,		1.f	);
 	CMD4(CCC_Float,		"r2_dhemi_smooth",		&ps_r2_lt_smooth,			0.f,	10.f	);
+	CMD3(CCC_Mask,		"rs_hom_depth_draw",	&ps_r2_ls_flags_ext,		R_FLAGEXT_HOM_DEPTH_DRAW);
+	
 #endif // DEBUG
 
 	CMD3(CCC_Mask,		"r2_shadow_cascede_zcul",&ps_r2_ls_flags_ext,		R2FLAGEXT_SUN_ZCULLING);

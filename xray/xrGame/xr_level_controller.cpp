@@ -370,8 +370,11 @@ void GetActionAllBinding		(LPCSTR _action, char* dst_buff, int dst_buff_sz)
 	{
 		strcpy_s(sec, pbinding->m_keyboard[1]->key_local_name.c_str());
 	}
-	
-	sprintf_s		(dst_buff, dst_buff_sz, "%s%s%s", prim[0]?prim:"", (sec[0]&&prim[0])?" , ":"", sec[0]?sec:"");
+	if(NULL==pbinding->m_keyboard[0] && NULL==pbinding->m_keyboard[1])
+	{
+		sprintf_s		(dst_buff, dst_buff_sz, "%s", CStringTable().translate("st_key_notbinded").c_str());
+	}else
+		sprintf_s		(dst_buff, dst_buff_sz, "%s%s%s", prim[0]?prim:"", (sec[0]&&prim[0])?" , ":"", sec[0]?sec:"");
 					
 }
 
@@ -439,7 +442,7 @@ public:
 	virtual void Save(IWriter* F) 
 	{
 		if(m_work_idx==0)
-			F->w_printf		("unbindall\r\n");
+			F->w_printf		("default_controls\r\n");
 
 		for(int idx=0; idx<bindings_count;++idx)
 		{
