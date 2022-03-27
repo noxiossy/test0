@@ -2,9 +2,9 @@
 #include "xrserver.h"
 #include "xrmessages.h"
 
-#if 1//def DEBUG
+//#if 1//def DEBUG
 #	define USE_DESIGNER_KEY
-#endif
+//#endif
 
 #ifdef USE_DESIGNER_KEY
 #	include "xrServer_Objects_ALife_Monsters.h"
