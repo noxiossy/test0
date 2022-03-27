@@ -4,6 +4,7 @@
 #include "object_broker.h"
 #include "UICellItem.h"
 
+#include "../HUDManager.h"
 #include "../Include/xrRender/UIRender.h"
 #include "../Include/xrRender/UIShader.h"
 
@@ -142,7 +143,7 @@ void CUIDragDropListEx::DestroyDragItem()
 
 Fvector2 CUIDragDropListEx::GetDragItemPosition()
 {
-	return (GetUICursor()->GetCursorPosition()); //return m_drag_item->GetPosition();
+	return m_drag_item->GetPosition(); 
 }
 
 void CUIDragDropListEx::OnItemStartDragging(CUIWindow* w, void* pData)
@@ -290,8 +291,6 @@ void CUIDragDropListEx::Compact()
 	}
 }
 
-
-#include "../HUDManager.h"
 void CUIDragDropListEx::Draw()
 {
 	inherited::Draw				();
