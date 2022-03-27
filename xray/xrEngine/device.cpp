@@ -29,6 +29,7 @@
 #include "igame_persistent.h"
 
 ENGINE_API CRenderDevice Device;
+ENGINE_API CLoadScreenRenderer load_screen_renderer;
 ENGINE_API BOOL g_bRendering = FALSE; 
 u32 g_dwFPSlimit = 60;
 
@@ -181,7 +182,7 @@ void 			mt_Thread	(void *ptr)	{
 }
 
 #include "igame_level.h"
-void CRenderDevice::PreCache	(u32 amount)
+void CRenderDevice::PreCache	(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
 {
 	//if (HW.Caps.bForceGPU_REF)	amount=0;
 	if (m_pRender->GetForceGPU_REF()) amount=0;
@@ -195,8 +196,12 @@ void CRenderDevice::PreCache	(u32 amount)
 		precache_light->set_range		(5.0f);
 		precache_light->set_active		(true);
 	}
-}
 
+        if(amount && b_draw_loadscreen && load_screen_renderer.b_registered==false)
+	{
+		load_screen_renderer.start	(b_wait_user_input);
+	}
+}
 
 int g_svDedicateServerUpdateReate = 100;
 
@@ -374,12 +379,16 @@ void CRenderDevice::Run			()
 //	DeleteCriticalSection	(&mt_csLeave);
 }
 
+u32 app_inactive_time		= 0;
+u32 app_inactive_time_start = 0;
+
 void ProcessLoading(RP_FUNC *f);
 void CRenderDevice::FrameMove()
 {
 	dwFrame			++;
 
-	dwTimeContinual	= TimerMM.GetElapsed_ms	();
+	dwTimeContinual	= TimerMM.GetElapsed_ms() - app_inactive_time;
+
 	if (psDeviceFlags.test(rsConstantFPS))	{
 		// 20ms = 50fps
 		//fTimeDelta		=	0.020f;			
@@ -500,6 +509,7 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
 		if (Device.b_is_Active)	
 		{
 			Device.seqAppActivate.Process(rp_AppActivate);
+			app_inactive_time		+= TimerMM.GetElapsed_ms() - app_inactive_time_start;
 
 #	ifdef INGAME_EDITOR
 			if (!editor())
@@ -507,10 +517,36 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
 				ShowCursor			(FALSE);
 		}else	
 		{
+			app_inactive_time_start	= TimerMM.GetElapsed_ms();
 			Device.seqAppDeactivate.Process(rp_AppDeactivate);
 			ShowCursor				(TRUE);
 		}
 	}
+}
+
+CLoadScreenRenderer::CLoadScreenRenderer()
+:b_registered(false)
+{}
+
+void CLoadScreenRenderer::start(bool b_user_input) 
+{
+	Device.seqRender.Add			(this, 0);
+	b_registered					= true;
+	b_need_user_input				= b_user_input;
+}
+
+void CLoadScreenRenderer::stop()
+{
+	if(!b_registered)				return;
+	Device.seqRender.Remove			(this);
+	pApp->destroy_loading_shaders	();
+	b_registered					= false;
+	b_need_user_input				= false;
+}
+
+void CLoadScreenRenderer::OnRender() 
+{
+	pApp->load_draw_internal();
 }
 
 void CRenderDevice::time_factor(const float& time_factor)

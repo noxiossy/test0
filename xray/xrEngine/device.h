@@ -145,7 +145,7 @@ public:
 	BOOL	Paused							();
 
 	// Scene control
-	void PreCache							(u32 frames);
+	void PreCache							(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input);
 	BOOL Begin								();
 	void Clear								();
 	void End								();
@@ -230,5 +230,19 @@ typedef fastdelegate::FastDelegate0<bool>		LOADING_EVENT;
 extern	ENGINE_API xr_list<LOADING_EVENT>		g_loading_events;
 
 //#include	"R_Backend_Runtime.h"
+
+
+class ENGINE_API CLoadScreenRenderer :public pureRender
+{
+public:
+					CLoadScreenRenderer	();
+	void			start				(bool b_user_input);
+	void			stop				();
+	virtual void	OnRender			();
+
+	bool			b_registered;
+	bool			b_need_user_input;
+};
+extern ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
 #endif

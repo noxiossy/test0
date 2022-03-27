@@ -113,6 +113,7 @@ public:
 	{}
 #endif
 	virtual	void					LoadTitle			(LPCSTR str){}
+	virtual	void					LoadTitleAdd			(bool change_tip=false){}
 	virtual bool					CanBePaused			()		{ return true;}
 };
 

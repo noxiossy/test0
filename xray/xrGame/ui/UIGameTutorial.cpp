@@ -3,34 +3,59 @@
 #include "UIWindow.h"
 #include "UIStatic.h"
 #include "UIXmlInit.h"
-#include "object_broker.h"
+#include "../../xrServerEntities/object_broker.h"
 #include "../../xrEngine/xr_input.h"
 #include "../xr_level_controller.h"
 #include "../../xrServerEntities/script_engine.h"
 #include "../ai_space.h"
+#include "../../xrEngine/xr_ioconsole.h"
+#include "../UIGameCustom.h"
+#include "UIActorMenu.h"
+#include "UIPdaWnd.h"
+
+extern ENGINE_API BOOL bShowPauseString;
+
+void CallFunction(shared_str const& func)
+{
+	luabind::functor<void>		functor_to_call;
+	bool functor_exists			= ai().script_engine().functor(func.c_str() ,functor_to_call);
+	THROW3						(functor_exists, "Cannot find script function described in tutorial item ", func.c_str());
+	if( functor_to_call.is_valid() ) 
+		functor_to_call();
+}
+
+void CallFunctions(xr_vector<shared_str>& v)
+{
+	xr_vector<shared_str>::const_iterator it	= v.begin();
+	for(;it!=v.end();++it)
+		CallFunction(*it);
+}
 
 void CUISequenceItem::Load(CUIXml* xml, int idx)
 {
 	XML_NODE* _stored_root			= xml->GetLocalRoot();
 	xml->SetLocalRoot				(xml->NavigateToNode("item",idx));
 	int disabled_cnt				= xml->GetNodesNum	(xml->GetLocalRoot(), "disabled_key");
-	for(int i=0; i<disabled_cnt;++i){
+	
+	for(int i=0; i<disabled_cnt; ++i)
+	{
 		LPCSTR str					= xml->Read			("disabled_key", i, NULL);
 		m_disabled_actions.push_back( action_name_to_id(str) );
-	};
+	}
 
 	int			j;
 	int			f_num				= xml->GetNodesNum(xml->GetLocalRoot(),"function_on_start");
 	m_start_lua_functions.resize	(f_num);
-	for(j=0; j<f_num; ++j){
+	for(j=0; j<f_num; ++j)
 		m_start_lua_functions[j]	= xml->Read(xml->GetLocalRoot(), "function_on_start", j, NULL);
-	}
 	
 	f_num							= xml->GetNodesNum(xml->GetLocalRoot(),"function_on_stop");
-	m_stop_lua_functions.resize	(f_num);
-	for(j=0; j<f_num; ++j){
+	m_stop_lua_functions.resize		(f_num);
+	for(j=0; j<f_num; ++j)
 		m_stop_lua_functions[j]		= xml->Read(xml->GetLocalRoot(), "function_on_stop", j, NULL);
-	}
+
+	m_check_lua_function			= xml->Read(xml->GetLocalRoot(), "function_check_start", 0, NULL);
+	m_onframe_lua_function			= xml->Read(xml->GetLocalRoot(), "function_on_frame", 0, NULL);
 
 	xml->SetLocalRoot				(_stored_root);
 }
@@ -44,22 +69,20 @@ bool CUISequenceItem::AllowKey(int dik)
 		return false;
 }
 
-void CallFunctions	(xr_vector<shared_str>& v)
+void CUISequenceItem::Update()
 {
-	xr_vector<shared_str>::iterator it	= v.begin();
-	for(;it!=v.end();++it)
-	{
-		luabind::functor<void>		lua_functor;
-		bool functor_exists			= ai().script_engine().functor((*it).c_str(),lua_functor);
-		THROW3						(functor_exists, "Cannot find script function described in tutorial item ", (*it).c_str());
-		if( lua_functor.is_valid() ) 
-			lua_functor();
-	}
+	if( m_onframe_functor.is_valid() ) 
+		m_onframe_functor(current_factor());
 }
 
 void CUISequenceItem::Start()
 {
 	CallFunctions(m_start_lua_functions);
+	if(m_onframe_lua_function.size())
+	{
+		bool functor_exists			= ai().script_engine().functor(m_onframe_lua_function.c_str() ,m_onframe_functor);
+		THROW3						(functor_exists, "Cannot find script function described in tutorial item ", m_onframe_lua_function.c_str());
+	}
 }
 
 bool CUISequenceItem::Stop(bool bForce)
@@ -70,31 +93,62 @@ bool CUISequenceItem::Stop(bool bForce)
 
 CUISequencer::CUISequencer()
 {
-	m_bActive					= false;
-	m_bPlayEachItem				= false;
+	m_flags.zero();
 }
 
 void CUISequencer::Start(LPCSTR tutor_name)
 {
 	VERIFY(m_items.size()==0);
 	Device.seqFrame.Add			(this, REG_PRIORITY_LOW-10000);
-	Device.seqRender.Add		(this, 3);
+	
 	
 	m_UIWindow					= xr_new<CUIWindow>();
 
 	CUIXml uiXml;
 	uiXml.Load					(CONFIG_PATH, UI_PATH, "game_tutorials.xml");
 	
-	int items_count				= uiXml.GetNodesNum	(tutor_name,0,"item");	VERIFY(items_count>0);
-	uiXml.SetLocalRoot			(uiXml.NavigateToNode(tutor_name,0));
+	int items_count				= uiXml.GetNodesNum	(tutor_name, 0, "item");	VERIFY(items_count>0);
+	uiXml.SetLocalRoot			(uiXml.NavigateToNode(tutor_name, 0));
 
-	m_bPlayEachItem				= !!uiXml.ReadInt("play_each_item",0,0);
+	m_flags.set(etsPlayEachItem, !!uiXml.ReadInt("play_each_item", 0, 0));
+	m_flags.set(etsPersistent, !!uiXml.Read("persistent", 0, 0));
+	m_flags.set(etsOverMainMenu, !!uiXml.Read("over_main_menu", 0, 0));
+	int render_prio				= uiXml.ReadInt("render_prio", 0, -2);
 
 	CUIXmlInit xml_init;
-	xml_init.InitWindow			(uiXml, "global_wnd", 0,	m_UIWindow);
+	if(UI()->is_16_9_mode() && uiXml.NavigateToNode("global_wnd_16", 0) )
+	{
+		//xml_init.AssignColor	("tut_gray", color_rgba(255,255,255,255));
+		xml_init.InitWindow		(uiXml, "global_wnd_16", 0, m_UIWindow);
+	}else
+	{
+		//xml_init.AssignColor	("tut_gray", color_rgba(100,100,100,255));
+		xml_init.InitWindow		(uiXml, "global_wnd", 0, m_UIWindow);
+	}
 
-	for(int i=0;i<items_count;++i){
-		LPCSTR	_tp				= uiXml.ReadAttrib			("item",i,"type","");
+	
+	XML_NODE* bk				= uiXml.GetLocalRoot();
+	uiXml.SetLocalRoot			(uiXml.NavigateToNode("global_wnd", 0));
+	{	
+		LPCSTR str				= uiXml.Read		("pause_state", 0, "ignore");
+		m_flags.set				(etsNeedPauseOn,	0==_stricmp(str, "on"));
+		m_flags.set				(etsNeedPauseOff,	0==_stricmp(str, "off"));
+	}
+
+	LPCSTR snd_name				= uiXml.Read("sound", 0, "");
+	if (snd_name && snd_name[0])
+	{
+		m_global_sound.create	(snd_name, st_Effect,sg_Undefined);	
+		VERIFY					(m_global_sound._handle() || strstr(Core.Params,"-nosound"));
+	}
+	m_start_lua_function		= uiXml.Read("function_on_start", 0, "");
+	m_stop_lua_function			= uiXml.Read("function_on_stop", 0, "");
+
+	uiXml.SetLocalRoot			(bk);
+
+	for(int i=0;i<items_count;++i)
+	{
+		LPCSTR	_tp				= uiXml.ReadAttrib("item",i,"type","");
 		bool bVideo				= 0==_stricmp(_tp,"video");
 		CUISequenceItem* pItem	= 0;
 		if (bVideo)	pItem		= xr_new<CUISequenceVideoItem>(this);
@@ -103,28 +157,101 @@ void CUISequencer::Start(LPCSTR tutor_name)
 		pItem->Load				(&uiXml,i);
 	}
 
-	CUISequenceItem* pCurrItem	= m_items.front();
+	Device.seqRender.Add		(this, render_prio /*-2*/);
+	
+	CUISequenceItem* pCurrItem	= GetNextItem();
+	R_ASSERT3					(pCurrItem, "no item(s) to start", tutor_name);
 	pCurrItem->Start			();
 	m_pStoredInputReceiver		= pInput->CurrentIR();
 	IR_Capture					();
-	m_bActive					= true;
+
+
+	m_flags.set					(etsActive, TRUE);
+	m_flags.set					(etsStoredPauseState, Device.Paused());
+	
+	if(m_flags.test(etsNeedPauseOn) && !m_flags.test(etsStoredPauseState))
+	{
+		Device.Pause			(TRUE, TRUE, TRUE, "tutorial_start");
+		bShowPauseString		= FALSE;
+	}
+
+	if(m_flags.test(etsNeedPauseOff) && m_flags.test(etsStoredPauseState))
+		Device.Pause			(FALSE, TRUE, FALSE, "tutorial_start");
+
+	if (m_global_sound._handle())		
+		m_global_sound.play(NULL, sm_2D);
+
+	if(m_start_lua_function.size())
+		CallFunction(m_start_lua_function);
 }
+
+CUISequenceItem* CUISequencer::GetNextItem()
+{
+	CUISequenceItem* result			= NULL;
+
+	while(m_items.size())
+	{
+		luabind::functor<bool>		functor_to_call;
+		result						= m_items.front();
+		shared_str const f			= result->m_check_lua_function;
+		if(f.size()==0)
+			break;
+
+		bool functor_exists			= ai().script_engine().functor(f.c_str() ,functor_to_call);
+		THROW3						(functor_exists, "Cannot find script function described in tutorial item ", f.c_str());
+		
+		bool call_result			= true;
+		if( functor_to_call.is_valid() ) 
+			call_result	= functor_to_call();
+
+		if(!call_result)
+		{
+			m_items.pop_front();
+			result					= NULL;
+		}else
+		{
+			break;
+		}
+	}
+
+	return result;
+}
+
+extern CUISequencer * g_tutorial;
+extern CUISequencer * g_tutorial2;
 
 void CUISequencer::Destroy()
 {
+	if(m_stop_lua_function.size())
+		CallFunction(m_stop_lua_function);
+
+	m_global_sound.stop			();
 	Device.seqFrame.Remove		(this);
 	Device.seqRender.Remove		(this);
 	delete_data					(m_items);
 	delete_data					(m_UIWindow);
 	IR_Release					();
-	m_bActive					= false;
+	m_flags.set					(etsActive, FALSE);
 	m_pStoredInputReceiver		= NULL;
+	
+	if(!m_on_destroy_event.empty())
+		m_on_destroy_event		();
+
+	if(g_tutorial==this)
+	{
+		g_tutorial = NULL;
+	}
+	if(g_tutorial2==this)
+	{
+		g_tutorial2 = NULL;
+	}
 }
 
 void CUISequencer::Stop()
 {
 	if(m_items.size()){ 
-		if (m_bPlayEachItem){
+		if (m_flags.test(etsPlayEachItem))
+		{
 			Next				();
 			return;
 		}else{
@@ -132,13 +259,20 @@ void CUISequencer::Stop()
 			pCurrItem->Stop		(true);
 		}
 	}
+	{
+	if(m_flags.test(etsNeedPauseOn) && !m_flags.test(etsStoredPauseState))
+		Device.Pause			(FALSE, TRUE, TRUE, "tutorial_stop");
+
+	if(m_flags.test(etsNeedPauseOff) && m_flags.test(etsStoredPauseState))
+		Device.Pause			(TRUE, TRUE, FALSE, "tutorial_stop");
+	}
 	Destroy			();
 }
 
 void CUISequencer::OnFrame()
 {  
-	if(!m_bActive)				
-		return;
+	if(!Device.b_is_Active)		return;
+	if(!IsActive() )			return;
 
 	if(!m_items.size()){
 		Stop					();
@@ -155,6 +289,7 @@ void CUISequencer::OnFrame()
 		return;
 	}
 
+	VERIFY(m_items.front());
 	m_items.front()->Update		();
 	m_UIWindow->Update			();
 }
@@ -180,8 +315,9 @@ void CUISequencer::Next		()
 
 	if(m_items.size())
 	{
-		pCurrItem				= m_items.front();
-		pCurrItem->Start		();
+		pCurrItem				= GetNextItem();
+		if(pCurrItem)
+			pCurrItem->Start	();
 	}
 }
 
@@ -196,6 +332,9 @@ bool CUISequencer::GrabInput()
 
 void CUISequencer::IR_OnMousePress		(int btn)
 {
+	if(m_items.size())	
+		m_items.front()->OnMousePress	(btn);
+
 	if(!GrabInput()&&m_pStoredInputReceiver)
 		m_pStoredInputReceiver->IR_OnMousePress(btn);
 }
@@ -251,7 +390,8 @@ void CUISequencer::IR_OnKeyboardPress	(int dik)
 	bool b = true;
 	if(m_items.size()) b &= m_items.front()->AllowKey(dik);
 
-	if(b && is_binded(kQUIT, dik) )
+	bool binded = is_binded(kQUIT, dik);
+	if(b && binded )
 	{
 		Stop		();
 		return;

@@ -21,6 +21,11 @@ class ENGINE_API CApplication	:
 		char*				name;
 	};
 	string256				app_title;
+public:
+	string2048				ls_header;
+	string2048				ls_tip_number;
+	string2048				ls_tip;
+
 private:
 	FactoryPtr<IApplicationRender>	m_pRender;
 
@@ -39,6 +44,7 @@ private:
 	void					Level_Append		(LPCSTR lname);
 public:
 	CGameFont*				pFontSystem;
+	CGameFont*				pFontSystemAdd;
 
 	// Levels
 	xr_vector<sLevelInfo>	Levels;
@@ -53,6 +59,7 @@ public:
 	void					LoadBegin			();
 	void					LoadEnd				();
 	void					LoadTitleInt		(LPCSTR str);
+	void					LoadTitleIntAdd		(LPCSTR str1, LPCSTR str2, LPCSTR str3);
 	void					LoadSwitch			();
 	void					LoadDraw			();
 

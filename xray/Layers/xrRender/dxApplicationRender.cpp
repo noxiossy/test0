@@ -2,8 +2,9 @@
 
 #include "dxApplicationRender.h"
 #include "../../xrEngine/x_ray.h"
-
 #include "../../xrEngine/GameFont.h"
+
+void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText);
 
 void dxApplicationRender::Copy(IApplicationRender &_in)
 {
@@ -47,14 +48,14 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 	RCache.set_ZB(HW.pBaseZB);
 #endif	//	USE_DX10
 
-	if(!sh_progress)
-	{
 #ifdef	USE_DX10
 		FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 		HW.pDevice->ClearRenderTargetView( RCache.get_RT(), ColorRGBA);
 #else	//	USE_DX10
 		CHK_DX			(HW.pDevice->Clear(0,0,D3DCLEAR_TARGET,D3DCOLOR_ARGB(0,0,0,0),1,0));
 #endif	//	USE_DX10
+	if(!sh_progress)
+	{
 		return;
 	}
 
@@ -206,6 +207,21 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 	owner.pFontSystem->OutI			(0.f,0.815f,owner.app_title);
 	owner.pFontSystem->OnRender		();
 
+	// Draw title Add
+	VERIFY							(owner.pFontSystemAdd);
+	owner.pFontSystemAdd->Clear		();
+	owner.pFontSystemAdd->SetColor		(color_rgba(103,103,103,255));
+	owner.pFontSystemAdd->SetAligment	(CGameFont::alCenter);
+	back_size.set					(_w/2,622.0f*k.y);
+	owner.pFontSystemAdd->OutSet		(back_size.x, back_size.y);
+	owner.pFontSystemAdd->OutNext		(owner.ls_header);
+	owner.pFontSystemAdd->OutNext		("");
+	owner.pFontSystemAdd->OutNext		(owner.ls_tip_number);
+
+	float fTargetWidth				= 600.0f*k.x*(b_ws?0.8f:1.0f);
+	draw_multiline_text				(owner.pFontSystemAdd, fTargetWidth, owner.ls_tip);
+
+	owner.pFontSystemAdd->OnRender	();
 
 	//draw level-specific screenshot
 	if(hLevelLogo)
@@ -273,6 +289,55 @@ void dxApplicationRender::draw_face(ref_shader& sh, Frect& coords, Frect& tex_co
 	RCache.set_Shader			(sh);
 	RCache.set_Geometry			(ll_hGeom);
 	RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+}
+
+#define IsSpace(ch)       ((ch) == ' ' || (ch) == '\t' || (ch) == '\r' || (ch) == '\n' || (ch) == ',' || (ch) == '.' || (ch) == ':' || (ch) == '!')
+
+void parse_word(LPCSTR str, CGameFont* font, float& length, LPCSTR& next_word)
+{
+	length				= 0.0f;
+	while(*str && !IsSpace(*str))
+	{
+//		length  += font->GetCharTC(*str).z;
+		length  += font->SizeOf_(*str);
+		++str;
+	}
+	next_word = (*str) ? str+1 : str;
+}
+
+void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText)
+{
+	if(!pszText || xr_strlen(pszText)==0)
+		return;
+
+	LPCSTR ch			= pszText;
+	float curr_word_len		= 0.0f;
+	LPCSTR next_word		= NULL;
+
+	float curr_len			= 0.0f;
+	string512			buff;
+	buff[0]				= 0;
+	while(*ch)
+	{
+		parse_word			(ch, F, curr_word_len, next_word);
+		if(curr_len+curr_word_len > fTargetWidth)
+		{
+			F->OutNext		(buff);
+			curr_len		= 0.0f;
+			buff[0]			= 0;
+		}else
+		{
+			curr_len		+= curr_word_len;
+			strncpy_s		(buff+xr_strlen(buff), sizeof(buff)-xr_strlen(buff), ch, next_word-ch);
+			ch				= next_word;
+		}
+		if(0==*next_word) //end of text
+		{
+			strncpy_s		(buff+xr_strlen(buff), sizeof(buff)-xr_strlen(buff), ch, next_word-ch);
+			F->OutNext		(buff);
+			break;
+		}
+	}
 }
 
 u32 calc_progress_color(u32 idx, u32 total, int stage, int max_stage)

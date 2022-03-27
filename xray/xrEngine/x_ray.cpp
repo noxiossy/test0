@@ -789,6 +789,7 @@ CApplication::CApplication()
 
 	// Font
 	pFontSystem					= NULL;
+	pFontSystemAdd					= NULL;
 
 	// Register us
 	Device.seqFrame.Add			(this, REG_PRIORITY_HIGH+1000);
@@ -800,6 +801,9 @@ CApplication::CApplication()
 
 	// App Title
 	app_title[ 0 ] = '\0';
+	ls_header[ 0 ] = '\0';
+	ls_tip_number[ 0 ] = '\0';
+	ls_tip[ 0 ] = '\0';
 }
 
 CApplication::~CApplication()
@@ -809,6 +813,8 @@ CApplication::~CApplication()
 	// font
 	Device.seqRender.Remove		( pFontSystem		);
 	xr_delete					( pFontSystem		);
+	Device.seqRender.Remove		( pFontSystemAdd		);
+	xr_delete					( pFontSystemAdd		);
 
 	Device.seqFrameMT.Remove	(&SoundProcessor);
 	Device.seqFrame.Remove		(&SoundProcessor);
@@ -864,6 +870,10 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 	} 
 	else if (E==eDisconnect) 
 	{
+		ls_header[0] = '\0';
+		ls_tip_number[0] = '\0';
+		ls_tip[0] = '\0';
+
 		if (g_pGameLevel) 
 		{
 			Console->Hide			();
@@ -899,6 +909,7 @@ void CApplication::LoadBegin	()
 		g_appLoaded			= FALSE;
 
 		_InitializeFont		(pFontSystem,"ui_font_graffiti19_russian",0);
+		_InitializeFont		(pFontSystemAdd,"ui_font_letterica18_russian",0);
 
 		m_pRender->LoadBegin();
 		phase_timer.Start	();
@@ -959,6 +970,14 @@ void CApplication::LoadTitleInt(LPCSTR str)
 		max_load_stage			= 14;
 
 	LoadDraw					();
+}
+
+void CApplication::LoadTitleIntAdd(LPCSTR str1, LPCSTR str2, LPCSTR str3)
+{
+	strcpy_s					(ls_header, str1);
+	strcpy_s					(ls_tip_number, str2);
+	strcpy_s					(ls_tip, str3);
+//	LoadDraw					();
 }
 
 void CApplication::LoadSwitch	()

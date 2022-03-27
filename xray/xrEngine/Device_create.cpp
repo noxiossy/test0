@@ -91,5 +91,5 @@ void CRenderDevice::Create	()
 	//////////////////////////////////////////////////////////////////////////
 	_Create				(fname);
 
-	PreCache			(0);
+	PreCache			(0, false, false);
 }
