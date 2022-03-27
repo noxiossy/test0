@@ -88,9 +88,9 @@ xr_token							qminmax_sm_token					[ ]={
 	{ 0,							0												}
 };
 
-//	“Off”
-//	“DX10.0 style [Standard]”
-//	“DX10.1 style [Higher quality]”
+//	â€œOffâ€
+//	â€œDX10.0 style [Standard]â€
+//	â€œDX10.1 style [Higher quality]â€
 
 // Common
 extern int			psSkeletonUpdate;
@@ -848,7 +848,6 @@ void		xrRender_initconsole	()
 	CMD3(CCC_Mask,		"r2_soft_particles",			&ps_r2_ls_flags,			R2FLAG_SOFT_PARTICLES);
 
 	CMD4(CCC_detail_radius, "r__detail_radius", 		&ps_r__detail_radius, 49, 300);
-	CMD4(CCC_Integer, 		"r__no_scale_on_fade", 		&ps_no_scale_on_fade, 0, 1); //Alundaio
 
 	//CMD3(CCC_Mask,		"r3_msaa",						&ps_r2_ls_flags,			R3FLAG_MSAA);
 	CMD3(CCC_Token,		"r3_msaa",						&ps_r3_msaa,				qmsaa_token);
