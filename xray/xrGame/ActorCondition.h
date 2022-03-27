@@ -40,8 +40,9 @@ public:
 	virtual CWound*		ConditionHit				(SHit* pHDS);
 	virtual void		UpdateCondition				();
 
-	virtual void 		ChangeAlcohol				(float value);
-	virtual void 		ChangeSatiety				(float value);
+	virtual void 		ChangeAlcohol				(const float value);
+	virtual void 		ChangeSatiety				(const float value);
+
 
 	// хромание при потере сил и здоровья
 	virtual	bool		IsLimping					() const;
@@ -57,6 +58,7 @@ public:
 			float	xr_stdcall	GetAlcohol			()	{return m_fAlcohol;}
 			float	xr_stdcall	GetPsy				()	{return 1.0f-GetPsyHealth();}
 			float				GetSatiety			()  {return m_fSatiety;}
+	IC		float				GetSatietyPower		() const {return m_fV_SatietyPower*m_fSatiety;};
 
 			void		AffectDamage_InjuriousMaterial();
 			float		GetInjuriousMaterialDamage	();
@@ -72,10 +74,11 @@ public:
 	}
 	virtual void			save					(NET_Packet &output_packet);
 	virtual void			load					(IReader &input_packet);
-	IC		float const&	Satiety					()	{ return m_fSatiety; }
+//	IC		float const&	Satiety					()	{ return m_fSatiety; }
 	IC		float const&	V_Satiety				()	{ return m_fV_Satiety; }
 	IC		float const&	V_SatietyPower			()	{ return m_fV_SatietyPower; }
 	IC		float const&	V_SatietyHealth			()	{ return m_fV_SatietyHealth; }
+	IC		float const&	SatietyCritical			()	{ return m_fSatietyCritical; }
 	
 	float	GetZoneMaxPower							(ALife::EInfluenceType type) const;
 	float	GetZoneMaxPower							(ALife::EHitType hit_type) const;
@@ -83,6 +86,9 @@ public:
 	bool	DisableSprint							(SHit* pHDS);
 	bool	PlayHitSound							(SHit* pHDS);
 	float	HitSlowmo								(SHit* pHDS);
+	float	GetMaxPowerRestoreSpeed					() {return m_max_power_restore_speed;};
+	float	GetMaxWoundProtection					() {return m_max_wound_protection;};
+	float	GetMaxFireWoundProtection				() {return m_max_fire_wound_protection;};
 
 protected:
 	float m_fAlcohol;
@@ -92,6 +98,7 @@ protected:
 	float m_fV_Satiety;
 	float m_fV_SatietyPower;
 	float m_fV_SatietyHealth;
+	float m_fSatietyCritical;
 //--
 	float m_fPowerLeakSpeed;
 
@@ -109,6 +116,9 @@ protected:
 	float	m_zone_max_power[ALife::infl_max_count];
 	float	m_zone_danger[ALife::infl_max_count];
 	float	m_f_time_affected;
+	float	m_max_power_restore_speed;
+	float	m_max_wound_protection;
+	float	m_max_fire_wound_protection;
 
 	mutable bool m_bLimping;
 	mutable bool m_bCantWalk;

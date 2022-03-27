@@ -117,17 +117,6 @@ CLevel::CLevel():IPureClient	(Device.GetTimerGlobal())
 		m_debug_renderer			= xr_new<CDebugRenderer>();
 		m_level_debug				= xr_new<CLevelDebug>();
 	#endif
-
-	}else
-	{
-		m_level_sound_manager		= NULL;
-		m_client_spawn_manager		= NULL;
-		m_autosave_manager			= NULL;
-		m_space_restriction_manager = NULL;
-	#ifdef DEBUG
-		m_debug_renderer			= NULL;
-		m_level_debug				= NULL;
-	#endif
 	}
 
 

@@ -17,6 +17,10 @@
 #include "object_broker.h"
 #include "weapon.h"
 
+#include "UIGameCustom.h"
+#include "ui/UIMainIngameWnd.h"
+#include "ui/UIStatic.h"
+
 #define MAX_SATIETY					1.0f
 #define START_SATIETY				0.5f
 
@@ -59,6 +63,10 @@ CActorCondition::CActorCondition(CActor *object) :
 	m_zone_danger[ALife::infl_psi]	= 0.0f;
 	m_zone_danger[ALife::infl_electra]= 0.0f;
 	m_f_time_affected = Device.fTimeGlobal;
+
+	m_max_power_restore_speed	= 0.0f;
+	m_max_wound_protection		= 0.0f;
+	m_max_fire_wound_protection = 0.0f;
 }
 
 CActorCondition::~CActorCondition()
@@ -103,7 +111,8 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 	
 	m_fV_Alcohol				= pSettings->r_float(section,"alcohol_v");
 
-//. ???	m_fSatietyCritical			= pSettings->r_float(section,"satiety_critical");
+	m_fSatietyCritical			= pSettings->r_float(section,"satiety_critical");
+	clamp						(m_fSatietyCritical, 0.0f, 1.0f);
 	m_fV_Satiety				= pSettings->r_float(section,"satiety_v");		
 	m_fV_SatietyPower			= pSettings->r_float(section,"satiety_power_v");
 	m_fV_SatietyHealth			= pSettings->r_float(section,"satiety_health_v");
@@ -116,11 +125,16 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 	m_zone_max_power[ALife::infl_psi]	= pSettings->r_float(section, "psi_zone_max_power" );
 	m_zone_max_power[ALife::infl_electra]= pSettings->r_float(section, "electra_zone_max_power" );
 
+	m_max_power_restore_speed = pSettings->r_float(section, "max_power_restore_speed" );
+	m_max_wound_protection = READ_IF_EXISTS(pSettings,r_float,section,"max_wound_protection",1.0f);
+	m_max_fire_wound_protection = READ_IF_EXISTS(pSettings,r_float,section,"max_fire_wound_protection",1.0f);
+
 	VERIFY( !fis_zero(m_zone_max_power[ALife::infl_rad]) );
 	VERIFY( !fis_zero(m_zone_max_power[ALife::infl_fire]) );
 	VERIFY( !fis_zero(m_zone_max_power[ALife::infl_acid]) );
 	VERIFY( !fis_zero(m_zone_max_power[ALife::infl_psi]) );
 	VERIFY( !fis_zero(m_zone_max_power[ALife::infl_electra]) );
+	VERIFY( !fis_zero(m_max_power_restore_speed) );
 }
 
 float CActorCondition::GetZoneMaxPower( ALife::EInfluenceType type) const
@@ -164,6 +178,20 @@ float CActorCondition::GetZoneMaxPower( ALife::EHitType hit_type ) const
 
 void CActorCondition::UpdateCondition()
 {
+	if(psActorFlags.test(AF_GODMODE_RT))
+	{
+		UpdateSatiety();
+
+		m_fAlcohol		+= m_fV_Alcohol*m_fDeltaTime;
+		clamp			(m_fAlcohol,			0.0f,		1.0f);
+		if(IsGameTypeSingle())
+		{
+			CEffectorCam* ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effAlcohol);
+			if(ce)
+				RemoveEffector(m_object,effAlcohol);
+		}
+	}
+
 	if (GodMode())				return;
 	if (!object().g_Alive())	return;
 	if (!object().Local() && m_object != Level().CurrentViewEntity())		return;	
@@ -171,7 +199,7 @@ void CActorCondition::UpdateCondition()
 	float base_weight			= object().MaxCarryWeight();
 	float cur_weight			= object().inventory().TotalWeight();
 
-	if ((object().mstate_real&mcAnyMove))
+	if ((object().mstate_real & mcAnyMove) || (object().mstate_real & mcFall))
 	{
 		ConditionWalk( cur_weight / base_weight,
 			isActorAccelerated( object().mstate_real,object().IsZoomAimingMode() ),
@@ -360,35 +388,24 @@ void CActorCondition::UpdateRadiation()
 
 void CActorCondition::UpdateSatiety()
 {
-	if (!IsGameTypeSingle()) return;
+ 	if (!IsGameTypeSingle()) 
+	{
+		m_fDeltaPower += m_fV_SatietyPower * m_fDeltaTime;
+ 		return;
+	}
 
-	float k = 1.0f;
 	if(m_fSatiety>0)
 	{
-		m_fSatiety -=	m_fV_Satiety*
-						k*
-						m_fDeltaTime;
-	
-		clamp			(m_fSatiety,		0.0f,		1.0f);
-
+		m_fSatiety -= m_fV_Satiety*m_fDeltaTime;
+		clamp(m_fSatiety, 0.0f, 1.0f);
 	}
 		
-	//сытость увеличивает здоровье только если нет открытых ран
-	if(!m_bIsBleeding)
+	float satiety_health_koef = (m_fSatiety-m_fSatietyCritical)/(m_fSatiety>=m_fSatietyCritical?1-m_fSatietyCritical:m_fSatietyCritical);
+	if(CanBeHarmed() && !psActorFlags.test(AF_GODMODE_RT) )
 	{
-		m_fDeltaHealth += CanBeHarmed() ? 
-					(m_fV_SatietyHealth*(m_fSatiety>0.0f?1.f:-1.f)*m_fDeltaTime)
-					: 0;
+		m_fDeltaHealth += m_fV_SatietyHealth*satiety_health_koef*m_fDeltaTime;
+		m_fDeltaPower += m_fV_SatietyPower*m_fSatiety*m_fDeltaTime;
 	}
-
-	//коэффициенты уменьшения восстановления силы от сытоти и радиации
-	float radiation_power_k		= 1.f;
-	float satiety_power_k		= 1.f;
-			
-	m_fDeltaPower += m_fV_SatietyPower*
-				radiation_power_k*
-				satiety_power_k*
-				m_fDeltaTime;
 }
 
 
@@ -401,6 +418,8 @@ CWound* CActorCondition::ConditionHit(SHit* pHDS)
 //weight - "удельный" вес от 0..1
 void CActorCondition::ConditionJump(float weight)
 {
+    if (GodMode())
+        return;
 	float power			=	m_fJumpPower;
 	power				+=	m_fJumpWeightPower*weight*(weight>1.f?m_fOverweightJumpK:1.f);
 	m_fPower			-=	HitPowerEffect(power);
@@ -409,7 +428,10 @@ void CActorCondition::ConditionWalk(float weight, bool accel, bool sprint)
 {	
 	float power			=	m_fWalkPower;
 	power				+=	m_fWalkWeightPower*weight*(weight>1.f?m_fOverweightWalkK:1.f);
-	power				*=	m_fDeltaTime*(accel?(sprint?m_fSprintK:m_fAccelK):1.f);
+    if ((object().mstate_real & mcFall))
+        power *= m_fDeltaTime * (accel ? (sprint ? m_fSprintK : 0) : 1.f);
+    else
+        power *= m_fDeltaTime * (accel ? (sprint ? m_fSprintK : m_fAccelK) : 1.f);
 	m_fPower			-=	HitPowerEffect(power);
 }
 
