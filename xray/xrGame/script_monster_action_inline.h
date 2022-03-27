@@ -10,6 +10,7 @@
 
 IC	CScriptMonsterAction::CScriptMonsterAction	()
 {
+	m_tObject 		= NULL;
 	m_tAction		= MonsterSpace::eGA_None;
 	m_bCompleted	= true;
 }
