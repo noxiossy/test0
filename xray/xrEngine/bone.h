@@ -75,7 +75,7 @@ struct ENGINE_API vertBoned2W			// (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
 	Fvector	B;
 	float	w;
 	float	u,v;
-	void	get_pos( Fvector& p ) { p.set(P); }
+	void	get_pos( Fvector& p ) const { p.set(P); }
 };
 struct ENGINE_API vertBoned3W          // 70 bytes
 {
@@ -86,7 +86,7 @@ struct ENGINE_API vertBoned3W          // 70 bytes
 	Fvector	B;
 	float	w		[2];
 	float	u,v;
-	void	get_pos( Fvector& p ) { p.set(P); }
+	void	get_pos( Fvector& p ) const { p.set(P); }
 };
 struct ENGINE_API vertBoned4W       //76 bytes
 {
@@ -97,7 +97,7 @@ struct ENGINE_API vertBoned4W       //76 bytes
 	Fvector	B;
 	float	w		[3];
 	float	u,v;
-	void	get_pos( Fvector& p ) { p.set(P); }
+	void	get_pos( Fvector& p ) const { p.set(P); }
 };
 #pragma pack(pop)
 
@@ -161,7 +161,7 @@ struct ECORE_API SBoneShape
     }
     bool			Valid(){  
     	switch (type){
-        case stBox: 	return !fis_zero(box.m_halfsize.x)&&!fis_zero(box.m_halfsize.x)&&!fis_zero(box.m_halfsize.x);
+        case stBox: 	return !fis_zero(box.m_halfsize.x)&&!fis_zero(box.m_halfsize.y)&&!fis_zero(box.m_halfsize.z);
         case stSphere: 	return !fis_zero(sphere.R);
         case stCylinder:return !fis_zero(cylinder.m_height)&&!fis_zero(cylinder.m_radius)&&!fis_zero(cylinder.m_direction.square_magnitude());
         };

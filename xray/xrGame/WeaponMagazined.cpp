@@ -19,8 +19,6 @@
 #include "ui/UIXmlInit.h"
 #include "ui/UIStatic.h"
 
-ENGINE_API	bool	g_dedicated_server;
-
 CUIXml*				pWpnScopeXml = NULL;
 
 void createWpnScopeXML()
@@ -709,6 +707,8 @@ void CWeaponMagazined::switch2_Hidden()
 
 	signal_HideComplete		();
 	RemoveShotEffector		();
+	
+	m_nearwall_last_hud_fov = psHUD_FOV_def;
 }
 void CWeaponMagazined::switch2_Showing()
 {
@@ -918,7 +918,6 @@ void CWeaponMagazined::InitAddons()
 			xr_delete( m_UIScope );
 		}
 
-		if ( !g_dedicated_server )
 		{
 			m_UIScope				= xr_new<CUIWindow>();
 			createWpnScopeXML		();

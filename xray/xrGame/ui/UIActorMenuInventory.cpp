@@ -530,7 +530,9 @@ bool CUIActorMenu::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 		bool result							= b_already || (!b_own_item || m_pActorInvOwner->inventory().Ruck(iitem) );
 		VERIFY								(result);
 		CUICellItem* i						= old_owner->RemoveItem(itm, (old_owner==new_owner) );
-		
+		if(!i)
+			return false;
+
 		if(b_use_cursor_pos)
 			new_owner->SetItem				(i,old_owner->GetDragItemPosition());
 		else

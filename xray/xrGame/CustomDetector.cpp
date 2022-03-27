@@ -13,6 +13,8 @@
 
 ITEM_INFO::ITEM_INFO()
 {
+    snd_time 	= 0.0f;
+    cur_period 	= 0.0f;	
 	pParticle	= NULL;
 	curr_ref	= NULL;
 }
@@ -38,9 +40,15 @@ bool  CCustomDetector::CheckCompatibilityInt(CHudItem* itm)
 	if(bres)
 	{
 		CWeapon* W = smart_cast<CWeapon*>(itm);
-		if(W)
-			bres = bres && (W->GetState()!=CHUDState::eBore) && !W->IsZoomed();
+		if (W)
+			bres = bres
+				&& (W->GetState() != CHUDState::eBore)
+				&& (W->GetState() != CWeapon::eReload)
+				&& (W->GetState() != CWeapon::eSwitch)
+				&& !W->IsZoomed();
 	}
+	if (bres)
+		m_lastParentSlot = slot;
 	return bres;
 }
 
@@ -71,6 +79,7 @@ void CCustomDetector::ShowDetector(bool bFastMode)
 
 void CCustomDetector::ToggleDetector(bool bFastMode)
 {
+	m_bNeedActivation = false;
 	m_bFastAnimMode = bFastMode;
 	if(GetState()==eHidden)
 	{
@@ -81,11 +90,14 @@ void CCustomDetector::ToggleDetector(bool bFastMode)
 			SwitchState				(eShowing);
 			TurnDetectorInternal	(true);
 		}
+		else {
+			m_pInventory->Activate(m_lastParentSlot);
+			m_bNeedActivation = true;
+		}
 	}else
 	if(GetState()==eIdle)
 		SwitchState					(eHiding);
 
-	m_bNeedActivation = false;
 }
 
 void CCustomDetector::OnStateSwitch(u32 S)

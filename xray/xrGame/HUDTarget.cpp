@@ -227,12 +227,6 @@ void CHUDTarget::Render()
 				{
 					if (pCurEnt && GameID() == eGameIDSingle)
 					{
-						if (GameID() == eGameIDDeathmatch)			C = C_ON_ENEMY;
-						else
-						{	
-							if (E->g_Team() != pCurEnt->g_Team())	C = C_ON_ENEMY;
-							else									C = C_ON_FRIEND;
-						};
 						if (PP.RQ.range >= recon_mindist() && PP.RQ.range <= recon_maxdist())
 						{
 							float ddist = (PP.RQ.range - recon_mindist())/(recon_maxdist() - recon_mindist());
@@ -271,8 +265,8 @@ void CHUDTarget::Render()
 	}
 
 	//отрендерить кружочек или крестик
-	if(!m_bShowCrosshair)
-	{
+	//if(!m_bShowCrosshair)
+	//{
 		
 		UIRender->StartPrimitive	(6, IUIRender::ptTriList, UI()->m_currentPointType);
 		
@@ -304,11 +298,11 @@ void CHUDTarget::Render()
 		UIRender->SetShader(*hShader);
 		UIRender->FlushPrimitive();
 
-	}else{
+	/*}else{
 		//отрендерить прицел
 		HUDCrosshair.cross_color	= C;
 		HUDCrosshair.OnRender		();
-	}
+	}*/
 }
 
 void CHUDTarget::net_Relcase(CObject* O)

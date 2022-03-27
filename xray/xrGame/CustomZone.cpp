@@ -17,6 +17,7 @@
 #include "zone_effector.h"
 #include "breakableobject.h"
 #include "GamePersistent.h"
+#include "../xrEngine/Environment.h"
 
 #define WIND_RADIUS (4*Radius())	//расстояние до актера, когда появляется ветер 
 #define FASTMODE_DISTANCE (50.f)	//distance to camera from sphere, when zone switches to fast update sequence
@@ -954,7 +955,7 @@ void CCustomZone::StartBlowoutLight		()
 {
 	if(!m_pLight || m_fLightTime<=0.f) return;
 	
-	m_fLightTimeLeft = m_fLightTime;
+	m_fLightTimeLeft = (float)Device.dwTimeGlobal + m_fLightTime*1000.0f;
 
 	m_pLight->set_color(m_LightColor.r, m_LightColor.g, m_LightColor.b);
 	m_pLight->set_range(m_fLightRange);
@@ -974,12 +975,14 @@ void  CCustomZone::StopBlowoutLight		()
 
 void CCustomZone::UpdateBlowoutLight	()
 {
-	if(m_fLightTimeLeft>0)
+	if(m_fLightTimeLeft > (float)Device.dwTimeGlobal)
 	{
-		m_fLightTimeLeft -= Device.fTimeDelta;
-		clamp(m_fLightTimeLeft,0.0f,m_fLightTime);
+		float time_k	= m_fLightTimeLeft - (float)Device.dwTimeGlobal;
 
-		float scale		= m_fLightTimeLeft/m_fLightTime;
+//		m_fLightTimeLeft -= Device.fTimeDelta;
+		clamp(time_k, 0.0f, m_fLightTime*1000.0f);
+
+		float scale		= time_k/(m_fLightTime*1000.0f);
 		scale			= powf(scale+EPS_L, 0.15f);
 		float r			= m_fLightRange*scale;
 		VERIFY(_valid(r));
@@ -1150,6 +1153,9 @@ bool CCustomZone::Disable()
 		StopObjectIdleParticles(pObject);
 	}
 	StopIdleParticles	();
+	if (m_actor_effector)
+		m_actor_effector->Stop();
+	StopBlowoutLight	();
 	return false;
 };
 

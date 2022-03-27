@@ -127,7 +127,7 @@ void CFontManager::OnDeviceReset()
 }
 
 //--------------------------------------------------------------------
-CHUDManager::CHUDManager() : m_Renderable(true), pUI(NULL), m_pHUDTarget(xr_new<CHUDTarget>())
+CHUDManager::CHUDManager() : m_Renderable(true), pUI(NULL), m_pHUDTarget(xr_new<CHUDTarget>()), b_online(false)
 { 
 	OnDisconnected();
 }
@@ -165,7 +165,7 @@ void CHUDManager::OnFrame()
 }
 //--------------------------------------------------------------------
 
-ENGINE_API extern float psHUD_FOV;
+
 
 void CHUDManager::Render_First()
 {

@@ -17,6 +17,7 @@
 #else
 #	include "../../xrEngine/igame_persistent.h"
 #	include "../../xrEngine/environment.h"
+#	include <xmmintrin.h> 
 #endif
 
 const float dbgOffset			= 0.f;
@@ -85,11 +86,74 @@ CDetailManager::CDetailManager	()
 	m_time_rot_2 = 0;
 	m_time_pos	= 0;
 	m_global_time_old = 0;
+
+	// KD: variable detail radius
+	dm_size = dm_current_size;
+	dm_cache_line = dm_current_cache_line;
+	dm_cache1_line = dm_current_cache1_line;
+	dm_cache_size = dm_current_cache_size;
+	dm_fade = dm_current_fade;
+	ps_r__Detail_density = ps_current_detail_density;
+	cache_level1 = (CacheSlot1**) Memory.mem_alloc(dm_cache1_line*sizeof(CacheSlot1*)
+#ifdef USE_MEMORY_MONITOR
+        , "CDetailManager::cache_level1"
+#endif
+        );
+	for (u32 i = 0; i < dm_cache1_line; ++i)
+	{
+		cache_level1[i] = (CacheSlot1*) Memory.mem_alloc(dm_cache1_line*sizeof(CacheSlot1)
+#ifdef USE_MEMORY_MONITOR
+            , "CDetailManager::cache_level1 " + i
+#endif
+            );
+		for (u32 j = 0; j < dm_cache1_line; ++j)
+			new (&(cache_level1[i][j])) CacheSlot1();
+	}
+
+	cache = (Slot***) Memory.mem_alloc(dm_cache_line*sizeof(Slot**)
+#ifdef USE_MEMORY_MONITOR
+        , "CDetailManager::cache"
+#endif
+        );
+	for (u32 i = 0; i < dm_cache_line; ++i)
+		cache[i] = (Slot**) Memory.mem_alloc(dm_cache_line*sizeof(Slot*)
+#ifdef USE_MEMORY_MONITOR
+        , "CDetailManager::cache " + i
+#endif		
+        );
+
+	cache_pool = (Slot *) Memory.mem_alloc(dm_cache_size*sizeof(Slot)
+#ifdef USE_MEMORY_MONITOR
+        , "CDetailManager::cache_pool"
+#endif
+        );
+	for (u32 i = 0; i < dm_cache_size; ++i)
+		new (&(cache_pool[i])) Slot();
 }
 
 CDetailManager::~CDetailManager	()
 {
+	if (dtFS)
+	{
+		FS.r_close(dtFS);
+		dtFS = NULL;
+	}
 
+	for (u32 i = 0; i < dm_cache_size; ++i)
+		cache_pool[i].~Slot();
+	Memory.mem_free(cache_pool);
+
+	for (u32 i = 0; i < dm_cache_line; ++i)
+		Memory.mem_free(cache[i]);
+	Memory.mem_free(cache);
+
+	for (u32 i = 0; i < dm_cache1_line; ++i)
+	{
+		for (u32 j = 0; j < dm_cache1_line; ++j)
+			cache_level1[i][j].~CacheSlot1();
+		Memory.mem_free(cache_level1[i]);
+	}
+	Memory.mem_free(cache_level1);
 }
 /*
 */
@@ -179,34 +243,45 @@ void CDetailManager::Unload		()
 	m_visibles[1].clear	();
 	m_visibles[2].clear	();
 	FS.r_close			(dtFS);
+	dtFS = NULL;
 }
 
 extern ECORE_API float r_ssaDISCARD;
 
 void CDetailManager::UpdateVisibleM()
 {
+	// Clean up
+	for (auto& vec : m_visibles)
+		for (auto& vis : vec)
+			vis.clear_not_free();
+
 	Fvector		EYE				= Device.vCameraPosition;
 	
 	CFrustum	View;
 	View.CreateFromMatrix		(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
-	float fade_limit			= dm_fade;	fade_limit=fade_limit*fade_limit;
-	float fade_start			= 1.f;		fade_start=fade_start*fade_start;
-	float fade_range			= fade_limit-fade_start;
-	float		r_ssaCHEAP		= 16*r_ssaDISCARD;
+	float fade_limit = dm_fade;
+	fade_limit = fade_limit * fade_limit;
+	float fade_start = 1.f;
+	fade_start = fade_start * fade_start;
+	float fade_range = fade_limit - fade_start;
+	float r_ssaCHEAP = 16 * r_ssaDISCARD;
 
 	// Initialize 'vis' and 'cache'
 	// Collect objects for rendering
 	Device.Statistic->RenderDUMP_DT_VIS.Begin	();
-	for (int _mz=0; _mz<dm_cache1_line; _mz++){
-		for (int _mx=0; _mx<dm_cache1_line; _mx++){
+	for (u32 _mz=0; _mz<dm_cache1_line; _mz++){
+		for (u32 _mx=0; _mx<dm_cache1_line; _mx++){
 			CacheSlot1& MS		= cache_level1[_mz][_mx];
 			if (MS.empty)		continue;
 			u32 mask			= 0xff;
 			u32 res				= View.testSAABB		(MS.vis.sphere.P,MS.vis.sphere.R,MS.vis.box.data(),mask);
 			if (fcvNone==res)						 	continue;	// invisible-view frustum
 			// test slots
-			for (int _i=0; _i<dm_cache1_count*dm_cache1_count; _i++){
+
+			u32 dwCC = dm_cache1_count*dm_cache1_count;
+
+			for (u32 _i=0; _i < dwCC ; _i++){
 				Slot*	PS		= *MS.slots[_i];
 				Slot& 	S 		= *PS;
 
@@ -274,8 +349,10 @@ void CDetailManager::UpdateVisibleM()
 void CDetailManager::Render	()
 {
 #ifndef _EDITOR
-	if (0==dtFS)						return;
-	if (!psDeviceFlags.is(rsDetails))	return;
+	if (!RImplementation.Details) return;	// possibly deleted
+	if (!dtFS) return;
+	if (!psDeviceFlags.is(rsDetails)) return;
+	if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive()) return;
 #endif
 
 	// MT
@@ -299,12 +376,15 @@ void CDetailManager::Render	()
 	m_frame_rendered		= Device.dwFrame;
 }
 
+u32 reset_frame = 0;
 void __stdcall	CDetailManager::MT_CALC		()
 {
 #ifndef _EDITOR
-	if (0==RImplementation.Details)		return;	// possibly deleted
-	if (0==dtFS)						return;
-	if (!psDeviceFlags.is(rsDetails))	return;
+	if (reset_frame == Device.dwFrame) return;
+	if (!RImplementation.Details) return;	// possibly deleted
+	if (!dtFS) return;
+	if (!psDeviceFlags.is(rsDetails)) return;
+	if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive()) return;
 #endif    
 
 	MT.Enter					();

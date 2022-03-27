@@ -157,6 +157,7 @@ public:
 	Fvector3			sun_dir		;
 	float				m_fSunShaftsIntensity;
 	float				m_fWaterIntensity;
+	float 				m_fTreeAmplitudeIntensity;
 
 
 //	int					lens_flare_id;
@@ -304,6 +305,7 @@ public:
 	bool					IsWFXPlaying		(){return bWFX;}
     void					SetWeather			(shared_str name, bool forced=false);
     shared_str				GetWeather			()					{ return CurrentWeatherName;}
+	void					ChangeGameTime		(float game_time);
 	void					SetGameTime			(float game_time, float time_factor);
 
 	void					OnDeviceCreate		();

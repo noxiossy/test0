@@ -49,6 +49,19 @@ xr_token							qsun_quality_token							[ ]={
 	{ 0,							0												}
 };
 
+u32 r2_SmapSize = 2048;
+xr_token SmapSizeToken[] = {
+  { "1536x1536",   1536 },
+  { "2048x2048",   2048 },
+  { "2560x2560",   2560 },
+  { "3072x3072",   3072 },
+  { "4096x4096",   4096 },
+  { "6144x6144",   6144 },
+  { "8192x8192",   8192 },
+  { "16384x16384", 16384 },
+  { nullptr, 0 }
+};
+
 u32			ps_r3_msaa				=	0;			//	=	0;
 xr_token							qmsaa_token							[ ]={
 	{ "st_opt_off",					0												},
@@ -213,6 +226,19 @@ float		ps_r3_dyn_wet_surf_near		= 10.f;				// 10.0f
 float		ps_r3_dyn_wet_surf_far		= 30.f;				// 30.0f
 int			ps_r3_dyn_wet_surf_sm_res	= 256;				// 256
 
+int			ps_r__detail_radius = 49;
+u32			dm_size = 24;
+u32 		dm_cache1_line = 12;	//dm_size*2/dm_cache1_count
+u32			dm_cache_line = 49;		//dm_size+1+dm_size
+u32			dm_cache_size = 2401;	//dm_cache_line*dm_cache_line
+float		dm_fade = 47.5;			//float(2*dm_size)-.5f;
+u32			dm_current_size = 24;
+u32 		dm_current_cache1_line = 12;	//dm_current_size*2/dm_cache1_count
+u32			dm_current_cache_line = 49;		//dm_current_size+1+dm_current_size
+u32			dm_current_cache_size = 2401;	//dm_current_cache_line*dm_current_cache_line
+float		dm_current_fade = 47.5;			//float(2*dm_current_size)-.5f;
+float		ps_current_detail_density = 0.6f;
+float		ps_current_detail_scale = 1.f;
 
 //- Mad Max
 float		ps_r2_gloss_factor			= 3.0f;
@@ -226,6 +252,30 @@ float		ps_r2_gloss_factor			= 3.0f;
 #endif	//	USE_DX10
 
 //-----------------------------------------------------------------------
+class CCC_detail_radius : public CCC_Integer
+{
+public:
+    void	apply()
+    {
+        dm_current_size = iFloor((float) ps_r__detail_radius / 4) * 2;
+        dm_current_cache1_line = dm_current_size * 2 / 4;		// assuming cache1_count = 4
+        dm_current_cache_line = dm_current_size + 1 + dm_current_size;
+        dm_current_cache_size = dm_current_cache_line*dm_current_cache_line;
+        dm_current_fade = float(2 * dm_current_size) - .5f;
+    }
+    CCC_detail_radius(LPCSTR N, int* V, int _min = 0, int _max = 999) : CCC_Integer(N, V, _min, _max)
+    {};
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_Integer::Execute(args);
+        apply();
+    }
+    virtual void	Status(TStatus& S)
+    {
+        CCC_Integer::Status(S);
+    }
+};
+
 class CCC_tf_Aniso		: public CCC_Integer
 {
 public:
@@ -624,7 +674,8 @@ void		xrRender_initconsole	()
 //.	CMD4(CCC_Float,		"r__geometry_lod_pow",	&ps_r__LOD_Power,			0,		2		);
 
 //.	CMD4(CCC_Float,		"r__detail_density",	&ps_r__Detail_density,		.05f,	0.99f	);
-	CMD4(CCC_Float,		"r__detail_density",	&ps_r__Detail_density,		.2f,	0.6f	);
+	CMD4(CCC_Float, 	"r__detail_density", 	&ps_current_detail_density/*&ps_r__Detail_density*/, 0.3f, 1.0f);
+	CMD4(CCC_Float, 	"r__detail_scale", 		&ps_current_detail_scale, 0.2f, 3.0f);
 
 #ifdef DEBUG
 	CMD4(CCC_Float,		"r__detail_l_ambient",	&ps_r__Detail_l_ambient,	.5f,	.95f	);
@@ -790,9 +841,14 @@ void		xrRender_initconsole	()
 
 	CMD3(CCC_Token,		"r2_sun_quality",				&ps_r_sun_quality,			qsun_quality_token);
 
+	CMD3(CCC_Token, 	"r__smap_size", 				&r2_SmapSize, 				SmapSizeToken);
+
 	//	Igor: need restart
 	CMD3(CCC_Mask,		"r2_soft_water",				&ps_r2_ls_flags,			R2FLAG_SOFT_WATER);
 	CMD3(CCC_Mask,		"r2_soft_particles",			&ps_r2_ls_flags,			R2FLAG_SOFT_PARTICLES);
+
+	CMD4(CCC_detail_radius, "r__detail_radius", 		&ps_r__detail_radius, 49, 300);
+	CMD4(CCC_Integer, 		"r__no_scale_on_fade", 		&ps_no_scale_on_fade, 0, 1); //Alundaio
 
 	//CMD3(CCC_Mask,		"r3_msaa",						&ps_r2_ls_flags,			R3FLAG_MSAA);
 	CMD3(CCC_Token,		"r3_msaa",						&ps_r3_msaa,				qmsaa_token);

@@ -14,6 +14,7 @@
 #include "../xrEngine/StatGraph.h"
 #include "PhraseDialogManager.h"
 #include "ui_defs.h"
+
 #include "step_manager.h"
 #include "script_export_space.h"
 
@@ -683,6 +684,7 @@ public:
 	virtual	bool				InventoryAllowSprint			();
 	virtual void				OnNextWeaponSlot				();
 	virtual void				OnPrevWeaponSlot				();
+	virtual void				RepackAmmo			        	();
 			void				SwitchNightVision				();
 			void				SwitchTorch						();
 

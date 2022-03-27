@@ -43,9 +43,9 @@ void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 		);
 	LPCSTR question = funct2( item_name, item->GetCondition(), can_repair, partner );
 
-	m_repair_mode = true;
-	if ( can_repair )
+	if(can_repair)
 	{
+		m_repair_mode = true;
 		CallMessageBoxYesNo( question );
 	} 
 	else

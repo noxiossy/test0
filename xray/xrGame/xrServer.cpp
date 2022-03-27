@@ -13,11 +13,13 @@
 #include "ai_space.h"
 #include "../xrEngine/IGame_Persistent.h"
 #include "string_table.h"
+
 #include "../xrEngine/XR_IOConsole.h"
 //#include "script_engine.h"
 #include "ui/UIInventoryUtilities.h"
 #include "file_transfer.h"
 #include "screenshot_server.h"
+
 #pragma warning(push)
 #pragma warning(disable:4995)
 #include <malloc.h>
@@ -51,7 +53,7 @@ xrClientData::~xrClientData()
 }
 
 
-xrServer::xrServer():IPureServer(Device.GetTimerGlobal(), g_dedicated_server)
+xrServer::xrServer():IPureServer(Device.GetTimerGlobal())
 {
 	m_iCurUpdatePacket = 0;
 	m_file_transfers = NULL;
@@ -85,14 +87,6 @@ xrServer::~xrServer()
 	entities.clear();
 }
 
-bool  xrServer::HasBattlEye()
-{
-#ifdef BATTLEYE
-	return (g_pGameLevel && Level().battleye_system.server)? true : false;
-#else
-	return false;
-#endif // BATTLEYE
-}
 
 //--------------------------------------------------------------------
 
@@ -463,12 +457,6 @@ void xrServer::SendUpdatesToAll()
 #endif			
 	if (game->sv_force_sync)	Perform_game_export();
 	VERIFY						(verify_entities());
-#ifdef BATTLEYE
-	if ( g_pGameLevel )
-	{
-		Level().battleye_system.UpdateServer( this );
-	}
-#endif // BATTLEYE
 }
 
 xr_vector<shared_str>	_tmp_log;
@@ -633,12 +621,6 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 				game->OnPlayerConnectFinished(sender);
 				CL->ps->setName( CL->name.c_str() );
 				
-#ifdef BATTLEYE
-				if ( g_pGameLevel && Level().battleye_system.server )
-				{
-					Level().battleye_system.server->AddConnected_OnePlayer( CL );
-				}
-#endif // BATTLEYE
 			};
 			game->signal_Syncronize	();
 			VERIFY					(verify_entities());
@@ -766,15 +748,6 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 	case M_REMOTE_CONTROL_CMD:
 		{
 			AddDelayedPacket(P, sender);
-		}break;
-	case M_BATTLEYE:
-		{
-#ifdef BATTLEYE
-			if ( g_pGameLevel )
-			{
-				Level().battleye_system.ReadPacketServer( sender.value(), &P );
-			}
-#endif // BATTLEYE
 		}break;
 	case M_FILE_TRANSFER:
 		{
@@ -1235,38 +1208,10 @@ void xrServer::KickCheaters			()
 
 void xrServer::MakeScreenshot(ClientID const & admin_id, ClientID const & cheater_id)
 {
-	if ((cheater_id == SV_Client->ID) && g_dedicated_server)
-	{
-		return;
-	}
-	for (int i = 0; i < sizeof(m_screenshot_proxies)/sizeof(clientdata_proxy*); ++i)
-	{
-		if (!m_screenshot_proxies[i]->is_active())
-		{
-			m_screenshot_proxies[i]->make_screenshot(admin_id, cheater_id);
-			Msg("* admin [%d] is making screeshot of client [%d]", admin_id, cheater_id);
-			return;
-		}
-	}
-	Msg("! ERROR: SV: not enough file transfer proxies for downloading screenshot, please try later ...");
 }
 
 void xrServer::MakeConfigDump(ClientID const & admin_id, ClientID const & cheater_id)
 {
-	if ((cheater_id == SV_Client->ID) && g_dedicated_server)
-	{
-		return;
-	}
-	for (int i = 0; i < sizeof(m_screenshot_proxies)/sizeof(clientdata_proxy*); ++i)
-	{
-		if (!m_screenshot_proxies[i]->is_active())
-		{
-			m_screenshot_proxies[i]->make_config_dump(admin_id, cheater_id);
-			Msg("* admin [%d] is making config dump of client [%d]", admin_id, cheater_id);
-			return;
-		}
-	}
-	Msg("! ERROR: SV: not enough file transfer proxies for downloading file, please try later ...");
 }
 
 

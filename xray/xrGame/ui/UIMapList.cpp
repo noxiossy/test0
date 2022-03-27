@@ -11,7 +11,6 @@
 #include "UIListBoxItem.h"
 #include "../../xrEngine/xr_ioconsole.h"
 #include "../string_table.h"
-#include "CExtraContentFilter.h"
 
 #include "object_broker.h"
 #include "game_base.h"
@@ -40,8 +39,6 @@ CUIMapList::CUIMapList(){
 	m_pBtnUp		= xr_new<CUI3tButtonEx>();
 	m_pBtnDown		= xr_new<CUI3tButtonEx>();
 
-	m_pExtraContentFilter = xr_new<CExtraContentFilter>();
-
 	m_pList1->SetAutoDelete(true);
 	m_pList2->SetAutoDelete(true);
 	m_pFrame1->SetAutoDelete(true);
@@ -66,7 +63,6 @@ CUIMapList::CUIMapList(){
 }
 
 CUIMapList::~CUIMapList(){
-	delete_data(m_pExtraContentFilter);
 }
 
 void CUIMapList::StartDedicatedServer(){

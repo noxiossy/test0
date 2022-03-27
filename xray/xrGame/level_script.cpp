@@ -24,12 +24,14 @@
 #include "HUDManager.h"
 #include "script_engine.h"
 #include "game_cl_single.h"
+#include "game_sv_single.h"
 #include "map_manager.h"
 #include "map_spot.h"
 #include "map_location.h"
 #include "phworld.h"
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
+#include "../xrEngine/Environment.h"
 
 using namespace luabind;
 
@@ -120,6 +122,19 @@ bool is_wfx_playing	()
 	return			(g_pGamePersistent->Environment().IsWFXPlaying());
 }
 
+void change_game_time(u32 days, u32 hours, u32 mins)
+{
+	game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
+	if (tpGame && ai().get_alife())
+	{
+		u32 value = days * 86400 + hours * 3600 + mins * 60;
+		float fValue = static_cast<float> (value);
+		value *= 1000;//msec		
+		g_pGamePersistent->Environment().ChangeGameTime(fValue);
+		tpGame->alife().time_manager().change_game_time(value);
+	}
+}
+
 void set_time_factor(float time_factor)
 {
 	if (!OnServer())
@@ -172,6 +187,11 @@ u32 get_time_minutes()
 
 float high_cover_in_direction(u32 level_vertex_id, const Fvector &direction)
 {
+	if (!ai().level_graph().valid_vertex_id(level_vertex_id))
+	{
+		return 0;
+	}
+
 	float			y,p;
 	direction.getHP	(y,p);
 	return			(ai().level_graph().high_cover_in_direction(y,level_vertex_id));
@@ -179,6 +199,11 @@ float high_cover_in_direction(u32 level_vertex_id, const Fvector &direction)
 
 float low_cover_in_direction(u32 level_vertex_id, const Fvector &direction)
 {
+	if (!ai().level_graph().valid_vertex_id(level_vertex_id))
+	{
+		return 0;
+	}
+
 	float			y,p;
 	direction.getHP	(y,p);
 	return			(ai().level_graph().low_cover_in_direction(y,level_vertex_id));
@@ -191,6 +216,10 @@ float rain_factor()
 
 u32	vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance)
 {
+	if (!ai().level_graph().valid_vertex_id(level_vertex_id))
+	{
+		return u32(-1);
+	}
 	direction.normalize_safe();
 	direction.mul	(max_distance);
 	Fvector			start_position = ai().level_graph().vertex_position(level_vertex_id);
@@ -202,6 +231,10 @@ u32	vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distan
 
 Fvector vertex_position(u32 level_vertex_id)
 {
+	if (!ai().level_graph().valid_vertex_id(level_vertex_id))
+	{
+		return Fvector{};
+	}
 	return			(ai().level_graph().vertex_position(level_vertex_id));
 }
 
@@ -673,6 +706,7 @@ void CLevel::script_register(lua_State *L)
 		def("get_time_days",					get_time_days),
 		def("get_time_hours",					get_time_hours),
 		def("get_time_minutes",					get_time_minutes),
+		def("change_game_time", 				change_game_time),
 
 		def("high_cover_in_direction",			high_cover_in_direction),
 		def("low_cover_in_direction",			low_cover_in_direction),

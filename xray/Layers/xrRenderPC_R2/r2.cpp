@@ -77,6 +77,16 @@ static class cl_water_intensity : public R_constant_setup
 	}
 }	binder_water_intensity;
 
+static class cl_tree_amplitude_intensity : public R_constant_setup
+{
+	virtual void setup(R_constant* C)
+	{
+		CEnvDescriptor&	E = *g_pGamePersistent->Environment().CurrentEnv;
+		float fValue = E.m_fTreeAmplitudeIntensity;
+		RCache.set_c(C, fValue, fValue, fValue, 0);
+	}
+} binder_tree_amplitude_intensity;
+
 static class cl_sun_shafts_intensity : public R_constant_setup		
 {	
 	virtual void setup	(R_constant* C)
@@ -223,11 +233,17 @@ void					CRender::create					()
         Msg("* Managed textures disabled");
 
 	// options (smap-pool-size)
-	if (strstr(Core.Params,"-smap1536"))	o.smapsize	= 1536;
-	if (strstr(Core.Params,"-smap2048"))	o.smapsize	= 2048;
-	if (strstr(Core.Params,"-smap2560"))	o.smapsize	= 2560;
-	if (strstr(Core.Params,"-smap3072"))	o.smapsize	= 3072;
-	if (strstr(Core.Params,"-smap4096"))	o.smapsize	= 4096;
+	if (r2_SmapSize >= 1024 && r2_SmapSize <= 4096)
+		o.smapsize = r2_SmapSize;
+	else if (r2_SmapSize > 4096) {
+		D3DCAPS9 caps;
+		CHK_DX(HW.pDevice->GetDeviceCaps(&caps));
+		auto video_mem = HW.pDevice->GetAvailableTextureMem();
+		if (caps.MaxTextureHeight >= r2_SmapSize && video_mem > 512)
+			o.smapsize = r2_SmapSize;
+	}
+
+	Msg("Shadow Map resolution: %ux%u", o.smapsize, o.smapsize);
 
 	// gloss
 	char*	g			= strstr(Core.Params,"-gloss ");
@@ -309,6 +325,7 @@ void					CRender::destroy				()
 	r_dsgraph_destroy			();
 }
 
+extern u32 reset_frame;
 void CRender::reset_begin()
 {
 	// Update incremental shadowmap-visibility solver
@@ -327,6 +344,15 @@ void CRender::reset_begin()
 		Lights_LastFrame.clear	();
 	}
 
+	reset_frame = Device.dwFrame;
+	//AVO: let's reload details while changed details options on vid_restart
+	if (b_loaded && ((dm_current_size != dm_size) || (ps_r__Detail_density != ps_current_detail_density)))
+	{
+		Details->Unload();
+		xr_delete(Details);
+	}
+	//-AVO
+
 	xr_delete					(Target);
 	HWOCC.occq_destroy			();
 	//_RELEASE					(q_sync_point[1]);
@@ -344,6 +370,14 @@ void CRender::reset_end()
 	HWOCC.occq_create			(occq_size);
 
 	Target						=	xr_new<CRenderTarget>	();
+
+	//AVO: let's reload details while changed details options on vid_restart
+	if (b_loaded && ((dm_current_size != dm_size) || (ps_r__Detail_density != ps_current_detail_density)))
+	{
+		Details = xr_new<CDetailManager>();
+		Details->Load();
+	}
+	//-AVO
 
 	xrRender_apply_tf			();
 

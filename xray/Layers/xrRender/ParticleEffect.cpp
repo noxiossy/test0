@@ -362,9 +362,9 @@ void CParticleEffect::Render(float )
 				Fmatrix FTold						= Device.mFullTransform;
 				if(GetHudMode())
 				{
-					Device.mProject.build_projection(	deg2rad(psHUD_FOV*Device.fFOV), 
+					Device.mProject.build_projection(	deg2rad(psHUD_FOV < 1.f ? psHUD_FOV*Device.fFOV : psHUD_FOV), 
 														Device.fASPECT, 
-														VIEWPORT_NEAR, 
+														HUD_VIEWPORT_NEAR, 
 														g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
 					Device.mFullTransform.mul	(Device.mProject, Device.mView);

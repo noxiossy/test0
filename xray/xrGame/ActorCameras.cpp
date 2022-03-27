@@ -20,10 +20,14 @@
 #include "CharacterPhysicsSupport.h"
 #include "EffectorShot.h"
 
+ENGINE_API extern float psHUD_FOV; //--#SM+#--
+ENGINE_API extern float psHUD_FOV_def; //--#SM+#--
+
 #include "PHMovementControl.h"
 
 extern BOOL dbg_draw_camera_collision;
 void	collide_camera( CCameraBase & camera, float _viewport_near  );
+static float CurrentHeight = 0.f;
 
 void CActor::cam_Set	(EActorCameras style)
 {
@@ -272,12 +276,30 @@ void	CActor::cam_Lookout	( const Fmatrix &xform, float camera_height )
 }
 void CActor::cam_Update(float dt, float fFOV)
 {
-	if(m_holder)		return;
+	if(m_holder)
+		return;
+
+	// HUD FOV Update --#SM+#--
+	if (this == Level().CurrentControlEntity())
+	{
+		CWeapon* pWeapon = smart_cast<CWeapon*>(this->inventory().ActiveItem());
+		if (eacFirstEye == cam_active && pWeapon)
+			psHUD_FOV = pWeapon->GetHudFov();
+		else
+			psHUD_FOV = psHUD_FOV_def;
+	}
+	//--#SM+#--
 
 	if( (mstate_real & mcClimb) && (cam_active!=eacFreeLook) )
 		camUpdateLadder(dt);
 	on_weapon_shot_update();
-	Fvector point		= {0,CameraHeight(),0}; 
+	if (!CurrentHeight)CurrentHeight = CameraHeight();
+	float HeightInterpolationSpeed = 9.f;
+	if (CurrentHeight != CameraHeight() && !Device.dwPrecacheFrame)
+	{
+		CurrentHeight = (CurrentHeight * (1.0f - HeightInterpolationSpeed*dt)) + (CameraHeight() * HeightInterpolationSpeed*dt);
+	}
+	Fvector point = { 0, CurrentHeight, 0 };
 	Fvector dangle		= {0,0,0};
 	Fmatrix				xform;
 	xform.setXYZ		(0,r_torso.yaw,0);

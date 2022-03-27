@@ -345,8 +345,6 @@ void game_cl_ArtefactHunt::shedule_Update			(u32 dt)
 
 	inherited::shedule_Update		(dt);
 
-	if(g_dedicated_server)	return;
-
 	//out game information
 //	m_game_ui->SetReinforcementCaption("");
 	m_game_ui->SetBuyMsgCaption		("");
@@ -448,39 +446,7 @@ void game_cl_ArtefactHunt::shedule_Update			(u32 dt)
 				{
 //					if(m_game_ui) m_game_ui->SetScoreCaption	(teams[0].score, teams[1].score);
 				};				
-	/*
-			if ( (artefactBearerID==0))// && (artefactID!=0) )
-				{
-					m_game_ui->SetTodoCaption("Grab the Artefact");
-				}
-				else
-				{
-					if (teamInPossession != local_player->team )
-					{
-						m_game_ui->SetTodoCaption("Stop ArtefactBearer");
-					}
-					else
-					{
-						if (local_player->GameID == artefactBearerID)
-						{
-							m_game_ui->SetTodoCaption("You got the Artefact. Bring it to your base.");
-						}
-						else
-						{
-							m_game_ui->SetTodoCaption("Protect your ArtefactBearer");
-						};
-					};
-				};
-			*/
 			};
-/*
-			if (Level().CurrentViewEntity() && m_game_ui)
-			{
-				game_PlayerState* ps = GetPlayerByGameID(Level().CurrentViewEntity()->ID());
-				if (ps&&m_game_ui) m_game_ui->SetRank(ps->team, ps->rank);
-				if (ps&&m_game_ui) m_game_ui->SetFraglimit(ps->kills, artefactsNum);
-			}
-*/
 			SetScore();
 		}break;
 	case GAME_PHASE_TEAM1_ELIMINATED:

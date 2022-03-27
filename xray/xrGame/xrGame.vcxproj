@@ -294,7 +294,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\xrGameSpy\gamespy\md5.h" />
     <ClInclude Include="..\xrServerEntities\ai_sounds.h" />
     <ClInclude Include="..\xrServerEntities\alife_human_brain.h" />
     <ClInclude Include="..\xrServerEntities\alife_human_brain_inline.h" />
@@ -875,8 +874,6 @@
     <ClInclude Include="base_client_classes.h" />
     <ClInclude Include="base_client_classes_wrappers.h" />
     <ClInclude Include="BastArtifact.h" />
-    <ClInclude Include="battleye.h" />
-    <ClInclude Include="battleye_system.h" />
     <ClInclude Include="BlackDrops.h" />
     <ClInclude Include="BlackGraviArtifact.h" />
     <ClInclude Include="BlockAllocator.h" />
@@ -1025,20 +1022,6 @@
     <ClInclude Include="GalantineArtifact.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GamePersistent.h" />
-    <ClInclude Include="gamespy\CdkeyDecode\base32.h" />
-    <ClInclude Include="gamespy\CdkeyDecode\cdkeydecode.h" />
-    <ClInclude Include="GameSpy\GameSpy_Available.h" />
-    <ClInclude Include="GameSpy\GameSpy_Base_Defs.h" />
-    <ClInclude Include="GameSpy\GameSpy_Browser.h" />
-    <ClInclude Include="gamespy\GameSpy_Full.h" />
-    <ClInclude Include="GameSpy\GameSpy_FuncDefs.h" />
-    <ClInclude Include="GameSpy\GameSpy_GCD_Client.h" />
-    <ClInclude Include="GameSpy\GameSpy_GCD_Server.h" />
-    <ClInclude Include="gamespy\GameSpy_HTTP.h" />
-    <ClInclude Include="GameSpy\GameSpy_Keys.h" />
-    <ClInclude Include="GameSpy\GameSpy_Patching.h" />
-    <ClInclude Include="GameSpy\GameSpy_QR2.h" />
-    <ClInclude Include="GameSpy\GameSpy_QR2_callbacks.h" />
     <ClInclude Include="GameTask.h" />
     <ClInclude Include="GameTaskDefs.h" />
     <ClInclude Include="GametaskManager.h" />
@@ -1710,7 +1693,6 @@
     <ClInclude Include="ui\map_hint.h" />
     <ClInclude Include="ui\MMSound.h" />
     <ClInclude Include="ui\Restrictions.h" />
-    <ClInclude Include="ui\ServerList.h" />
     <ClInclude Include="ui\TeamInfo.h" />
     <ClInclude Include="ui\UI3tButton.h" />
     <ClInclude Include="ui\uiabstract.h" />
@@ -1917,16 +1899,12 @@
     <ClInclude Include="Wound.h" />
     <ClInclude Include="wrapper_abstract.h" />
     <ClInclude Include="wrapper_abstract_inline.h" />
-    <ClInclude Include="xrGameSpyServer.h" />
-    <ClInclude Include="xrGameSpyServer_callbacks.h" />
     <ClInclude Include="xrServer.h" />
     <ClInclude Include="xrServerMapSync.h" />
     <ClInclude Include="xrServer_svclient_validation.h" />
-    <ClInclude Include="xr_Client_BattlEye.h" />
     <ClInclude Include="xr_dsa_signer.h" />
     <ClInclude Include="xr_dsa_verifyer.h" />
     <ClInclude Include="xr_level_controller.h" />
-    <ClInclude Include="xr_Server_BattlEye.h" />
     <ClInclude Include="xr_time.h" />
     <ClInclude Include="ZoneCampfire.h" />
     <ClInclude Include="ZoneVisual.h" />
@@ -1934,23 +1912,6 @@
     <ClInclude Include="ZudaArtifact.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\xrGameSpy\gamespy\md5c.c">
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Sync</ExceptionHandling>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </ExceptionHandling>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </PrecompiledHeader>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ExceptionHandling>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\alife_human_brain.cpp" />
     <ClCompile Include="..\xrServerEntities\alife_monster_brain.cpp" />
     <ClCompile Include="..\xrServerEntities\alife_space.cpp" />
@@ -3446,35 +3407,6 @@
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="gamespy\CdkeyDecode\base32.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="gamespy\CdkeyDecode\cdkeydecode.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="GameSpy\GameSpy_Available.cpp" />
-    <ClCompile Include="GameSpy\GameSpy_Browser.cpp" />
-    <ClCompile Include="gamespy\GameSpy_Full.cpp" />
-    <ClCompile Include="GameSpy\GameSpy_GCD_Client.cpp" />
-    <ClCompile Include="GameSpy\GameSpy_GCD_Server.cpp" />
-    <ClCompile Include="gamespy\GameSpy_HTTP.cpp" />
-    <ClCompile Include="GameSpy\GameSpy_Patching.cpp" />
-    <ClCompile Include="GameSpy\GameSpy_QR2.cpp" />
-    <ClCompile Include="GameSpy\GameSpy_QR2_callbacks.cpp" />
     <ClCompile Include="GameTask.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3931,7 +3863,6 @@
     <ClCompile Include="Level_bullet_manager_firetrace.cpp" />
     <ClCompile Include="level_changer.cpp" />
     <ClCompile Include="level_debug.cpp" />
-    <ClCompile Include="Level_GameSpy_Funcs.cpp" />
     <ClCompile Include="level_graph.cpp" />
     <ClCompile Include="level_graph_debug.cpp" />
     <ClCompile Include="level_graph_debug2.cpp">
@@ -5510,8 +5441,6 @@
     <ClCompile Include="ui\map_hint.cpp" />
     <ClCompile Include="ui\MMSound.cpp" />
     <ClCompile Include="ui\Restrictions.cpp" />
-    <ClCompile Include="ui\ServerList.cpp" />
-    <ClCompile Include="ui\ServerList_GameSpy_func.cpp" />
     <ClCompile Include="ui\TeamInfo.cpp" />
     <ClCompile Include="ui\UI3tButton.cpp" />
     <ClCompile Include="ui\UIActorInfo.cpp" />
@@ -6340,9 +6269,6 @@
     <ClCompile Include="weapon_dump_impl.cpp" />
     <ClCompile Include="Wound.cpp" />
     <ClCompile Include="xrGame.cpp" />
-    <ClCompile Include="xrGameSpyServer.cpp" />
-    <ClCompile Include="xrGameSpyServer_callbacks.cpp" />
-    <ClCompile Include="xrGameSpy_GameSpyFuncs.cpp" />
     <ClCompile Include="xrgame_dll_detach.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -6386,11 +6312,9 @@
     <ClCompile Include="xrServer_secure_messaging.cpp" />
     <ClCompile Include="xrServer_sls_clear.cpp" />
     <ClCompile Include="xrServer_svclient_validation.cpp" />
-    <ClCompile Include="xr_Client_BattlEye.cpp" />
     <ClCompile Include="xr_dsa_signer.cpp" />
     <ClCompile Include="xr_dsa_verifyer.cpp" />
     <ClCompile Include="xr_level_controller.cpp" />
-    <ClCompile Include="xr_Server_BattlEye.cpp" />
     <ClCompile Include="xr_time.cpp" />
     <ClCompile Include="ZoneCampfire.cpp" />
     <ClCompile Include="ZoneVisual.cpp" />
@@ -6431,10 +6355,6 @@
     </ProjectReference>
     <ProjectReference Include="..\xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\xrGameSpy\xrGameSpy.vcxproj">
-      <Project>{5535f6b4-7ae6-4b66-8aea-cc31c14d7ab7}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\xrNetServer\xrNetServer.vcxproj">

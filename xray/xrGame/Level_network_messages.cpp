@@ -335,31 +335,9 @@ void CLevel::ClientReceive()
 			{
 				ClientSave			();
 			}break;
-		case M_GAMESPY_CDKEY_VALIDATION_CHALLENGE:
-			{
-				#pragma todo("remove next deadlock checking after testing...")
-				#ifdef DEBUG
-				csMessagesAndNetQueueDeadLockDetect = false;
-				#endif
-				
-				OnGameSpyChallenge(P);
-
-				#ifdef DEBUG
-				csMessagesAndNetQueueDeadLockDetect = true;
-				#endif
-			}break;
 		case M_AUTH_CHALLENGE:
 			{
-				#pragma todo("remove next deadlock checking after testing...")
-				#ifdef DEBUG
-				csMessagesAndNetQueueDeadLockDetect = false;
-				#endif
-
 				OnBuildVersionChallenge();
-
-				#ifdef DEBUG
-				csMessagesAndNetQueueDeadLockDetect = true;
-				#endif
 			}break;
 		case M_CLIENT_CONNECT_RESULT:
 			{
@@ -476,16 +454,6 @@ void CLevel::ClientReceive()
 			}break;
 		case M_STATISTIC_UPDATE_RESPOND: //deprecated, see  xrServer::OnMessage
 			{
-				/*Msg("--- CL: On Update Respond");
-				if (!game) break;
-				if (GameID() != eGameIDSingle)
-					Game().m_WeaponUsageStatistic->OnUpdateRespond(P);*/
-			}break;
-		case M_BATTLEYE:
-			{
-#ifdef BATTLEYE
-			battleye_system.ReadPacketClient( P );
-#endif // BATTLEYE
 			}break;
 		case M_FILE_TRANSFER:
 			{

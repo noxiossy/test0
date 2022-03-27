@@ -189,6 +189,10 @@ void CUIActorMenu::Hide()
 	PlaySnd								(eSndClose);
 	SetMenuMode							(mmUndefined);
 	m_ActorStateInfo->Show				(false);
+
+	CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
+	
+	if (pActor) pActor->RepackAmmo();
 }
 
 void CUIActorMenu::Draw()

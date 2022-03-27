@@ -137,6 +137,8 @@ extern ECORE_API float			ps_r3_dyn_wet_surf_near;	// 10.0f
 extern ECORE_API float			ps_r3_dyn_wet_surf_far;		// 30.0f
 extern ECORE_API int			ps_r3_dyn_wet_surf_sm_res;	// 256
 
+extern u32 						r2_SmapSize;
+
 enum
 {
 	R2FLAG_SUN					= (1<<0),
@@ -201,5 +203,8 @@ enum
 extern void						xrRender_initconsole	();
 extern BOOL						xrRender_test_hw		();
 extern void						xrRender_apply_tf		();
+
+// KD
+extern ECORE_API int			ps_r__detail_radius;
 
 #endif

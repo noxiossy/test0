@@ -1091,8 +1091,8 @@ void	CCharacterPhysicsSupport::	CreateShell						( CObject* who, Fvector& dp, Fv
 	
 	if(IsGameTypeSingle())
 	{
-		m_pPhysicsShell->SetPrefereExactIntegration	();//use exact integration for ragdolls in single
-		m_pPhysicsShell->SetRemoveCharacterCollLADisable();
+	//	m_pPhysicsShell->SetPrefereExactIntegration	();//use exact integration for ragdolls in single
+	//	m_pPhysicsShell->SetRemoveCharacterCollLADisable();
 	}
 	else
 		m_pPhysicsShell->SetIgnoreDynamic();
@@ -1113,7 +1113,7 @@ if( dbg_draw_ragdoll_spawn )
 #endif
 
 	CollisionCorrectObjPos( dp );
-	m_pPhysicsShell->SetGlTransformDynamic(mXFORM);
+//	m_pPhysicsShell->SetGlTransformDynamic(mXFORM);
 
 #ifdef	DEBUG
 if( dbg_draw_ragdoll_spawn )
@@ -1124,7 +1124,7 @@ if( dbg_draw_ragdoll_spawn )
 }
 #endif
 	//fly back after correction
-	FlyTo(Fvector().sub(inital_entity_position,m_EntityAlife.Position()));
+//	FlyTo(Fvector().sub(inital_entity_position,m_EntityAlife.Position()));
 
 #ifdef	DEBUG
 if( dbg_draw_ragdoll_spawn )
@@ -1144,10 +1144,10 @@ if( dbg_draw_ragdoll_spawn )
 		}
 #endif
 
-	m_pPhysicsShell->set_LinearVel( v );
+//	m_pPhysicsShell->set_LinearVel( v );
 	//actualize
-	m_pPhysicsShell->GetGlobalTransformDynamic(&mXFORM);
-	m_pPhysicsShell->mXFORM.set(mXFORM);
+//	m_pPhysicsShell->GetGlobalTransformDynamic(&mXFORM);
+//	m_pPhysicsShell->mXFORM.set(mXFORM);
 
 
 
@@ -1160,23 +1160,25 @@ if( dbg_draw_ragdoll_spawn )
 	//	m_pPhysicsShell->AnimToVelocityState( Device.fTimeDelta, 2 * default_l_limit, 10.f * default_w_limit );
 	//	mXFORM.set( sv_xform );
 	//}
-	IKinematics* K=smart_cast<IKinematics*>( m_EntityAlife.Visual( ) );
-	K->CalculateBones_Invalidate();
-	K->CalculateBones	(TRUE);
+//	IKinematics* K=smart_cast<IKinematics*>( m_EntityAlife.Visual( ) );
+//	K->CalculateBones_Invalidate();
+//	K->CalculateBones	(TRUE);
 }
 
 void CCharacterPhysicsSupport::in_ChangeVisual()
 {
 	
+	IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>( m_EntityAlife.Visual( ) );
 	if(m_ik_controller)
 	{
 		DestroyIKController();
-		CreateIKController();
+		if( KA )
+			CreateIKController();
 	}
 	xr_delete( m_interactive_animation );
 	destroy_animation_collision();
 	destroy( m_interactive_motion );
-	IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>( m_EntityAlife.Visual( ) );
+	
 	if( KA )
 	{
 		m_death_anims.setup( KA, m_EntityAlife.cNameSect().c_str() , pSettings );
@@ -1195,10 +1197,13 @@ void CCharacterPhysicsSupport::in_ChangeVisual()
 			m_physics_skeleton->Deactivate()		;
 			xr_delete(m_physics_skeleton)			;
 		}
-		CreateSkeleton(m_physics_skeleton);
-		if(m_pPhysicsShell)m_pPhysicsShell->Deactivate();
+		if( m_EntityAlife.Visual( ) )
+			CreateSkeleton( m_physics_skeleton );
+		if(m_pPhysicsShell)
+			m_pPhysicsShell->Deactivate();
 		xr_delete(m_pPhysicsShell);
-		ActivateShell(NULL);
+		if( m_EntityAlife.Visual( ) )
+			ActivateShell(NULL);
 	}
 
 }

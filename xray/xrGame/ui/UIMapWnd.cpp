@@ -742,7 +742,10 @@ void CUIMapWnd::Reset()
 void CUIMapWnd::SpotSelected(CUIWindow* w)
 {
 	CMapSpot* sp		= smart_cast<CMapSpot*>(w);
-	if(NULL==sp)		return;
+	if ( !sp )
+	{
+		return;
+	}
 	
 	CGameTask* t		= Level().GameTaskManager().HasGameTask(sp->MapLocation(), true);
 	if(t && t->GetTaskType()==eTaskTypeAdditional)

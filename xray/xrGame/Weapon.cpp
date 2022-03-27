@@ -58,7 +58,7 @@ CWeapon::CWeapon()
 	m_pFlameParticles2		= NULL;
 	m_sFlameParticles2		= NULL;
 
-
+	m_fLR_MovingFactor 		= 0.f;
 	m_fCurrentCartirdgeDisp = 1.f;
 
 	m_strap_bone0			= 0;
@@ -71,6 +71,8 @@ CWeapon::CWeapon()
 	m_UIScope				= NULL;
 	m_set_next_ammoType_on_reload = u32(-1);
 	m_crosshair_inertion	= 0.f;
+	
+	m_nearwall_last_hud_fov = psHUD_FOV_def;
 }
 
 CWeapon::~CWeapon		()
@@ -126,7 +128,8 @@ void CWeapon::UpdateXForm	()
 	if ((HandDependence() == hd1Hand) || (GetState() == eReload) || (!E->g_Alive()))
 		boneL				= boneR2;
 
-	V->CalculateBones		();
+	V->CalculateBones_Invalidate		();
+	V->CalculateBones			(true);
 	Fmatrix& mL				= V->LL_GetTransform(u16(boneL));
 	Fmatrix& mR				= V->LL_GetTransform(u16(boneR));
 	// Calculate
@@ -437,6 +440,14 @@ void CWeapon::Load		(LPCSTR section)
 		strconcat					(sizeof(temp),temp,"hit_probability_",get_token_name(difficulty_type_token,i));
 		m_hit_probability[i]		= READ_IF_EXISTS(pSettings,r_float,section,temp,1.f);
 	}
+
+    m_hud_fov_add_mod = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov_addition_modifier", 0.f);
+
+    m_nearwall_dist_min       = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_min", 0.5f);
+    m_nearwall_dist_max       = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_max", 1.f);
+    m_nearwall_target_hud_fov = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_target_hud_fov", 0.35f);
+    m_nearwall_speed_mod      = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_speed_mod", 10.f);
+
 }
 
 void CWeapon::LoadFireParams		(LPCSTR section)
@@ -670,6 +681,7 @@ void CWeapon::OnH_B_Independent	(bool just_before_destroy)
 	m_zoom_params.m_bIsZoomModeNow	= false;
 	UpdateXForm					();
 
+	m_nearwall_last_hud_fov 	= psHUD_FOV_def;
 }
 
 void CWeapon::OnH_A_Independent	()
@@ -744,6 +756,8 @@ void CWeapon::OnH_B_Chield		()
 
 	OnZoomOut					();
 	m_set_next_ammoType_on_reload	= u32(-1);
+	
+	m_nearwall_last_hud_fov 	= psHUD_FOV_def;
 }
 
 extern u32 hud_adj_mode;
@@ -970,7 +984,7 @@ void CWeapon::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, u32 ParentID)
 		D->ID_Phantom				= 0xffff;
 		D->s_flags.assign			(M_SPAWN_OBJECT_LOCAL);
 		D->RespawnTime				= 0;
-		l_pA->m_tNodeID				= g_dedicated_server ? u32(-1) : ai_location().level_vertex_id();
+		l_pA->m_tNodeID				= ai_location().level_vertex_id();
 
 		if(boxCurr == 0xffffffff) 	
 			boxCurr					= l_pA->m_boxSize;
@@ -1284,11 +1298,41 @@ float CWeapon::CurrentZoomFactor()
 	return IsScopeAttached() ? m_zoom_params.m_fScopeZoomFactor : m_zoom_params.m_fIronSightZoomFactor;
 };
 
+float CWeapon::GetHudFov()
+{
+    if (ParentIsActor() && Level().CurrentViewEntity() == H_Parent())
+    {
+        collide::rq_result& RQ   = HUD().GetCurrentRayQuery();
+        float               dist = RQ.range;
+
+        clamp(dist, m_nearwall_dist_min, m_nearwall_dist_max);
+        float fDistanceMod = ((dist - m_nearwall_dist_min) / (m_nearwall_dist_max - m_nearwall_dist_min)); // 0.f ... 1.f
+
+        float fBaseFov = psHUD_FOV_def + m_hud_fov_add_mod;
+        clamp(fBaseFov, 0.0f, FLT_MAX);
+
+        float src = m_nearwall_speed_mod * Device.fTimeDelta;
+        clamp(src, 0.f, 1.f);
+
+        float fTrgFov           = m_nearwall_target_hud_fov + fDistanceMod * (fBaseFov - m_nearwall_target_hud_fov);
+        m_nearwall_last_hud_fov = m_nearwall_last_hud_fov * (1 - src) + fTrgFov * src;
+    }
+
+    if (m_zoom_params.m_fZoomRotationFactor > 0.0f)
+    {
+		return m_nearwall_last_hud_fov;
+    }
+    else
+    {
+        return m_nearwall_last_hud_fov;
+    }
+}
+
 void CWeapon::OnZoomIn()
 {
 	m_zoom_params.m_bIsZoomModeNow		= true;
 	m_zoom_params.m_fCurrentZoomFactor	= CurrentZoomFactor();
-	EnableHudInertion					(FALSE);
+	//EnableHudInertion					(FALSE);
 
 	
 	if(m_zoom_params.m_bZoomDofEnabled && !IsScopeAttached())
@@ -1299,7 +1343,7 @@ void CWeapon::OnZoomOut()
 {
 	m_zoom_params.m_bIsZoomModeNow		= false;
 	m_zoom_params.m_fCurrentZoomFactor	= g_fov;
-	EnableHudInertion					(TRUE);
+	//EnableHudInertion					(TRUE);
 
  	GamePersistent().RestoreEffectorDOF	();
 	ResetSubStateTime					();
@@ -1506,18 +1550,18 @@ bool CWeapon::ready_to_kill	() const
 
 void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 {
-	CActor* pActor	= smart_cast<CActor*>(H_Parent());
+	auto pActor	= smart_cast<const CActor*>(H_Parent());
 	if(!pActor)		return;
 
+	attachable_hud_item*		hi = HudItemData();
+	R_ASSERT					(hi);
 
+	u8 idx = GetCurrentHudOffsetIdx();
+	
 	if(		(IsZoomed() && m_zoom_params.m_fZoomRotationFactor<=1.f) ||
 			(!IsZoomed() && m_zoom_params.m_fZoomRotationFactor>0.f))
 	{
-		u8 idx = GetCurrentHudOffsetIdx();
-//		if(idx==0)					return;
 
-		attachable_hud_item*		hi = HudItemData();
-		R_ASSERT					(hi);
 		Fvector						curr_offs, curr_rot;
 		curr_offs					= hi->m_measures.m_hands_offset[0][idx];//pos,aim
 		curr_rot					= hi->m_measures.m_hands_offset[1][idx];//rot,aim
@@ -1546,6 +1590,87 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 			m_zoom_params.m_fZoomRotationFactor -= Device.fTimeDelta/m_zoom_params.m_fZoomRotateTime;
 
 		clamp(m_zoom_params.m_fZoomRotationFactor, 0.f, 1.f);
+	}
+
+
+	//clamp(idx, u8(0), u8(1));
+	clamp(idx, 0ui8, 1ui8);
+
+	float fStrafeMaxTime = hi->m_measures.m_strafe_offset[2][idx].y; 
+	if (fStrafeMaxTime <= EPS)
+		fStrafeMaxTime = 0.01f;
+
+    float fStepPerUpd = Device.fTimeDelta / fStrafeMaxTime;
+
+	u32 iMovingState = pActor->MovingState();
+	if ((iMovingState & mcLStrafe) != 0)
+	{
+        float fVal = (m_fLR_MovingFactor > 0.f ? fStepPerUpd * 3 : fStepPerUpd);
+		m_fLR_MovingFactor -= fVal;
+	}
+	else if ((iMovingState & mcRStrafe) != 0)
+	{ 
+        float fVal = (m_fLR_MovingFactor < 0.f ? fStepPerUpd * 3 : fStepPerUpd);
+		m_fLR_MovingFactor += fVal;
+	}
+	else
+	{
+		if (m_fLR_MovingFactor < 0.0f)
+		{
+			m_fLR_MovingFactor += fStepPerUpd;
+			clamp(m_fLR_MovingFactor, -1.0f, 0.0f);
+		}
+		else
+		{
+			m_fLR_MovingFactor -= fStepPerUpd;
+			clamp(m_fLR_MovingFactor, 0.0f, 1.0f);
+		}
+	}
+
+	clamp(m_fLR_MovingFactor, -1.0f, 1.0f); 
+
+	for (int _idx = 0; _idx <= 1; _idx++)
+	{
+        bool bEnabled = (hi->m_measures.m_strafe_offset[2][_idx].x != 0.0f);
+		if (!bEnabled)
+			continue;
+
+		Fvector curr_offs, curr_rot;
+
+        curr_offs = hi->m_measures.m_strafe_offset[0][_idx]; // pos
+		curr_offs.mul(m_fLR_MovingFactor);                   
+
+        curr_rot = hi->m_measures.m_strafe_offset[1][_idx]; // rot
+		curr_rot.mul(-PI / 180.f);                          
+		curr_rot.mul(m_fLR_MovingFactor);                   
+
+		if (_idx == 0)
+		{ 
+            curr_offs.mul(1.f - m_zoom_params.m_fZoomRotationFactor);
+            curr_rot.mul(1.f - m_zoom_params.m_fZoomRotationFactor);
+        }
+        else
+        { 
+            curr_offs.mul(m_zoom_params.m_fZoomRotationFactor);
+            curr_rot.mul(m_zoom_params.m_fZoomRotationFactor);
+		}
+
+		Fmatrix hud_rotation;
+		Fmatrix hud_rotation_y;
+
+		hud_rotation.identity();
+		hud_rotation.rotateX(curr_rot.x);
+
+		hud_rotation_y.identity();
+		hud_rotation_y.rotateY(curr_rot.y);
+		hud_rotation.mulA_43(hud_rotation_y);
+
+		hud_rotation_y.identity();
+		hud_rotation_y.rotateZ(curr_rot.z);
+		hud_rotation.mulA_43(hud_rotation_y);
+
+		hud_rotation.translate_over(curr_offs);
+		trans.mulB_43(hud_rotation);
 	}
 }
 
@@ -1707,7 +1832,7 @@ void CWeapon::debug_draw_firedeps()
 const float &CWeapon::hit_probability	() const
 {
 	VERIFY					((g_SingleGameDifficulty >= egdNovice) && (g_SingleGameDifficulty <= egdMaster)); 
-	return					(m_hit_probability[egdNovice]);
+	return					(m_hit_probability[g_SingleGameDifficulty]);
 }
 
 void CWeapon::OnStateSwitch	(u32 S)

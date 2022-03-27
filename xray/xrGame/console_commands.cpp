@@ -45,9 +45,6 @@
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
 
-#include "GameSpy/GameSpy_Full.h"
-#include "GameSpy/GameSpy_Patching.h"
-
 #ifdef DEBUG
 #	include "PHDebug.h"
 #	include "ui/UIDebugFonts.h" 
@@ -70,7 +67,7 @@ extern	u64		g_qwStartGameTime;
 extern	u64		g_qwEStartGameTime;
 
 ENGINE_API
-extern	float	psHUD_FOV;
+extern	float	psHUD_FOV_def;
 extern	float	psSqueezeVelocity;
 extern	int		psLUA_GCSTEP;
 
@@ -96,12 +93,11 @@ extern int		g_upgrades_log;
 extern float	g_smart_cover_animation_speed_factor;
 
 ENGINE_API extern float	g_console_sensitive;
-
-void register_mp_console_commands();
 //-----------------------------------------------------------
 
 		BOOL	g_bCheckTime			= FALSE;
 		int		net_cl_inputupdaterate	= 50;
+		int		g_dwEventDelay			= 0	;
 		Flags32	g_mt_config				= {mtLevelPath | mtDetailPath | mtObjectHandler | mtSoundPlayer | mtAiVision | mtBullets | mtLUA_GC | mtLevelSounds | mtALife | mtMap};
 #ifdef DEBUG
 		Flags32	dbg_net_Draw_Flags		= {0};
@@ -1501,26 +1497,13 @@ public:
 	virtual void Execute(LPCSTR arguments)
 	{
 		if (!MainMenu()) return;
-		/*
-		CGameSpy_Available GSA;
-		shared_str result_string;
-		if (!GSA.CheckAvailableServices(result_string))
-		{
-			Msg(*result_string);
-//			return;
-		};
-		CGameSpy_Patching GameSpyPatching;
-		*/
+
 		bool InformOfNoPatch = true;
 		if (arguments && *arguments) {
 			int bInfo = 1;
 			sscanf	(arguments,"%d", &bInfo);
 			InformOfNoPatch = (bInfo != 0);
 		}
-		
-//		GameSpyPatching.CheckForPatch(InformOfNoPatch);
-		
-		MainMenu()->GetGS()->m_pGS_Patching->CheckForPatch(InformOfNoPatch);
 	}
 };
 
@@ -1601,8 +1584,8 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"hud_crosshair",		&psHUD_Flags,	HUD_CROSSHAIR);
 	CMD3(CCC_Mask,				"hud_crosshair_dist",	&psHUD_Flags,	HUD_CROSSHAIR_DIST);
 
-	CMD4(CCC_Float,				"hud_fov",				&psHUD_FOV,		0.1f,	1.0f);
-	CMD4(CCC_Float,				"fov",					&g_fov,			5.0f,	180.0f);
+	CMD4(CCC_Float,				"hud_fov",				&psHUD_FOV_def,		0.1f,	1.0f);
+	CMD4(CCC_Float,				"fov",					&g_fov,			5.0f,	120.0f);
 
 	// Demo
 	CMD1(CCC_DemoPlay,			"demo_play"				);
@@ -1941,5 +1924,4 @@ extern BOOL dbg_moving_bones_snd_player;
 	
 	*g_last_saved_game	= 0;
 
-	register_mp_console_commands					();
 }

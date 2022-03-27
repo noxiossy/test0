@@ -113,6 +113,11 @@ void	CSoundRender_TargetA::update			()
             A_CHK			(alSourceQueueBuffers(pSource, 1, &BufferID));
             --processed;
         }
+
+		ALint state;
+		A_CHK(alGetSourcei(pSource, AL_SOURCE_STATE, &state));
+		if (state == AL_STOPPED)
+			A_CHK(alSourcePlay(pSource));
     }else{ 
     	// processed == 0
         // check play status -- if stopped then queue is not being filled fast enough
@@ -149,13 +154,15 @@ void	CSoundRender_TargetA::fill_parameters()
 
 	VERIFY2(m_pEmitter,SE->source()->file_name());
     float	_gain	= m_pEmitter->smooth_volume;			clamp	(_gain,EPS_S,1.f);
-    if (!fsimilar(_gain,cache_gain)){
+    if (!fsimilar(_gain,cache_gain, 0.01f))
+	{
         cache_gain	= _gain;
         A_CHK(alSourcef	(pSource, AL_GAIN,				_gain));
     }
 
 	VERIFY2(m_pEmitter,SE->source()->file_name());
-    float	_pitch	= m_pEmitter->p_source.freq;			clamp	(_pitch,EPS_L,2.f);
+    float _pitch = m_pEmitter->p_source.freq * psSoundTimeFactor; //--#SM+#-- Correct sound "speed" by time factor
+    clamp(_pitch, EPS_L, 100.f); //--#SM+#-- Increase sound frequancy (speed) limit 
     if (!fsimilar(_pitch,cache_pitch)){
         cache_pitch	= _pitch;
         A_CHK(alSourcef	(pSource, AL_PITCH,				_pitch));

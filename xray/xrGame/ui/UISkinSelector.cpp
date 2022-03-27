@@ -11,7 +11,6 @@
 #include "../game_cl_deathmatch.h"
 #include "../xr_level_controller.h"
 #include "../HUDManager.h"
-#include "CExtraContentFilter.h"
 
 #include "object_broker.h"
 
@@ -40,8 +39,6 @@ CUISkinSelectorWnd::CUISkinSelectorWnd(const char* strSectionName, s16 team)
 
 	m_firstSkin = 0;
 	//---------------------------------------------------
-	m_pExtraContentFilter = xr_new<CExtraContentFilter>();
-	//---------------------------------------------------
 	Init(strSectionName);	
 }
 
@@ -60,7 +57,6 @@ CUISkinSelectorWnd::~CUISkinSelectorWnd()
 	for (int i = 0; i<4; i++)
 		xr_delete(m_pImage[i]);
 
-	delete_data(m_pExtraContentFilter);
 	delete_data(m_skinsEnabled);
 }
 
@@ -76,8 +72,7 @@ void CUISkinSelectorWnd::InitSkins(){
 	{
 		_GetItem(lst, j, singleItem);
 		m_skins.push_back(singleItem);
-		//if (m_pExtraContentFilter->IsDataEnabled(singleItem))
-			m_skinsEnabled.push_back(j);
+		m_skinsEnabled.push_back(j);
 	}
 }
 

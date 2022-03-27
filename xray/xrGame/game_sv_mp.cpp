@@ -18,7 +18,6 @@
 #include "MPPlayersBag.h"
 #include "WeaponKnife.h"
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "xrGameSpyServer.h"
 
 #include "game_sv_mp_vote_flags.h"
 #include "player_name_modifyer.h"
@@ -1496,24 +1495,6 @@ void	game_sv_mp::OnPlayerChangeName		(NET_Packet& P, ClientID sender)
 	game_PlayerState* ps = pClient->ps;
 	if (!ps) return;
 
-	xrGameSpyServer* sv = smart_cast<xrGameSpyServer*>( m_server );
-	if( sv && sv->HasProtected() )
-	{
-		Msg( "Player \"%s\" try to change name on \"%s\" at protected server.", ps->getName(), NewName );
-
-		NET_Packet			P;
-		GenerateGameMessage (P);
-		P.w_u32				(GAME_EVENT_SERVER_STRING_MESSAGE);
-		P.w_stringZ			("Server is protected. Can\'t change player name!");
-		m_server->SendTo	( sender, P );
-		return;
-	}
-
-	if (NewPlayerName_Exists(pClient, NewName))
-	{
-		NewPlayerName_Generate(pClient, NewName);
-	};
-
 	if (pClient->owner)
 	{
 		NET_Packet			P;
@@ -1917,71 +1898,6 @@ void game_sv_mp::RejectGameItem(CSE_Abstract* entity)
 #include "string_table.h"
 void game_sv_mp::DumpOnlineStatistic()
 {
-	xrGameSpyServer* srv		= smart_cast<xrGameSpyServer*>(m_server);
-
-	string_path					fn;
-	FS.update_path				(fn,"$logs$","mp_stats\\");
-	strcat_s					(fn, srv->HostName.c_str());
-	strcat_s					(fn, "\\online_dump.ltx" );
-
-	string64					t_stamp;
-	timestamp					(t_stamp);
-
-	CInifile					ini(fn, FALSE, FALSE, TRUE);
-	shared_str					current_section = "global";
-	string256					str_buff;
-
-	ini.w_string				(current_section.c_str(), "dump_time", t_stamp);
-	
-	ini.w_u32					(current_section.c_str(), "players_total_cnt", m_server->GetClientsCount());
-
-	sprintf_s					(str_buff,"\"%s\"",CStringTable().translate(Level().name().c_str()).c_str());
-	ini.w_string				(current_section.c_str(), "current_map_name", str_buff);
-
-	sprintf_s					(str_buff,"%s",CStringTable().translate(type_name()).c_str() );
-	ini.w_string				(current_section.c_str(), "game_mode", str_buff);
-
-	MAP_ROTATION_LIST_it it		= m_pMapRotation_List.begin();
-	MAP_ROTATION_LIST_it it_e	= m_pMapRotation_List.end();
-	for(u32 idx=0;it!=it_e;++it,++idx)
-	{
-		string16					num_buf;
-		sprintf_s					(num_buf,"%d",idx);
-		sprintf_s					(str_buff,"\"%s\"", CStringTable().translate((*it).map_name.c_str()).c_str());
-		ini.w_string				("map_rotation", num_buf, str_buff);
-	}
-
-	struct player_stats_writer
-	{
-		game_sv_mp* m_owner;
-		xrServer* m_server;
-		u32 player_index;
-		CInifile* ini;
-		
-		void operator()(IClient* client)
-		{
-			xrClientData *l_pC			= static_cast<xrClientData*>(client);
-		
-			if(m_server->GetServerClient()==l_pC && g_dedicated_server) 
-				return;
-			
-			if(!l_pC->net_Ready)
-				return;
-
-			string16					num_buf;
-			sprintf_s					(num_buf,"player_%d",player_index);
-			++player_index;
-
-			m_owner->WritePlayerStats(*ini,num_buf,l_pC);
-		}
-	};
-	player_stats_writer tmp_functor;
-	tmp_functor.m_owner = this;
-	tmp_functor.m_server = m_server;
-	tmp_functor.ini = &ini;
-	tmp_functor.player_index = 0;
-	m_server->ForEachClientDo(tmp_functor);
-	WriteGameState				(ini, current_section.c_str(), false);
 }
 
 void game_sv_mp::WritePlayerStats(CInifile& ini, LPCSTR sect, xrClientData* pCl)
@@ -2088,21 +2004,6 @@ bool game_sv_mp::CheckStatisticsReady()
 
 void game_sv_mp::StartToDumpStatistics	()
 {
-	if ( !g_sv_mp_iDumpStatsPeriod ) return;
-
-	if (xr_strlen(round_statistics_dump_fn))
-	{
-		StopToDumpStatistics();
-	}
-	
-	xrGameSpyServer* srv		= smart_cast<xrGameSpyServer*>(m_server);
-	FS.update_path				(round_statistics_dump_fn,"$logs$","mp_stats\\");
-	string64					t_stamp;
-	timestamp					(t_stamp);
-	strcat_s					(round_statistics_dump_fn, srv->HostName.c_str() );
-	strcat_s					(round_statistics_dump_fn, "\\games\\dmp" );
-	strcat_s					(round_statistics_dump_fn, t_stamp );
-	strcat_s					(round_statistics_dump_fn, ".ltx" );
 }
 
 void game_sv_mp::StopToDumpStatistics	()
@@ -2154,8 +2055,6 @@ void game_sv_mp::DumpRoundStatistics()
 		{
 			xrClientData *l_pC			= static_cast<xrClientData*>(client);
 		
-			if(m_server->GetServerClient()==l_pC && g_dedicated_server) 
-				return;
 			if (!l_pC->m_cdkey_digest.size())
 				return;
 			

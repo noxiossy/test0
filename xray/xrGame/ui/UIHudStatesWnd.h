@@ -1,6 +1,3 @@
-#ifndef	UI_HUD_STATES_WND_H_INCLUDED
-#define UI_HUD_STATES_WND_H_INCLUDED
-
 #include "UIWindow.h"
 #include "..\..\xrServerEntities\alife_space.h"
 #include "..\actor_defs.h"
@@ -91,5 +88,3 @@ protected:
 			void	SwitchLA			( bool state, ALife::EInfluenceType type );
 
 }; // class CUIHudStatesWnd
-
-#endif // UI_HUD_STATES_WND_H_INCLUDED

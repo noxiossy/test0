@@ -7,7 +7,7 @@ namespace mp_anticheat
 {
 
 dump_verifyer::dump_verifyer() :
-	xr_dsa_verifyer(p_number, q_number, g_number, public_key)
+	xr_dsa_verifyer()
 {
 }
 
@@ -45,53 +45,8 @@ static char* search_info_section(u8* buffer, u32 buffer_size)
 	return NULL;
 }
 
-bool const configs_verifyer::verify_dsign(u8* data,
-										  u32 data_size,
-										  sha_checksum_t & sha_checksum)
+bool const configs_verifyer::verify_dsign()
 {
-	char*		tmp_info_sect = search_info_section(data, data_size);
-	if (!tmp_info_sect)
-		return false;
-
-	--tmp_info_sect;
-	u32			tmp_info_sect_size = xr_strlen(tmp_info_sect);
-	IReader		tmp_reader(tmp_info_sect, tmp_info_sect_size);
-	CInifile	tmp_ini(&tmp_reader);
-
-	if (!tmp_ini.line_exist(cd_info_secion, cd_player_name_key) ||
-		!tmp_ini.line_exist(cd_info_secion, cd_player_digest_key) ||
-		!tmp_ini.line_exist(cd_info_secion, cd_creation_date) ||
-		!tmp_ini.line_exist(cd_info_secion, cd_digital_sign_key))
-	{
-		return false;
-	}
-	
-	char*		dst_buffer = tmp_info_sect;
-	*dst_buffer	= 0;
-	u32			dst_size = static_cast<u32>(
-		(data + data_size) - (u8*)dst_buffer);
-	u32			src_data_size = data_size - dst_size;
-
-	LPCSTR		add_str = NULL;
-	STRCONCAT	(add_str,
-		tmp_ini.r_string(cd_info_secion, cd_player_name_key),
-		tmp_ini.r_string(cd_info_secion, cd_player_digest_key),
-		tmp_ini.r_string(cd_info_secion, cd_creation_date));
-
-	shared_str	tmp_dsign = tmp_ini.r_string(cd_info_secion, cd_digital_sign_key);
-
-	strcat_s		(dst_buffer, dst_size, add_str);
-	src_data_size	+= xr_strlen(dst_buffer) + 1; //zero ending
-
-	bool ret		= m_verifyer.verify(data, src_data_size, tmp_dsign);
-	if (!ret)
-		return false;
-
-	CopyMemory		(
-		sha_checksum,
-		m_verifyer.get_sha_checksum(),
-		sizeof(sha_checksum));
-
 	return true;
 }
 
@@ -226,24 +181,6 @@ bool const configs_verifyer::verify(u8* data, u32 data_size, string256 & diff)
 
 	m_orig_config_body.w_stringZ(add_str);
 	
-	crypto::xr_sha256	tmp_sha_checksum;
-	tmp_sha_checksum.start_calculate(
-		m_orig_config_body.pointer(),
-		m_orig_config_body.tell());
-	while (!tmp_sha_checksum.continue_calculate()) {};
-	
-	u8	tmp_checksum[crypto::xr_sha256::digest_length];
-	if (!verify_dsign(data, data_size, tmp_checksum))
-	{
-		strcpy_s(diff, "invalid digital sign");
-		return false;
-	}
-
-	if (memcmp(tmp_checksum, tmp_sha_checksum.pointer(), sizeof(tmp_checksum)))
-	{
-		get_diff(tmp_ini, tmp_active_params, diff);
-		return false;
-	}
 	return true;
 }
 

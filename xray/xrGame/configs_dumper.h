@@ -13,15 +13,6 @@ extern char const * cd_player_digest_key;
 extern char const * cd_digital_sign_key;
 extern char const * cd_creation_date;
 
-class dump_signer : public xr_dsa_signer
-{
-public:
-			dump_signer				();
-			~dump_signer			();
-private:
-	void	feel_private_dsa_key	();
-};
-
 class configs_dumper : public ISheduled
 {
 public:
@@ -39,7 +30,6 @@ public:
 	void					dump_config			(complete_callback_t complete_cb);
 private:
 	void					write_configs		();
-	void					sign_configs		();
 	void					compress_configs	();
 
 	static void				dumper_thread		(void* my_ptr);
@@ -63,24 +53,15 @@ private:
 	complete_callback_t		m_complete_cb;
 	yield_callback_t		m_yield_cb;
 	CMemoryWriter			m_dump_result;
-	dump_signer				m_dump_signer;
-	
+
 	mp_config_sections		m_ltx_configs;
 	mp_active_params		m_active_params;
 
 	HANDLE					m_make_start_event;
 	HANDLE					m_make_done_event;
 
-#ifdef DEBUG
-	CTimer				m_debug_timer;
-	u32					m_start_time;
-	shared_str			m_timer_comment;
-			void		timer_begin		(LPCSTR comment);
-			void		timer_end		();
-#else
 	inline	void		timer_begin		(LPCSTR comment) {}
 	inline	void		timer_end		()	{}
-#endif
 }; //class configs_dumper
 
 } //namespace mp_anticheat

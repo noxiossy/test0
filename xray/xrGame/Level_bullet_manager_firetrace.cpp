@@ -34,6 +34,9 @@ extern float gCheckHitK;
 //return TRUE-тестировать объект / FALSE-пропустить объект
 BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object, LPVOID params)
 {
+	if (!object)
+		return TRUE;
+
 	bullet_test_callback_data* pData	= (bullet_test_callback_data*)params;
 	SBullet* bullet = pData->pBullet;
 
@@ -48,9 +51,9 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 			ICollisionForm*	cform	= entity->collidable.model;
 			if ((NULL!=cform) && (cftObject==cform->Type())){
 				CActor* actor		= smart_cast<CActor*>(entity);
-				CAI_Stalker* stalker= smart_cast<CAI_Stalker*>(entity);
+				//CAI_Stalker* stalker= smart_cast<CAI_Stalker*>(entity);
 				// в кого попали?
-				if (actor && IsGameTypeSingle()/**/||stalker/**/){
+				if (actor/* || stalker*/) {
 					// попали в актера или сталкера
 					Fsphere S		= cform->getSphere();
 					entity->XFORM().transform_tiny	(S.P)	;
@@ -65,18 +68,6 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 							// попали в актера
 							float hpf				= 1.f;
 							float ahp				= actor->HitProbability();
-#if 1
-#	if 0
-							CObject					*weapon_object = Level().Objects.net_Find	(bullet->weapon_id);
-							if (weapon_object) {
-								CWeapon				*weapon = smart_cast<CWeapon*>(weapon_object);
-								if (weapon) {
-									float fly_dist		= bullet->fly_dist+dist;
-									float dist_factor	= _min(1.f,fly_dist/Level().BulletManager().m_fHPMaxDist);
-									ahp					= dist_factor*weapon->hit_probability() + (1.f-dist_factor)*1.f;
-								}
-							}
-#	else
 							float					game_difficulty_hit_probability = actor->HitProbability();
 							CAI_Stalker				*stalker = smart_cast<CAI_Stalker*>(initiator);
 							if (stalker)
@@ -94,17 +85,6 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 							}
 
 							ahp						= dist_factor*game_difficulty_hit_probability + (1.f-dist_factor)*1.f;
-#	endif
-#else
-							CAI_Stalker* i_stalker	= smart_cast<CAI_Stalker*>(initiator);
-							// если стрелял сталкер, учитываем - hit_probability_factor сталкерa иначе - 1.0
-							if (i_stalker) {
-								hpf					= i_stalker->SpecificCharacter().hit_probability_factor();
-								float fly_dist		= bullet->fly_dist+dist;
-								float dist_factor	= _min(1.f,fly_dist/Level().BulletManager().m_fHPMaxDist);
-								ahp					= dist_factor*actor->HitProbability() + (1.f-dist_factor)*1.f;
-							}
-#endif
 							if (Random.randF(0.f,1.f)>(ahp*hpf)){ 
 								bRes				= FALSE;	// don't hit actor
 								play_whine			= true;		// play whine sound
@@ -155,27 +135,22 @@ void CBulletManager::FireShotmark (SBullet* bullet, const Fvector& vDir, const F
 
 	if (R.O)
 	{
-/*  add_SkeletonWallmark not implemented now...
 		particle_dir		 = vDir;
 		particle_dir.invert	();
 
 		//на текущем актере отметок не ставим
-		if(Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID()) return;
-
-		if (mtl_pair && !mtl_pair->m_pCollideMarks->empty() && ShowMark)
+		if ( !smart_cast<CActor*>( R.O ) && mtl_pair && !mtl_pair->m_pCollideMarks->empty() && ShowMark )
 		{
 			//добавить отметку на материале
 			Fvector p;
 			p.mad(bullet->bullet_pos,bullet->dir,R.range-0.01f);
-			if(!g_dedicated_server)
-				::Render->add_SkeletonWallmark	(	&R.O->renderable.xform, 
+			::Render->add_SkeletonWallmark	(	&R.O->renderable.xform, 
 													PKinematics(R.O->Visual()), 
 													&*mtl_pair->m_pCollideMarks,
 													p, 
 													bullet->dir, 
 													bullet->wallmark_size);
 		}
-*/
 	} 
 	else 
 	{
@@ -423,6 +398,8 @@ bool CBulletManager::ObjectHit( SBullet_Hit* hit_res, SBullet* bullet, const Fve
 	hit_res->impulse = 0.0f;
 	float speed_scale = 0.0f;
 
+
+
 #ifdef DEBUG
 	Fvector dbg_bullet_pos;
 	dbg_bullet_pos.mad(bullet->bullet_pos,bullet->dir,R.range);
@@ -448,7 +425,7 @@ bool CBulletManager::ObjectHit( SBullet_Hit* hit_res, SBullet* bullet, const Fve
 	if ( (f < ricoshet_factor) && !mtl->Flags.test(SGameMtl::flNoRicoshet) && bullet->flags.allow_ricochet )	
 	{
 		// уменьшение скорости полета в зависимости от угла падения пули (чем прямее угол, тем больше потеря)
-		bullet->flags.allow_ricochet = 0;
+		bullet->flags.allow_ricochet = 1;
 		float scale = 1.0f - _abs(bullet->dir.dotproduct(hit_normal)) * m_fCollisionEnergyMin;
 		clamp(scale, 0.0f, m_fCollisionEnergyMax);
 		speed_scale = scale;
@@ -458,7 +435,7 @@ bool CBulletManager::ObjectHit( SBullet_Hit* hit_res, SBullet* bullet, const Fve
 		bullet->dir.set				(tgt_dir);
 		bullet->bullet_pos			= end_point;
 		bullet->flags.ricochet_was	= 1;
-
+	
 #ifdef DEBUG
 		bullet_state = 0;
 #endif		
@@ -492,7 +469,6 @@ bool CBulletManager::ObjectHit( SBullet_Hit* hit_res, SBullet* bullet, const Fve
 	float energy_lost = 1.0f - bullet->speed / old_speed;
 	//импульс переданный объекту равен прямопропорционален потерянной энергии
 	hit_res->impulse = bullet->hit_param.impulse * speed_factor * energy_lost;
-
 
 #ifdef DEBUG
 	extern BOOL g_bDrawBulletHit;

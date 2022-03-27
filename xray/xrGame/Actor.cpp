@@ -184,7 +184,7 @@ CActor::CActor() : CEntityAlive()
 	m_iLastHittingWeaponID	= u16(-1);
 	m_statistic_manager		= NULL;
 	//-----------------------------------------------------------------------------------
-	m_memory				= g_dedicated_server ? 0 : xr_new<CActorMemory>(this);
+	m_memory				= xr_new<CActorMemory>(this);
 	m_bOutBorder			= false;
 	m_hit_probability		= 1.f;
 	m_feel_touch_characters = 0;
@@ -233,8 +233,7 @@ void CActor::reinit	()
 	material().reinit							();
 
 	m_pUsableObject								= NULL;
-	if (!g_dedicated_server)
-		memory().reinit							();
+	memory().reinit							();
 	
 	set_input_external_handler					(0);
 	m_time_lock_accel							= 0;
@@ -246,8 +245,7 @@ void CActor::reload	(LPCSTR section)
 	CInventoryOwner::reload		(section);
 	material().reload			(section);
 	CStepManager::reload		(section);
-	if (!g_dedicated_server)
-		memory().reload			(section);
+	memory().reload			(section);
 	m_location_manager->reload	(section);
 }
 
@@ -342,7 +340,6 @@ void CActor::Load	(LPCSTR section )
 	m_vMissileOffset			= pSettings->r_fvector3(section,"missile_throw_offset");
 
 
-if(!g_dedicated_server)
 {
 	LPCSTR hit_snd_sect = pSettings->r_string(section,"hit_sounds");
 	for(int hit_type=0; hit_type<(int)ALife::eHitTypeMax; ++hit_type)
@@ -447,7 +444,7 @@ void	CActor::Hit							(SHit* pHDS)
 	bool bPlaySound = true;
 	if (!g_Alive()) bPlaySound = false;
 
-	if (!IsGameTypeSingle() && !g_dedicated_server)
+	if (!IsGameTypeSingle() )
 	{
 		game_PlayerState* ps = Game().GetPlayerByGameID(ID());
 		if (ps && ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
@@ -478,8 +475,7 @@ void	CActor::Hit							(SHit* pHDS)
 		last_hit_frame = Device.dwFrame;
 	};
 
-	if(	!g_dedicated_server				&& 
-		!sndHit[HDS.hit_type].empty()	&&
+	if(	!sndHit[HDS.hit_type].empty()	&&
 		conditions().PlayHitSound(pHDS)	)
 	{
 		ref_sound& S			= sndHit[HDS.hit_type][Random.randI(sndHit[HDS.hit_type].size())];
@@ -503,7 +499,7 @@ void	CActor::Hit							(SHit* pHDS)
 			Fvector point		= Position();
 			point.y				+= CameraHeight();
 			S.play_at_pos		(this, point);
-		};
+		}
 	}
 
 	
@@ -511,18 +507,18 @@ void	CActor::Hit							(SHit* pHDS)
 	m_hit_slowmo = conditions().HitSlowmo(pHDS);
 
 	//---------------------------------------------------------------
-	if(Level().CurrentViewEntity() == this && !g_dedicated_server && (HDS.hit_type == ALife::eHitTypeFireWound) )
+	if(Level().CurrentViewEntity() == this && (HDS.hit_type == ALife::eHitTypeFireWound) )
 	{
 		CObject* pLastHitter			= Level().Objects.net_Find(m_iLastHitterID);
 		CObject* pLastHittingWeapon		= Level().Objects.net_Find(m_iLastHittingWeaponID);
 		HitSector						(pLastHitter, pLastHittingWeapon);
-	};
+	}
 
 	if( (mstate_real&mcSprint) && Level().CurrentControlEntity() == this && conditions().DisableSprint(pHDS) )
 	{
 		mstate_wishful	&=~mcSprint;
-	};
-	if(!g_dedicated_server)
+	}
+
 	{
 		HitMark			(HDS.damage(), HDS.dir, HDS.who, HDS.bone(), HDS.p_in_bone_space, HDS.impulse, HDS.hit_type);
 	}
@@ -696,15 +692,6 @@ void CActor::Die	(CObject* who)
 				{
 					if (IsGameTypeSingle())
 						(*I).m_pIItem->SetDropManual(TRUE);
-					else
-					{
-						//This logic we do on a server site
-						/*
-						if ((*I).m_pIItem->object().CLS_ID != CLSID_OBJECT_W_KNIFE)
-						{
-							(*I).m_pIItem->SetDropManual(TRUE);
-						}*/							
-					}
 				};
 			continue;
 			}
@@ -722,37 +709,12 @@ void CActor::Die	(CObject* who)
 		TIItemContainer &l_blist = inventory().m_belt;
 		while (!l_blist.empty())	
 			inventory().Ruck(l_blist.front());
-
-		if (!IsGameTypeSingle())
-		{
-			//if we are on server and actor has PDA - destroy PDA
-			TIItemContainer &l_rlist	= inventory().m_ruck;
-			for(TIItemContainer::iterator l_it = l_rlist.begin(); l_rlist.end() != l_it; ++l_it)
-			{
-				if (GameID() == eGameIDArtefactHunt)
-				{
-					CArtefact* pArtefact = smart_cast<CArtefact*> (*l_it);
-					if (pArtefact)
-					{
-						(*l_it)->SetDropManual(TRUE);
-						continue;
-					};
-				};
-
-				if ((*l_it)->object().CLS_ID == CLSID_OBJECT_PLAYERS_BAG)
-				{
-					(*l_it)->SetDropManual(TRUE);
-					continue;
-				};
-			};
-		};
 	};
 
 	cam_Set					(eacFreeLook);
 	mstate_wishful	&=		~mcAnyMove;
 	mstate_real		&=		~mcAnyMove;
 
-	if(!g_dedicated_server)
 	{
 		::Sound->play_at_pos	(sndDie[Random.randI(SND_DIE_COUNT)],this,Position());
 
@@ -1091,7 +1053,7 @@ void CActor::shedule_Update	(u32 DT)
 		mstate_wishful &=~mcFwd;
 		mstate_wishful &=~mcBack;
 		extern bool g_bAutoClearCrouch;
-		if (g_bAutoClearCrouch)
+		if (g_bAutoClearCrouch && !(mstate_real&(mcJump | mcFall)))
 			mstate_wishful &=~mcCrouch;
 		//-----------------------------------------------------
 		}
@@ -1145,7 +1107,7 @@ void CActor::shedule_Update	(u32 DT)
 	pCamBobbing->SetState						(mstate_real, conditions().IsLimping(), IsZoomAimingMode());
 
 	//звук тяжелого дыхания при уталости и хромании
-	if(this==Level().CurrentControlEntity() && !g_dedicated_server )
+	if(this==Level().CurrentControlEntity() )
 	{
 		if(conditions().IsLimping() && g_Alive()){
 			if(!m_HeavyBreathSnd._feedback()){
@@ -1491,7 +1453,7 @@ void CActor::ForceTransform(const Fmatrix& m)
 		character_physics_support()->movement()->BlockDamageSet( u64( block_damage_time_seconds/fixed_step ) );
 }
 
-ENGINE_API extern float		psHUD_FOV;
+//ENGINE_API extern float		psHUD_FOV;
 float CActor::Radius()const
 { 
 	float R		= inherited::Radius();
@@ -1883,7 +1845,7 @@ float CActor::GetRestoreSpeed( ALife::EConditionRestoreType const& type )
 	case ALife::eHealthRestoreSpeed:
 	{
 		res = conditions().change_v().m_fV_HealthRestore;
-		res += conditions().V_SatietyHealth() * ( (conditions().Satiety() > 0.0f) ? 1.0f : -1.0f );
+		res += conditions().V_SatietyHealth() * ( (conditions().GetSatiety() > 0.0f) ? 1.0f : -1.0f );
 
 		TIItemContainer::iterator itb = inventory().m_belt.begin();
 		TIItemContainer::iterator ite = inventory().m_belt.end();
@@ -1944,7 +1906,7 @@ float CActor::GetRestoreSpeed( ALife::EConditionRestoreType const& type )
 	}
 	case ALife::ePowerRestoreSpeed:
 	{
-		res = conditions().V_SatietyPower();
+		res = conditions().GetSatietyPower();
 
 		TIItemContainer::iterator itb = inventory().m_belt.begin();
 		TIItemContainer::iterator ite = inventory().m_belt.end();
@@ -2008,3 +1970,75 @@ void CActor::On_LostEntity()
 {
 	psCamInert = prev_cam_inert_value;
 }
+
+class remove_predikat
+{
+	shared_str sect;
+public:
+	remove_predikat(shared_str _s) :sect(_s){};
+	IC bool operator() (CWeaponAmmo* a)
+	{
+		return a->cNameSect() == sect;
+	}
+};
+
+void CActor::RepackAmmo()
+{
+	xr_vector<CWeaponAmmo*>  _ammo;
+	TIItemContainer ruck = inventory().m_ruck;
+	TIItemContainer::iterator it = ruck.begin();
+
+	for (; it != ruck.end(); ++it)
+	{
+		PIItem _pIItem = *it;
+		CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(_pIItem);
+		if (pAmmo && pAmmo->m_boxCurr < pAmmo->m_boxSize) _ammo.push_back(pAmmo);
+	}
+
+	while (!_ammo.empty())
+	{
+
+		shared_str asect = _ammo[0]->cNameSect();
+		u16 box_size = _ammo[0]->m_boxSize;
+
+		u32 cnt = 0;
+		u16 cart_cnt = 0;
+		xr_vector<CWeaponAmmo*>::iterator  it_ammo = _ammo.begin();
+
+		for (; it_ammo != _ammo.end(); ++it_ammo)
+		{
+			if (asect == (*it_ammo)->cNameSect())
+			{
+				cnt = cnt + (*it_ammo)->m_boxCurr;
+				cart_cnt++;
+			}
+		}//for	
+
+		if (cart_cnt > 1)
+			for (it_ammo = _ammo.begin(); it_ammo != _ammo.end(); ++it_ammo)
+			{
+				if (asect == (*it_ammo)->cNameSect())
+				{
+					if (cnt > 0)
+					{
+						if (cnt > box_size)
+						{
+							(*it_ammo)->m_boxCurr = box_size;
+							cnt = cnt - box_size;
+						}
+						else
+						{
+							(*it_ammo)->m_boxCurr = (u16)cnt;
+							cnt = 0;
+						}
+					}
+					else
+					{
+						(*it_ammo)->DestroyObject();
+					}
+				}
+			}//for
+
+			_ammo.erase(std::remove_if(_ammo.begin(), _ammo.end(), remove_predikat(asect)), _ammo.end());
+	}// while
+}  
