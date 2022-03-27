@@ -35,6 +35,10 @@ class CGamePersistent:
 
 	void xr_stdcall		start_logo_intro		();
 	void xr_stdcall		update_logo_intro		();
+
+	void xr_stdcall		game_loaded				();
+	void xr_stdcall		update_game_loaded		();
+
 	void xr_stdcall		start_game_intro		();
 	void xr_stdcall		update_game_intro		();
 
@@ -78,6 +82,7 @@ public:
 	virtual void		OnRenderPPUI_main		();
 	virtual void		OnRenderPPUI_PP			();
 	virtual	void		LoadTitle				(LPCSTR str);
+	virtual	void		LoadTitleAdd			(bool change_tip = false);
 
 	virtual bool		CanBePaused				();
 
