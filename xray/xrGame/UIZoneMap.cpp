@@ -84,6 +84,7 @@ void CUIZoneMap::Render			()
 
 void CUIZoneMap::Update()
 {
+	if ( !visible ) return;
 	CActor* pActor = smart_cast<CActor*>( Level().CurrentViewEntity() );
 	if ( !pActor ) return;
 

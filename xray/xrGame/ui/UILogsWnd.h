@@ -57,11 +57,12 @@ private:
 	u32					m_previous_time;
 	bool				m_need_reload;
 	WINDOW_LIST			m_items_cache;
+	WINDOW_LIST			m_items_ready;
 	xr_vector<u32>		m_news_in_queue;
 
 	CUIWindow*			CreateItem			();
 	CUIWindow*			ItemFromCache		();
-	void				ItemToCache			(CUIWindow* w);
+//	void				ItemToCache			(CUIWindow* w);
 	CUIXml				m_uiXml;
 
 public:
@@ -82,7 +83,7 @@ public:
 
 protected:
 			void		ReLoadNews			();
-			void		AddNewsItem			( GAME_NEWS_DATA& news_data, CUIWindow* item );
+			void		AddNewsItem			( GAME_NEWS_DATA& news_data );
 	ALife::_TIME_ID		GetShiftPeriod		( ALife::_TIME_ID datetime, int shift_day );
 
 			void xr_stdcall	UpdateChecks	( CUIWindow* w, void* d);

@@ -7,7 +7,7 @@
 #include "UI3tButton.h"
 #include "../UI.h"
 #include "UITalkWnd.h"
-
+#include <dinput.h>
 
 #define				TALK_XML				"talk.xml"
 
@@ -102,18 +102,18 @@ void CUITalkDialogWnd::Show()
 {
 	InventoryUtilities::SendInfoToActor				("ui_talk_show");
 	InventoryUtilities::SendInfoToLuaScripts		("ui_talk_show");
-	inherited::Show(true);
-	inherited::Enable(true);
+	inherited::Show									(true);
+	inherited::Enable								(true);
 
-	ResetAll();
+	ResetAll										();
 }
 
 void CUITalkDialogWnd::Hide()
 {
 	InventoryUtilities::SendInfoToActor				("ui_talk_hide");
 	InventoryUtilities::SendInfoToLuaScripts		("ui_talk_hide");
-	inherited::Show(false);
-	inherited::Enable(false);
+	inherited::Show									(false);
+	inherited::Enable								(false);
 }
 
 void CUITalkDialogWnd::OnQuestionClicked(CUIWindow* w, void*)

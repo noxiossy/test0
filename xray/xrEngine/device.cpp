@@ -110,7 +110,7 @@ void CRenderDevice::End		(void)
 			if(precache_light) precache_light->set_active	(false);
 			if(precache_light) precache_light.destroy		();
 			::Sound->set_master_volume						(1.f);
-			pApp->destroy_loading_shaders					();
+			//pApp->destroy_loading_shaders					();
 
 			m_pRender->ResourcesDestroyNecessaryTextures	();
 			Memory.mem_compact								();
