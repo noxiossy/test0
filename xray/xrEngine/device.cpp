@@ -97,8 +97,8 @@ void CRenderDevice::End		(void)
 	{
 		::Sound->set_master_volume	(0.f);
 		dwPrecacheFrame	--;
-		pApp->load_draw_internal	();
-        if (!dwPrecacheFrame)
+		//pApp->load_draw_internal	();
+		if (!dwPrecacheFrame)
 		{
 
 #ifdef INGAME_EDITOR
