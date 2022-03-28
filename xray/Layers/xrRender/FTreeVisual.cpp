@@ -88,21 +88,19 @@ void FTreeVisual::Load		(const char* N, IReader *data, u32 dwFlags)
 struct	FTreeVisual_setup
 {
 	u32			dwFrame;
-	float		scale;
+	float		scale{};
 	Fvector4	wave;
 	Fvector4	wind;
 
-	FTreeVisual_setup() 
-	{
-		dwFrame	= 0;
-	}
+    FTreeVisual_setup(): dwFrame(0), scale(0) {}
+
 
 	void		calculate	()
 	{
 		dwFrame					= Device.dwFrame;
 
 		// Calc wind-vector3, scale
-		float	tm_rot			= PI_MUL_2*Device.fTimeGlobal/ps_r__Tree_w_rot;
+		const	float	tm_rot			= PI_MUL_2*Device.fTimeGlobal/ps_r__Tree_w_rot;
 		CEnvDescriptor&	E = *g_pGamePersistent->Environment().CurrentEnv;
 		float fValue = E.m_fTreeAmplitudeIntensity;
 		wind.set(_sin(tm_rot), 0, _cos(tm_rot), 0);

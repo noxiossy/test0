@@ -101,12 +101,11 @@ void		CWallmarksEngine::static_wm_render		(CWallmarksEngine::static_wallmark*	W,
 	float		a		= 1-(W->ttl/ps_r__WallmarkTTL);
 	int			aC		= iFloor	( a * 255.f);	clamp	(aC,0,255);
 	u32			C		= color_rgba(128,128,128,aC);
-	FVF::LIT*	S		= &*W->verts.begin	();
-	FVF::LIT*	E		= &*W->verts.end	();
-	for (; S!=E; S++, V++){
-		V->p.set		(S->p);
+	for (const auto& el: W->verts) {
+		V->p.set		(el.p);
 		V->color		= C;
-		V->t.set		(S->t);
+		V->t.set		(el.t);
+		V++;
 	}
 }
 //--------------------------------------------------------------------------------
@@ -228,14 +227,16 @@ void CWallmarksEngine::AddWallmark_internal	(CDB::TRI* pTri, const Fvector* pVer
 	RecurseTri			(0,mView,*W);
 
 	// calc sphere
-	if (W->verts.size()<3) { static_wm_destroy(W); return; }
-	else {
+	if (W->verts.size()<3) 
+	{ 
+		static_wm_destroy(W); 
+		return; 
+	}else 
+	{
 		Fbox bb;	bb.invalidate();
-
-		FVF::LIT* I=&*W->verts.begin	();
-		FVF::LIT* E=&*W->verts.end		();
-		for (; I!=E; I++)	bb.modify	(I->p);
-		bb.getsphere					(W->bounds.P,W->bounds.R);
+		for (const auto& el: W->verts)
+			bb.modify(el.p);
+		bb.getsphere					(W->bounds.P, W->bounds.R);
 	}
 
 	if (W->bounds.R < 1.f)	
@@ -361,7 +362,7 @@ void CWallmarksEngine::Render()
 		BeginStream	(hGeom,w_offset,w_verts,w_start);
 		wm_slot* slot			= *slot_it;	
 		// static wallmarks
-		for (StaticWMVecIt w_it=slot->static_items.begin(); w_it!=slot->static_items.end(); ){
+		for (auto w_it = slot->static_items.begin(); w_it != slot->static_items.end(); ) {
 			static_wallmark* W	= *w_it;
 			if (RImplementation.ViewBase.testSphere_dirty(W->bounds.P,W->bounds.R)){
 				Device.Statistic->RenderDUMP_WMS_Count++;

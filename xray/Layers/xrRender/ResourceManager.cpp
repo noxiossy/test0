@@ -32,8 +32,8 @@ void fix_texture_name(LPSTR fn)
 template <class T>
 BOOL	reclaim		(xr_vector<T*>& vec, const T* ptr)
 {
-	typename xr_vector<T*>::iterator it	= vec.begin	();
-	typename xr_vector<T*>::iterator end	= vec.end	();
+	auto it = vec.begin();
+	auto end = vec.end();
 	for (; it!=end; it++)
 		if (*it == ptr)	{ vec.erase	(it); return TRUE; }
 		return FALSE;
@@ -93,7 +93,7 @@ void	CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 	if (0==names || 0==names[0])
  		names 	= "$null";
 
-	ZeroMemory			(&dest, sizeof(dest));
+	dest.clear();
 	char*	P			= (char*) names;
 	svector<char,128>	N;
 
@@ -283,11 +283,6 @@ Shader*		CResourceManager::Create	(IBlender*	B,		LPCSTR s_shader,	LPCSTR s_textu
 
 Shader*		CResourceManager::Create	(LPCSTR s_shader,	LPCSTR s_textures,	LPCSTR s_constants,	LPCSTR s_matrices)
 {
-//#ifndef DEDICATED_SERVER
-#ifndef _EDITOR
-	if (!g_dedicated_server)
-#endif
-	{
 		//	TODO: DX10: When all shaders are ready switch to common path
 #ifdef	USE_DX10
 		if	(_lua_HasShader(s_shader))		
@@ -316,15 +311,6 @@ Shader*		CResourceManager::Create	(LPCSTR s_shader,	LPCSTR s_textures,	LPCSTR s_
 #endif
 			return	_cpp_Create	(s_shader,s_textures,s_constants,s_matrices);
 #endif	//	USE_DX10
-	}
-//#else
-#ifndef _EDITOR
-	else
-#endif
-	{
-		return NULL;
-	}
-//#endif
 }
 
 void CResourceManager::Delete(const Shader* S)

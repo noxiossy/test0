@@ -1,5 +1,3 @@
-#ifndef xrRender_consoleH
-#define xrRender_consoleH
 #pragma once
 
 // Common
@@ -206,5 +204,3 @@ extern void						xrRender_apply_tf		();
 
 // KD
 extern ECORE_API int			ps_r__detail_radius;
-
-#endif

@@ -20,7 +20,7 @@ public:
 		rstHull = rstGeometry+256,
 		rstDomain = rstHull+256,
 		rstCompute = rstDomain+256,
-        rstInvalid = rstCompute+256
+		rstInvalid = rstCompute+256
 	};
 
 public:

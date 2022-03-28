@@ -2,8 +2,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef ResourceManagerH
-#define ResourceManagerH
 #pragma once
 
 #include	"shader.h"
@@ -204,4 +202,3 @@ public:
 	void			Dump					(bool bBrief);
 };
 
-#endif //ResourceManagerH

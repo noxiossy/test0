@@ -161,11 +161,7 @@ void CTexture::Load		()
 	}
 
 	Preload							();
-//#ifndef		DEDICATED_SERVER
-#ifndef _EDITOR
-	if (!g_dedicated_server)
-#endif
-	{
+
 		// Check for OGM
 		string_path			fn;
 		if (FS.exist(fn,"$game_textures$",*cName,".ogm"))
@@ -182,7 +178,8 @@ void CTexture::Load		()
 			else 
 			{
 				flags.MemoryUsage	= pTheora->Width(true)*pTheora->Height(true)*4;
-				pTheora->Play		(TRUE,Device.dwTimeContinual);
+				BOOL bstop_at_end	= (0!=strstr(cName.c_str(), "intro\\")) || (0!=strstr(cName.c_str(), "outro\\"));
+				pTheora->Play		(!bstop_at_end, Device.dwTimeContinual);
 
 				// Now create texture
 				ID3DTexture2D*	pTexture = 0;
@@ -282,8 +279,6 @@ void CTexture::Load		()
 				flags.MemoryUsage		=	mem;
 			}
 		}
-//#endif
-	}
 	PostLoad	()		;
 }
 

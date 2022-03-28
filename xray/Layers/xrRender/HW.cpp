@@ -55,7 +55,8 @@ void CHW::Reset		(HWND hwnd)
 
 #ifndef _EDITOR
 	BOOL	bWindowed		= TRUE;
-	bWindowed		= !psDeviceFlags.is	(rsFullscreen);
+	if (!strstr(Core.Params, "-editor"))
+        bWindowed		= !psDeviceFlags.is	(rsFullscreen);
 
 	selectResolution		(DevPP.BackBufferWidth, DevPP.BackBufferHeight, bWindowed);
 	// Windoze
@@ -89,11 +90,7 @@ void CHW::Reset		(HWND hwnd)
 
 void CHW::CreateD3D	()
 {
-
-	LPCSTR		_name			= "xrd3d9-null.dll";
-
-	_name			= "d3d9.dll";
-
+	LPCSTR		_name			= "d3d9.dll";
 
 	hD3D            			= LoadLibrary(_name);
 	R_ASSERT2	           	 	(hD3D,"Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
@@ -202,7 +199,8 @@ void		CHW::CreateDevice		(HWND m_hWnd, bool move_window)
 	BOOL  bWindowed			= TRUE;
 	
 #ifndef _EDITOR
-	bWindowed			= !psDeviceFlags.is(rsFullscreen);
+	if (!strstr(Core.Params, "-editor"))
+        bWindowed			= !psDeviceFlags.is(rsFullscreen);
 #else
 	bWindowed				= 1;
 #endif        
@@ -450,7 +448,8 @@ void	CHW::updateWindowProps	(HWND m_hWnd)
 {
 	BOOL	bWindowed				= TRUE;
 #ifndef _EDITOR
-	bWindowed			= !psDeviceFlags.is(rsFullscreen);
+	if (!strstr(Core.Params, "-editor"))
+        bWindowed			= !psDeviceFlags.is(rsFullscreen);
 #endif	
 
 	u32		dwWindowStyle			= 0;

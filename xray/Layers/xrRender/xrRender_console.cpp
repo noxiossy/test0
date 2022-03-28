@@ -49,17 +49,18 @@ xr_token							qsun_quality_token							[ ]={
 	{ 0,							0												}
 };
 
-u32 r2_SmapSize = 2048;
+u32 r2_SmapSize = 1024;
 xr_token SmapSizeToken[] = {
-  { "1536x1536",   1536 },
-  { "2048x2048",   2048 },
-  { "2560x2560",   2560 },
-  { "3072x3072",   3072 },
-  { "4096x4096",   4096 },
-  { "6144x6144",   6144 },
-  { "8192x8192",   8192 },
-  { "16384x16384", 16384 },
-  { nullptr, 0 }
+	{ "1024x1024",   1024 },
+	{ "1536x1536",   1536 },
+	{ "2048x2048",   2048 },
+	{ "2560x2560",   2560 },
+	{ "3072x3072",   3072 },
+	{ "4096x4096",   4096 },
+	{ "6144x6144",   6144 },
+	{ "8192x8192",   8192 },
+	{ "16384x16384", 16384 },
+	{ nullptr, 0 }
 };
 
 u32			ps_r3_msaa				=	0;			//	=	0;
@@ -132,7 +133,7 @@ float		ps_r1_ssaLOD_B				= 48.f	;
 float		ps_r1_tf_Mipbias			= 0.0f	;
 Flags32		ps_r1_flags					= { R1FLAG_DLIGHTS };		// r1-only
 float		ps_r1_lmodel_lerp			= 0.1f	;
-float		ps_r1_dlights_clip			= 30.f	;
+float		ps_r1_dlights_clip			= 40.f	;
 float		ps_r1_pps_u					= 0.f	;
 float		ps_r1_pps_v					= 0.f	;
 
@@ -164,18 +165,19 @@ Flags32		ps_r2_ls_flags				= { R2FLAG_SUN
 
 Flags32		ps_r2_ls_flags_ext			= {
 		/*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA
+		|R2FLAGEXT_ENABLE_TESSELLATION
 	};
 
 float		ps_r2_df_parallax_h			= 0.02f;
 float		ps_r2_df_parallax_range		= 75.f;
 float		ps_r2_tonemap_middlegray	= 0.25f;			// r2-only
-float		ps_r2_tonemap_adaptation	= 5.f;				// r2-only
-float		ps_r2_tonemap_low_lum		= 0.001f;			// r2-only
+float		ps_r2_tonemap_adaptation	= 1.f;				// r2-only
+float		ps_r2_tonemap_low_lum		= 0.0001f;			// r2-only
 float		ps_r2_tonemap_amount		= 0.5f;				// r2-only
 float		ps_r2_ls_bloom_kernel_g		= 3.3f;				// r2-only
 float		ps_r2_ls_bloom_kernel_b		= .7f;				// r2-only
 float		ps_r2_ls_bloom_speed		= 10.f;				// r2-only
-float		ps_r2_ls_bloom_kernel_scale	= 1.0f;				// r2-only	// gauss
+float		ps_r2_ls_bloom_kernel_scale	= 0.7f;				// r2-only	// gauss
 float		ps_r2_ls_dsm_kernel			= .7f;				// r2-only
 float		ps_r2_ls_psm_kernel			= .7f;				// r2-only
 float		ps_r2_ls_ssm_kernel			= .7f;				// r2-only
@@ -183,7 +185,7 @@ float		ps_r2_ls_bloom_threshold	= .3f;				// r2-only
 Fvector		ps_r2_aa_barier				= { .8f, .1f, 0};	// r2-only
 Fvector		ps_r2_aa_weight				= { .25f,.25f,0};	// r2-only
 float		ps_r2_aa_kernel				= .5f;				// r2-only
-float		ps_r2_mblur					= .5f;				// .5f
+float		ps_r2_mblur					= .3f;				// .5f
 int			ps_r2_GI_depth				= 1;				// 1..5
 int			ps_r2_GI_photons			= 16;				// 8..64
 float		ps_r2_GI_clip				= EPS_L;			// EPS
@@ -664,7 +666,7 @@ void		xrRender_initconsole	()
 	CMD4(CCC_Float,		"r__wallmark_shift_v",	&ps_r__WallmarkSHIFT_V,		0.0f,	1.f		);
 	CMD1(CCC_ModelPoolStat,"stat_models"		);
 #endif // DEBUG
-	CMD4(CCC_Float,		"r__wallmark_ttl",		&ps_r__WallmarkTTL,			1.0f,	5.f*60.f);
+	CMD4(CCC_Float,		"r__wallmark_ttl",		&ps_r__WallmarkTTL,			1.0f,	10.f*60.f);
 
 	CMD4(CCC_Integer,	"r__supersample",		&ps_r__Supersample,			1,		8		);
 
@@ -690,7 +692,7 @@ void		xrRender_initconsole	()
 	CMD4(CCC_Vector3,	"r__d_tree_wave",		&ps_r__Tree_Wave,			tw_min, tw_max	);
 #endif // DEBUG
 
-    CMD3(CCC_Mask, 		"r__no_ram_textures", 	&ps_r__common_flags, 		RFLAG_NO_RAM_TEXTURES);
+	CMD3(CCC_Mask,		"r__no_ram_textures",	&ps_r__common_flags,		RFLAG_NO_RAM_TEXTURES);
 
 	CMD2(CCC_tf_Aniso,	"r__tf_aniso",			&ps_r__tf_Anisotropic		); //	{1..16}
 

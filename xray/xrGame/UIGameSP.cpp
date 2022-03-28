@@ -77,12 +77,16 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
 	{
 	case kACTIVE_JOBS:
 		{
+			if ( MainInputReceiver() == m_ActorMenu )
+				HideActorMenu();
 			ShowPdaMenu();
 			break;
 		}
 
 	case kINVENTORY:
 		{
+			if ( MainInputReceiver() == m_PdaMenu )
+				HidePdaMenu();
 			ShowActorMenu();
 			break;
 		}

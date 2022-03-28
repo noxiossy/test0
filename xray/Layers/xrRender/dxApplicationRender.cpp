@@ -291,6 +291,18 @@ void dxApplicationRender::draw_face(ref_shader& sh, Frect& coords, Frect& tex_co
 	RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
 }
 
+u32 calc_progress_color(u32 idx, u32 total, int stage, int max_stage)
+{
+	if(idx>(total/2)) 
+		idx	= total-idx;
+
+
+	float kk			= (float(stage+1)/float(max_stage))*(total/2.0f);
+	float f				= 1/(exp((float(idx)-kk)*0.5f)+1.0f);
+
+	return color_argb_f		(f,1.0f,1.0f,1.0f);
+}
+
 #define IsSpace(ch)       ((ch) == ' ' || (ch) == '\t' || (ch) == '\r' || (ch) == '\n' || (ch) == ',' || (ch) == '.' || (ch) == ':' || (ch) == '!')
 
 void parse_word(LPCSTR str, CGameFont* font, float& length, LPCSTR& next_word)
@@ -338,16 +350,4 @@ void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText)
 			break;
 		}
 	}
-}
-
-u32 calc_progress_color(u32 idx, u32 total, int stage, int max_stage)
-{
-	if(idx>(total/2)) 
-		idx	= total-idx;
-
-
-	float kk			= (float(stage+1)/float(max_stage))*(total/2.0f);
-	float f				= 1/(exp((float(idx)-kk)*0.5f)+1.0f);
-
-	return color_argb_f		(f,1.0f,1.0f,1.0f);
 }
