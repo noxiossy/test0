@@ -123,6 +123,10 @@ void IGame_Persistent::Disconnect	()
 
 	if(g_hud)
 		g_hud->OnDisconnected			();
+	
+	// Kill object - save memory
+	ObjectPool.clear();
+	Render->models_Clear(TRUE); 
 #endif
 }
 
