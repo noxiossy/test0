@@ -55,7 +55,7 @@ void CDialogHolder::StartMenu (CUIDialogWnd* pDialog, bool bDoHideIndicators)
 	AddDialogToRender				(pDialog);
 	SetMainInputReceiver			(pDialog, false);
 
-	if(UseIndicators())
+	if (UseIndicators() && !m_input_receivers.empty()) //Alundaio
 	{
 		bool b							= !!psHUD_Flags.test(HUD_CROSSHAIR_RT);
 		m_input_receivers.back().m_flags.set(recvItem::eCrosshair, b);
@@ -97,7 +97,7 @@ void CDialogHolder::StopMenu (CUIDialogWnd* pDialog)
 
 	if( MainInputReceiver()==pDialog )
 	{
-		if(UseIndicators())
+		if (UseIndicators() && !m_input_receivers.empty()) //Alundaio
 		{
 			bool b					= !!m_input_receivers.back().m_flags.test(recvItem::eCrosshair);
 			psHUD_Flags.set			(HUD_CROSSHAIR_RT, b);
@@ -221,6 +221,16 @@ void CDialogHolder::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 		StartMenu(pDialog, bDoHideIndicators);
 	}
 	
+}
+
+void CDialogHolder::StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators)
+{
+	StartMenu(pDialog, bDoHideIndicators);
+}
+
+void CDialogHolder::StopDialog(CUIDialogWnd* pDialog)
+{
+	StopMenu(pDialog);
 }
 
 void CDialogHolder::OnFrame	()

@@ -9,6 +9,7 @@
 #include "UIMMShniaga.h"
 #include "UITextureMaster.h"
 #include "UIScrollView.h"
+#include "UIDialogHolder.h"
 
 CFontManager& mngr(){
 	return *(UI()->Font());
@@ -121,6 +122,8 @@ void CUIWindow::script_register(lua_State *L)
 		.def("RemoveDialogToRender",	&CDialogHolder::RemoveDialogToRender),
 
 		class_<CUIDialogWnd, CUIWindow>("CUIDialogWnd")
+		.def("ShowDialog",				&CUIDialogWnd::ShowDialog)
+		.def("HideDialog",				&CUIDialogWnd::HideDialog)
 		.def("GetHolder",				&CUIDialogWnd::GetHolder)
 		.def("SetHolder",				&CUIDialogWnd::SetHolder),
 
