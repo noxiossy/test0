@@ -1,8 +1,3 @@
-// UIDialogWnd.cpp: класс простого диалога, нужен для стандартного запуска
-// разным менюшек путем вызова виртуальных Show() И Hide()
-//////////////////////////////////////////////////////////////////////
-
-
 #include "stdafx.h"
 #include "uidialogwnd.h"
 #include "../hudmanager.h"
@@ -178,8 +173,8 @@ void CUIDialogWnd::Update(){
 
 void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 {
-	if(!IsShown())
-		CDialogHolder::StartDialog(this,bDoHideIndicators);
+	//if(!IsShown())
+	//	CDialogHolder::StartDialog(this,bDoHideIndicators);
 }
 void CUIDialogWnd::HideDialog()
 {
