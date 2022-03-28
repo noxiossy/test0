@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "UIDialogHolder.h"
-#include "ui\UIDialogWnd.h"
+#include "ui/UIDialogWnd.h"
 #include "UICursor.h"
 #include "level.h"
 #include "actor.h"
