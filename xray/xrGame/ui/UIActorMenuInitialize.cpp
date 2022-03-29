@@ -124,10 +124,6 @@ void CUIActorMenu::Construct()
 	m_takeall_button	= UIHelper::Create3tButtonEx(uiXml, "takeall_button", this);
 	m_exit_button		= UIHelper::Create3tButtonEx(uiXml, "exit_button", this);
 
-	m_pda1_button		= UIHelper::Create3tButtonEx(uiXml, "pda1_button", this);
-	m_pda2_button		= UIHelper::Create3tButtonEx(uiXml, "pda2_button", this);
-	m_pda3_button		= UIHelper::Create3tButtonEx(uiXml, "pda3_button", this);
-
 	m_clock_value						= UIHelper::CreateStatic(uiXml, "clock_value", this);
 
 	m_pDeadBodyBagList					= xr_new<CUIDragDropListEx>(); 

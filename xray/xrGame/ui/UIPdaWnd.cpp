@@ -276,9 +276,9 @@ void CUIPdaWnd::DrawHint()
 	}
 
 	else if ( m_pActiveDialog == pUIEncyclopediaWnd )
-	(
+	{
 	
-	)
+	}
 	else if ( m_pActiveDialog == pUIRankingWnd )
 	{
 
