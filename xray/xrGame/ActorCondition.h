@@ -32,17 +32,38 @@ private:
 	virtual void		UpdateRadiation				();
 public:
 						CActorCondition				(CActor *object);
-	virtual				~CActorCondition			(void);
+	virtual				~CActorCondition			();
 
 	virtual void		LoadCondition				(LPCSTR section);
 	virtual void		reinit						();
 
 	virtual CWound*		ConditionHit				(SHit* pHDS);
 	virtual void		UpdateCondition				();
+			void		UpdateBoosters				();
 
 	virtual void 		ChangeAlcohol				(const float value);
 	virtual void 		ChangeSatiety				(const float value);
 
+	void 				BoostParameters				(const SBooster& B);
+	void 				DisableBoostParameters		(const SBooster& B);
+	IC void				BoostMaxWeight				(const float value);
+	IC void				BoostHpRestore				(const float value);
+	IC void				BoostPowerRestore			(const float value);
+	IC void				BoostRadiationRestore		(const float value);
+	IC void				BoostBleedingRestore		(const float value);
+	IC void				BoostBurnImmunity			(const float value);
+	IC void				BoostShockImmunity			(const float value);
+	IC void				BoostRadiationImmunity		(const float value);
+	IC void				BoostTelepaticImmunity		(const float value);
+	IC void				BoostChemicalBurnImmunity	(const float value);
+	IC void				BoostExplImmunity			(const float value);
+	IC void				BoostStrikeImmunity			(const float value);
+	IC void				BoostFireWoundImmunity		(const float value);
+	IC void				BoostWoundImmunity			(const float value);
+	IC void				BoostRadiationProtection	(const float value);
+	IC void				BoostTelepaticProtection	(const float value);
+	IC void				BoostChemicalBurnProtection	(const float value);
+	BOOSTER_MAP			GetCurBoosterInfluences		() {return m_booster_influences;};
 
 	// хромание при потере сил и здоровья
 	virtual	bool		IsLimping					() const;
@@ -86,11 +107,14 @@ public:
 	bool	DisableSprint							(SHit* pHDS);
 	bool	PlayHitSound							(SHit* pHDS);
 	float	HitSlowmo								(SHit* pHDS);
+	virtual bool			ApplyInfluence			(const SMedicineInfluenceValues& V, const shared_str& sect);
+	virtual bool			ApplyBooster			(const SBooster& B, const shared_str& sect);
 	float	GetMaxPowerRestoreSpeed					() {return m_max_power_restore_speed;};
 	float	GetMaxWoundProtection					() {return m_max_wound_protection;};
 	float	GetMaxFireWoundProtection				() {return m_max_fire_wound_protection;};
 
 protected:
+	SMedicineInfluenceValues						m_curr_medicine_influence;
 	float m_fAlcohol;
 	float m_fV_Alcohol;
 //--
@@ -135,6 +159,8 @@ protected:
 
 	float m_fLimpingHealthBegin;
 	float m_fLimpingHealthEnd;
+
+        ref_sound m_use_sound;
 };
 
 class CActorDeathEffector

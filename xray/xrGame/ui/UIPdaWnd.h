@@ -17,6 +17,7 @@ class CUIActorInfoWnd;
 class CUIPdaContactsWnd;
 class CUITaskWnd;
 class CUIFactionWarWnd;
+class CUIEncyclopediaWnd;
 class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
@@ -46,6 +47,7 @@ protected:
 public:
 	CUITaskWnd*				pUITaskWnd;
 	CUIFactionWarWnd*		pUIFactionWarWnd;
+	CUIEncyclopediaWnd*		pUIEncyclopediaWnd;
 	CUIRankingWnd*			pUIRankingWnd;
 	CUILogsWnd*				pUILogsWnd;
 

@@ -14,8 +14,8 @@ class CBottleItem: public CFoodItem
 private:
     typedef	CFoodItem inherited;
 public:
-	CBottleItem(void);
-	virtual ~CBottleItem(void);
+				CBottleItem			();
+	virtual		~CBottleItem		();
 
 
 	virtual void Load				(LPCSTR section);
@@ -28,9 +28,7 @@ public:
 	
 
 			void					BreakToPieces		();
-	virtual void					UseBy				(CEntityAlive* entity_alive);
 protected:
-	float		m_alcohol;
 	//партиклы разбивания бутылки
 	shared_str m_sBreakParticles;
 	ref_sound sndBreaking;

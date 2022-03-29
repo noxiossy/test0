@@ -42,6 +42,7 @@ private:
 	CUICellItem*			m_selected_item;
 	Ivector2				m_orig_cell_capacity;
 
+	bool					m_bConditionProgBarVisible;
 protected:
 	
 	CUICellContainer*		m_container;
@@ -76,6 +77,10 @@ public:
 	DRAG_DROP_EVENT			m_f_item_focus_lost;
 	DRAG_DROP_EVENT			m_f_item_focused_update;
 
+	typedef					fastdelegate::FastDelegate2<CUIDragItem*, bool, void>	DRAG_ITEM_EVENT;
+	DRAG_ITEM_EVENT			m_f_drag_event;
+	void		OnDragEvent(CUIDragItem* drag_item, bool b_receive);
+
 	u32						back_color;
 
 	const	Ivector2&		CellsCapacity		();
@@ -101,6 +106,9 @@ public:
 			void			SetVerticalPlacement(bool b);
 			bool			GetVerticalPlacement();
 			void			SetAlwaysShowScroll	(bool b);
+
+			bool			GetConditionProgBarVisibility() {return m_bConditionProgBarVisible;};
+			void			SetConditionProgBarVisibility(bool b) {m_bConditionProgBarVisible = b;};
 public:
 			// items management
 			virtual void	SetItem				(CUICellItem* itm); //auto

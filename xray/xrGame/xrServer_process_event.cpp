@@ -270,7 +270,16 @@ void xrServer::Process_event	(NET_Packet& P, ClientID sender)
 #	ifdef SLOW_VERIFY_ENTITIES
 			VERIFY					(verify_entities());
 #	endif
-		}break;	
+		}break;
+	case GEG_PLAYER_USE_BOOSTER:
+		{
+			if (receiver && receiver->owner && (receiver->owner != SV_Client))
+			{
+				NET_Packet tmp_packet;
+				CGameObject::u_EventGen(tmp_packet, GEG_PLAYER_USE_BOOSTER, receiver->ID);
+				SendTo(receiver->owner->ID, P, net_flags(TRUE, TRUE));
+			}
+		}break;
 	case GEG_PLAYER_ITEM_SELL:
 		{
 			game->OnPlayer_Sell_Item(sender, P);

@@ -40,18 +40,21 @@ void CUIActorMenu::InitInventoryMode()
 	m_pInventoryPistolList->Show		(true);
 	m_pInventoryAutomaticList->Show		(true);
 	
+	m_pTrashList->Show(true);
+
 	m_RightDelimiter->Show				(false);
 	m_clock_value->Show					(true);
 
 	InitInventoryContents				(m_pInventoryBagList);
 
 	VERIFY( HUD().GetUI() && HUD().GetUI()->UIMainIngameWnd );
-	HUD().GetUI()->UIMainIngameWnd->ShowZoneMap(true);
+	//HUD().GetUI()->UIMainIngameWnd->ShowZoneMap(true);
 }
 
 void CUIActorMenu::DeInitInventoryMode()
 {
 	m_clock_value->Show					(false);
+	m_pTrashList->Show(false);
 }
 
 void CUIActorMenu::SendEvent_ActivateSlot(u32 slot, u16 recipient)
@@ -692,18 +695,19 @@ void CUIActorMenu::ActivatePropertiesBox()
 	m_UIPropertiesBox->RemoveAll();
 	bool b_show = false;
 
-	if ( m_currMenuMode == mmInventory )
+	if ( m_currMenuMode == mmInventory || m_currMenuMode == mmDeadBodySearch)
 	{
 		PropertiesBoxForSlots( item, b_show );
 		PropertiesBoxForWeapon( cell_item, item, b_show );
 		PropertiesBoxForAddon( item, b_show );
 		PropertiesBoxForUsing( item, b_show );
+		if ( m_currMenuMode == mmInventory )
 		PropertiesBoxForDrop( cell_item, item, b_show );
 	}
-	else if ( m_currMenuMode == mmDeadBodySearch )
-	{
-		PropertiesBoxForUsing( item, b_show );
-	}
+	//else if ( m_currMenuMode == mmDeadBodySearch )
+	//{
+	//	PropertiesBoxForUsing( item, b_show );
+	//}
 	else if ( m_currMenuMode == mmUpgrade )
 	{
 		PropertiesBoxForRepair( item, b_show );
@@ -813,7 +817,7 @@ void CUIActorMenu::PropertiesBoxForWeapon( CUICellItem* cell_item, PIItem item, 
 		}
 	}
 }
-
+#include "../string_table.h"
 void CUIActorMenu::PropertiesBoxForAddon( PIItem item, bool& b_show )
 {
 	//присоединение аддонов к активному слоту (2 или 3)
@@ -880,15 +884,25 @@ void CUIActorMenu::PropertiesBoxForUsing( PIItem item, bool& b_show )
 	{
 		act_str = "st_use";
 	}
+	else if ( pBottleItem )
+	{
+		act_str = "st_drink";
+	}
 	else if ( pEatableItem )
 	{
-		if ( pBottleItem )
+		CObject*	pObj			= smart_cast<CObject*>		(item);
+		shared_str	section_name	= pObj->cNameSect();
+		if ( !xr_strcmp(section_name,"vodka") || !(xr_strcmp(section_name,"energy_drink")) )
 		{
 			act_str = "st_drink";
 		}
-		else
+		else if( !xr_strcmp(section_name,"bread") || !xr_strcmp(section_name,"kolbasa") || !xr_strcmp(section_name,"conserva"))
 		{
 			act_str = "st_eat";
+		}
+		else
+		{
+			act_str = "st_use";
 		}
 	}
 	if ( act_str )
@@ -954,8 +968,13 @@ void CUIActorMenu::ProcessPropertiesBoxClicked( CUIWindow* w, void* d )
 			break;
 		}
 	case INVENTORY_ATTACH_ADDON:
-		AttachAddon( (PIItem)(m_UIPropertiesBox->GetClickedItem()->GetData()) );
-		break;
+		{
+			AttachAddon((PIItem)(m_UIPropertiesBox->GetClickedItem()->GetData()));
+			if(m_currMenuMode==mmDeadBodySearch)
+				RemoveItemFromList(m_pDeadBodyBagList, item);
+			
+			break;
+		}
 	case INVENTORY_DETACH_SCOPE_ADDON:
 		if ( weapon )
 		{

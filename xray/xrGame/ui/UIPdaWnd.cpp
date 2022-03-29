@@ -28,6 +28,7 @@
 #include "UIBtnHint.h"
 #include "UITaskWnd.h"
 #include "UIFactionWarWnd.h"
+#include "UIEncyclopediaWnd.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
 
@@ -41,6 +42,7 @@ CUIPdaWnd::CUIPdaWnd()
 {
 	pUITaskWnd       = NULL;
 	pUIFactionWarWnd = NULL;
+	pUIEncyclopediaWnd = NULL;
 	pUIRankingWnd    = NULL;
 	pUILogsWnd       = NULL;
 	m_hint_wnd       = NULL;
@@ -51,6 +53,7 @@ CUIPdaWnd::~CUIPdaWnd()
 {
 	delete_data( pUITaskWnd );
 	delete_data( pUIFactionWarWnd );
+	delete_data( pUIEncyclopediaWnd );
 	delete_data( pUIRankingWnd );
 	delete_data( pUILogsWnd );
 	delete_data( m_hint_wnd );
@@ -91,6 +94,9 @@ void CUIPdaWnd::Init()
 		pUIFactionWarWnd->hint_wnd		= m_hint_wnd;
 		pUIFactionWarWnd->Init			();
 
+		pUIEncyclopediaWnd				= xr_new<CUIEncyclopediaWnd>();
+		pUIEncyclopediaWnd->Init			();
+		
 		pUIRankingWnd					= xr_new<CUIRankingWnd>();
 		pUIRankingWnd->Init				();
 
@@ -157,7 +163,7 @@ void CUIPdaWnd::Hide()
 {
 	inherited::Hide						();
 	InventoryUtilities::SendInfoToActor	("ui_pda_hide");
-	HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
+	//HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
 	m_pActiveDialog->Show				(false);
 	m_btn_close->Show					(false);
 	g_btnHint->Discard					();
@@ -168,7 +174,7 @@ void CUIPdaWnd::Update()
 	inherited::Update();
 	m_pActiveDialog->Update();
 
-	Device.seqParallel.push_back	(fastdelegate::FastDelegate0<>(pUILogsWnd,&CUILogsWnd::PerformWork));
+	pUILogsWnd->PerformWork();
 }
 
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
@@ -188,6 +194,10 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 	else if ( section == "eptFractionWar" )
 	{
 		m_pActiveDialog = pUIFactionWarWnd;
+	}
+	else if ( section == "eptEncyclopedia" )
+	{
+		m_pActiveDialog = pUIEncyclopediaWnd;
 	}
 	else if ( section == "eptRanking" )
 	{
@@ -264,6 +274,11 @@ void CUIPdaWnd::DrawHint()
 	{
 //		m_hint_wnd->Draw();
 	}
+
+	else if ( m_pActiveDialog == pUIEncyclopediaWnd )
+	(
+	
+	)
 	else if ( m_pActiveDialog == pUIRankingWnd )
 	{
 
@@ -291,6 +306,7 @@ void CUIPdaWnd::Reset()
 
 	if ( pUITaskWnd )		pUITaskWnd->ResetAll();
 	if ( pUIFactionWarWnd )	pUITaskWnd->ResetAll();
+	if ( pUIEncyclopediaWnd )	pUITaskWnd->ResetAll();
 	if ( pUIRankingWnd )	pUITaskWnd->ResetAll();
 	if ( pUILogsWnd )		pUITaskWnd->ResetAll();
 }

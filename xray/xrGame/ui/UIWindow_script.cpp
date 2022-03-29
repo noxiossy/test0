@@ -9,7 +9,7 @@
 #include "UIMMShniaga.h"
 #include "UITextureMaster.h"
 #include "UIScrollView.h"
-#include "UIDialogHolder.h"
+#include "../UIDialogHolder.h"
 
 CFontManager& mngr(){
 	return *(UI()->Font());

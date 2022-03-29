@@ -16,7 +16,9 @@ public:
 	virtual void LoadImmunities (LPCSTR section,CInifile* ini);
 
 	virtual float AffectHit		(float power, ALife::EHitType hit_type);
-
+	
+			float GetHitImmunity (ALife::EHitType hit_type) const				{return m_HitTypeK[hit_type];}
+			
 protected:
 	//коэффициенты на которые домножается хит
 	//при соответствующем типе воздействия

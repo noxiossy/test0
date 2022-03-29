@@ -75,7 +75,7 @@ static float ICoincidenced = 0;
 //if we are not current control entity we use this value
 const float	CActor::cam_inert_value = 0.7f;
 
-
+string32		ACTOR_DEFS::g_quick_use_slots[4]={NULL, NULL, NULL, NULL};
 //skeleton
 
 

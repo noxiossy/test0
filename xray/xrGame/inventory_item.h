@@ -144,6 +144,7 @@ public:
 
 	EItemPlace					m_eItemCurrPlace;
 
+	bool						m_remove_after_use;
 
 	virtual void				OnMoveToSlot		() {};
 	virtual void				OnMoveToBelt		() {};

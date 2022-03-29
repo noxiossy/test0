@@ -102,6 +102,10 @@ void CUIActorMenu::Construct()
 	m_pTradePartnerBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_bag", this);
 	m_pTradePartnerList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_trade", this);
 
+	m_pTrashList				= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_trash", this);
+	m_pTrashList->m_f_item_drop	= CUIDragDropListEx::DRAG_DROP_EVENT(this, &CUIActorMenu::OnItemDrop);
+	m_pTrashList->m_f_drag_event = CUIDragDropListEx::DRAG_ITEM_EVENT(this, &CUIActorMenu::OnDragItemOnTrash);
+
 	m_belt_list_over[0] = UIHelper::CreateStatic(uiXml, "belt_list_over", this);
 	Fvector2 pos;
 	pos = m_belt_list_over[0]->GetWndPos();
@@ -119,6 +123,10 @@ void CUIActorMenu::Construct()
 	m_trade_button		= UIHelper::Create3tButtonEx(uiXml, "trade_button", this);
 	m_takeall_button	= UIHelper::Create3tButtonEx(uiXml, "takeall_button", this);
 	m_exit_button		= UIHelper::Create3tButtonEx(uiXml, "exit_button", this);
+
+	m_pda1_button		= UIHelper::Create3tButtonEx(uiXml, "pda1_button", this);
+	m_pda2_button		= UIHelper::Create3tButtonEx(uiXml, "pda2_button", this);
+	m_pda3_button		= UIHelper::Create3tButtonEx(uiXml, "pda3_button", this);
 
 	m_clock_value						= UIHelper::CreateStatic(uiXml, "clock_value", this);
 
@@ -189,6 +197,10 @@ void CUIActorMenu::Construct()
 	BindDragDropListEvents				(m_pTradePartnerBagList);
 	BindDragDropListEvents				(m_pTradePartnerList);
 	BindDragDropListEvents				(m_pDeadBodyBagList);
+
+	m_allowed_drops[iTrashSlot].push_back(iActorBag);
+	m_allowed_drops[iTrashSlot].push_back(iActorSlot);
+	m_allowed_drops[iTrashSlot].push_back(iActorBelt);
 
 	m_allowed_drops[iActorSlot].push_back(iActorBag);
 	m_allowed_drops[iActorSlot].push_back(iActorTrade);

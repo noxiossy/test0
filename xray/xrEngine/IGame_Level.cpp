@@ -111,7 +111,6 @@ BOOL IGame_Level::Load			(u32 dwNum)
 	return TRUE;
 }
 
-int		psNET_DedicatedSleep	= 5;
 void	IGame_Level::OnRender		( ) 
 {
 //	if (_abs(Device.fTimeDelta)<EPS_S) return;

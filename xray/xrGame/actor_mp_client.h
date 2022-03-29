@@ -31,6 +31,7 @@ public:
 	shared_str const 		GetAnticheatSectionName	() const { return "mp_actor"; };
 protected:
 	virtual	void			cam_Set					(EActorCameras style);
+			void			use_booster				(NET_Packet &packet);
 };
 
 #endif // ACTOR_MP_CLIENT_H

@@ -1496,14 +1496,7 @@ public:
 	CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void Execute(LPCSTR arguments)
 	{
-		if (!MainMenu()) return;
-
-		bool InformOfNoPatch = true;
-		if (arguments && *arguments) {
-			int bInfo = 1;
-			sscanf	(arguments,"%d", &bInfo);
-			InformOfNoPatch = (bInfo != 0);
-		}
+		return;
 	}
 };
 
@@ -1875,7 +1868,7 @@ CMD4(CCC_FloatBlock,		"dbg_text_height_scale",	&dbg_text_height_scale	,			0.2f	,
 
 #ifndef MASTER_GOLD
 	CMD1(CCC_StartTimeSingle,	"start_time_single");
-	CMD4(CCC_TimeFactorSingle,	"time_factor_single", &g_fTimeFactor, 0.f,flt_max);
+	CMD4(CCC_TimeFactorSingle,	"time_factor_single", &g_fTimeFactor, 0.f,1000.0f);
 #endif // MASTER_GOLD
 
 
@@ -1888,7 +1881,7 @@ CMD4(CCC_FloatBlock,		"dbg_text_height_scale",	&dbg_text_height_scale	,			0.2f	,
 	CMD4(CCC_Vector3,		"psp_cam_offset",				&CCameraLook2::m_cam_offset, Fvector().set(-1000,-1000,-1000),Fvector().set(1000,1000,1000));
 #endif // MASTER_GOLD
 
-	CMD1(CCC_GSCheckForUpdates, "check_for_updates");
+
 #ifdef DEBUG
 	CMD1(CCC_Crash,		"crash"						);
 	CMD1(CCC_DumpObjects,"dump_all_objects"			);
@@ -1924,4 +1917,8 @@ extern BOOL dbg_moving_bones_snd_player;
 	
 	*g_last_saved_game	= 0;
 
+	CMD3(CCC_String, "slot_0", g_quick_use_slots[0], 32);
+	CMD3(CCC_String, "slot_1", g_quick_use_slots[1], 32);
+	CMD3(CCC_String, "slot_2", g_quick_use_slots[2], 32);
+	CMD3(CCC_String, "slot_3", g_quick_use_slots[3], 32);
 }

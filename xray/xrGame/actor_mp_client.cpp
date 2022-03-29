@@ -3,6 +3,12 @@
 #include "actorcondition.h"
 #include "../xrEngine/CameraBase.h"
 
+#include "game_cl_base.h"
+#include "ui/UIActorMenu.h"
+//#include "ui/UIDragDropReferenceList.h"
+#include "uigamecustom.h"
+#include "eatable_item.h"
+
 CActorMP::CActorMP			()
 {
 	//m_i_am_dead				= false;
@@ -11,6 +17,13 @@ CActorMP::CActorMP			()
 void CActorMP::OnEvent		( NET_Packet &P, u16 type)
 {
 	inherited::OnEvent		(P,type);
+	
+	if (type == GEG_PLAYER_USE_BOOSTER)
+	{
+		use_booster(P);
+		return;
+	}
+
 #ifdef DEBUG
 	if (type == GE_ACTOR_MAX_HEALTH)
 	{
@@ -41,3 +54,29 @@ void CActorMP::cam_Set		(EActorCameras style)
 	old_cam->OnDeactivate();
 	cam_Active()->OnActivate(old_cam);
 }
+
+void CActorMP::use_booster(NET_Packet &packet)
+{
+	if (OnServer())
+		return;
+
+	u16 tmp_booster_id;
+	packet.r_u16			(tmp_booster_id);
+	CObject* tmp_booster =	Level().Objects.net_Find(tmp_booster_id);
+	VERIFY2(tmp_booster, "using unknown or deleted booster");
+	if (!tmp_booster)
+	{
+		Msg("! ERROR: trying to use unkown booster object, ID = %d", tmp_booster_id);
+		return;
+	}
+
+	CEatableItem* tmp_eatable = smart_cast<CEatableItem*>(tmp_booster);
+	VERIFY2(tmp_eatable, "using not eatable object");
+	if (!tmp_eatable)
+	{
+		Msg("! ERROR: trying to use not eatable object, ID = %d", tmp_booster_id);
+		return;
+	}
+	tmp_eatable->UseBy(this);
+}
+

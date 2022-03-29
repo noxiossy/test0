@@ -259,6 +259,11 @@ bool CUIActorMenu::CanMoveToPartner(PIItem pItem)
 		return false;
 	}
 
+	const CTradeFactors *p_trade_factors = &m_pPartnerInvOwner->trade_parameters().factors( CTradeParameters::action_buy( 0 ), pItem->object().cNameSect() );
+	const CTradeFactors &trade_factors   = *p_trade_factors;
+	if ( pItem->GetCondition() < trade_factors.min_condition() )
+	  return false;
+
 	float r1				= CalcItemsWeight( m_pTradeActorList );		// actor
 	float r2				= CalcItemsWeight( m_pTradePartnerList );	// partner
 	float itmWeight			 = pItem->Weight();

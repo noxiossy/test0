@@ -51,6 +51,9 @@
 #include "debug_text_tree.h"
 #endif
 
+#pragma warning (disable:4355)
+#pragma warning (push)
+
 CBaseMonster::CBaseMonster()
 {
 	m_pPhysics_support=xr_new<CCharacterPhysicsSupport>(CCharacterPhysicsSupport::etBitting,this);
@@ -101,6 +104,8 @@ CBaseMonster::CBaseMonster()
 	m_feel_enemy_who_just_hit_max_distance = 0;
 	m_feel_enemy_max_distance			   = 0;
 }
+
+#pragma warning (pop)
 
 CBaseMonster::~CBaseMonster()
 {

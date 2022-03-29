@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "UICellItem.h"
+#include "../uicursor.h"
 #include "../inventory_item.h"
 #include "UIDragDropListEx.h"
 #include "../xr_level_controller.h"
@@ -8,6 +9,10 @@
 #include "../level.h"
 #include "object_broker.h"
 #include "UIXmlInit.h"
+#include "UIProgressBar.h"
+
+#include "../Weapon.h"
+#include "../CustomOutfit.h"
 
 CUICellItem* CUICellItem::m_mouse_selected_item = NULL;
 
@@ -19,6 +24,7 @@ CUICellItem::CUICellItem()
 	m_text				= NULL;
 //-	m_mark				= NULL;
 	m_upgrade			= NULL;
+	m_pConditionState	= NULL;
 	m_drawn_frame		= 0;
 	SetAccelerator		(0);
 	m_b_destroy_childs	= true;
@@ -60,6 +66,12 @@ void CUICellItem::init()
 	CUIXmlInit::InitStatic	( uiXml, "cell_item_upgrade", 0, m_upgrade );
 	m_upgrade_pos			= m_upgrade->GetWndPos();
 	m_upgrade->Show			( false );
+
+	m_pConditionState = xr_new<CUIProgressBar>();
+	m_pConditionState->SetAutoDelete(true);
+	AttachChild(m_pConditionState);
+	CUIXmlInit::InitProgressBar(uiXml, "condition_progess_bar", 0, m_pConditionState);
+	m_pConditionState->Show(true);
 }
 
 void CUICellItem::Draw()
@@ -187,7 +199,36 @@ CUIDragItem* CUICellItem::CreateDragItem()
 
 void CUICellItem::SetOwnerList(CUIDragDropListEx* p)	
 {
-	m_pParentList=p;
+	m_pParentList = p;
+	UpdateConditionProgressBar();
+}
+
+void CUICellItem::UpdateConditionProgressBar()
+{
+
+	if(m_pParentList && m_pParentList->GetConditionProgBarVisibility())
+	{
+		PIItem itm = (PIItem)m_pData;
+		CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
+		CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(itm);
+		if(pWeapon || pOutfit )
+		{
+			Ivector2 itm_grid_size = GetGridSize();
+			if(m_pParentList->GetVerticalPlacement())
+				std::swap(itm_grid_size.x, itm_grid_size.y);
+
+			Ivector2 cell_size = m_pParentList->CellSize();
+			Ivector2 cell_space = m_pParentList->CellsSpacing();
+			float x = 1.f;
+			float y = itm_grid_size.y * (cell_size.y + cell_space.y) - m_pConditionState->GetHeight() - 2.f;
+
+			m_pConditionState->SetWndPos(Fvector2().set(x,y));
+			m_pConditionState->SetProgressPos(iCeil(itm->GetCondition()*13.0f)/13.0f);
+			m_pConditionState->Show(true);
+			return;
+		}
+	}
+	m_pConditionState->Show(false);
 }
 
 bool CUICellItem::EqualTo(CUICellItem* itm)
@@ -275,6 +316,7 @@ void CUICellItem::SetCustomDraw			(ICustomDrawCell* c){
 CUIDragItem::CUIDragItem(CUICellItem* parent)
 {
 	m_back_list						= NULL;
+	m_custom_draw = NULL;
 	m_pParent						= parent;
 	AttachChild						(&m_static);
 	Device.seqRender.Add			(this, REG_PRIORITY_LOW-5000);
@@ -286,6 +328,8 @@ CUIDragItem::~CUIDragItem()
 {
 	Device.seqRender.Remove			(this);
 	Device.seqFrame.Remove			(this);
+	if (m_custom_draw) 
+		delete_data(m_custom_draw); 
 }
 
 void CUIDragItem::Init(const ui_shader& sh, const Frect& rect, const Frect& text_rect)
@@ -333,13 +377,28 @@ void CUIDragItem::Draw()
 	inherited::Draw();
 
 	UI()->PopScissor();
+
+	if (m_custom_draw)
+		m_custom_draw->OnDraw(this);
 }
 
 void CUIDragItem::SetBackList(CUIDragDropListEx*l)
 {
-	if(m_back_list!=l){
-		m_back_list=l;
-	}
+	if (m_back_list)
+		m_back_list->OnDragEvent(this, false);
+
+	m_back_list = l;
+
+	if (m_back_list)
+		l->OnDragEvent(this, true);
+}
+
+void CUIDragItem::SetCustomDraw(ICustomDrawDragItem* c)
+{
+	if (m_custom_draw)
+		delete_data(m_custom_draw);
+
+	m_custom_draw = c;
 }
 
 Fvector2 CUIDragItem::GetPosition()

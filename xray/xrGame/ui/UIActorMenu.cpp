@@ -113,7 +113,7 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
 			break;
 		}
 
-		HUD().GetUI()->UIMainIngameWnd->ShowZoneMap(false);
+		//HUD().GetUI()->UIMainIngameWnd->ShowZoneMap(false);
 
 		m_currMenuMode = mode;
 		switch(mode)
@@ -198,7 +198,7 @@ void CUIActorMenu::Hide()
 void CUIActorMenu::Draw()
 {
 	inherited::Draw();
-	HUD().GetUI()->UIMainIngameWnd->DrawZoneMap();
+	//HUD().GetUI()->UIMainIngameWnd->DrawZoneMap();
 	m_ItemInfo->Draw();
 	m_hint_wnd->Draw();
 }
@@ -217,7 +217,7 @@ void CUIActorMenu::Update()
 	case mmInventory:
 		{
 			m_clock_value->SetText( InventoryUtilities::GetGameTimeAsString( InventoryUtilities::etpTimeToMinutes ).c_str() );
-			HUD().GetUI()->UIMainIngameWnd->UpdateZoneMap();
+			//HUD().GetUI()->UIMainIngameWnd->UpdateZoneMap();
 			break;
 		}
 	case mmTrade:
@@ -301,6 +301,8 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pTradePartnerBagList)		return iPartnerTradeBag;
 	if(l==m_pTradePartnerList)			return iPartnerTrade;
 	if(l==m_pDeadBodyBagList)			return iDeadBodyBag;
+	if(l==m_pTrashList)				return iTrashSlot;
+
 
 	R_ASSERT(0);
 	
@@ -440,6 +442,14 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 		case iDeadBodyBag:
 		{
 			ToDeadBodyBag(itm, true);
+		}break;
+		case iTrashSlot:
+		{
+			if (CurrentIItem()->IsQuestItem())
+				return true;
+
+			SendEvent_Item_Drop(CurrentIItem(), m_pActorInvOwner->object_id());
+			SetCurrentItem(NULL);
 		}break;
 	};
 
@@ -773,4 +783,39 @@ void CUIActorMenu::UpdateActorMP()
 
 	m_ActorCharacterInfo->InitCharacterMP( Game().local_player->name, "ui_npc_u_nebo_1" );
 
+}
+
+class CUITrashIcon :public ICustomDrawDragItem
+{
+	CUIStatic			m_icon;
+public:
+	CUITrashIcon()
+	{
+		m_icon.SetWndSize(Fvector2().set(29.0f * UI()->get_current_kx(), 36.0f));
+		m_icon.SetStretchTexture(true);
+		//		m_icon.SetAlignment		(waCenter);
+		m_icon.InitTexture("a_icon_trash");
+	}
+	virtual void		OnDraw(CUIDragItem* drag_item)
+	{
+		Fvector2 pos = drag_item->GetWndPos();
+		Fvector2 icon_sz = m_icon.GetWndSize();
+		Fvector2 drag_sz = drag_item->GetWndSize();
+
+		pos.x -= icon_sz.x;
+		pos.y += drag_sz.y;
+
+		m_icon.SetWndPos(pos);
+		//		m_icon.SetWndSize(sz);
+		m_icon.Draw();
+	}
+
+};
+
+void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
+{
+	if (b_receive && !CurrentIItem()->IsQuestItem())
+		item->SetCustomDraw(new CUITrashIcon());
+	else
+		item->SetCustomDraw(NULL);
 }

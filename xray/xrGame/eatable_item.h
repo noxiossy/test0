@@ -9,7 +9,7 @@ class CEatableItem : public CInventoryItem {
 private:
 	typedef CInventoryItem	inherited;
 
-private:
+protected:
 	CPhysicItem		*m_physic_item;
 
 public:
@@ -25,22 +25,10 @@ public:
 
 	virtual void			OnH_B_Independent			(bool just_before_destroy);
 	virtual void			OnH_A_Independent			();
-	virtual	void			UseBy						(CEntityAlive* npc);
+	virtual	bool			UseBy						(CEntityAlive* npc);
 	virtual	bool			Empty						()						{return PortionsNum()==0;};
 			int				PortionsNum					()	const				{return m_iPortionsNum;}
 protected:	
-	//влияние при поедании вещи на параметры игрока
-	float					m_fHealthInfluence;
-	float					m_fPowerInfluence;
-	float					m_fSatietyInfluence;
-	float					m_fRadiationInfluence;
-	float					m_fMaxPowerUpInfluence;
-	//заживление ран на кол-во процентов
-	float					m_fWoundsHealPerc;
-
-	//количество порций еды, 
-	//-1 - порция одна и больше не бывает (чтоб не выводить надпись в меню)
 	int						m_iPortionsNum;
-	int						m_iStartPortionsNum;
 };
 

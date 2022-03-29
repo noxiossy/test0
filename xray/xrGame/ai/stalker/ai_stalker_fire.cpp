@@ -209,6 +209,9 @@ void CAI_Stalker::g_WeaponBones	(int &L, int &R1, int &R2)
 
 void CAI_Stalker::Hit			(SHit* pHDS)
 {
+	if (invulnerable())
+		return;
+
 	//хит может меняться в зависимости от ранга (новички получают больше хита, чем ветераны)
 	SHit		HDS = *pHDS;
 	HDS.add_wound   = true;
@@ -259,7 +262,7 @@ void CAI_Stalker::Hit			(SHit* pHDS)
 		}
 
 		const CEntityAlive	*entity_alive = smart_cast<const CEntityAlive*>(HDS.initiator());
-		if (entity_alive && !wounded()) {
+		if ( entity_alive && !wounded() && !fis_zero( pHDS->damage() ) ) {
 			if (is_relation_enemy(entity_alive))
 				sound().play		(eStalkerSoundInjuring);
 //			else
@@ -306,7 +309,7 @@ void CAI_Stalker::Hit			(SHit* pHDS)
 				if (!already_critically_wounded && became_critically_wounded) {
 					if (HDS.who) {
 						CAI_Stalker		*stalker = smart_cast<CAI_Stalker*>(HDS.who);
-						if (stalker)
+						if ( stalker && stalker->g_Alive() )
 							stalker->on_critical_wound_initiator	(this);
 					}
 				}
@@ -321,7 +324,8 @@ void CAI_Stalker::Hit			(SHit* pHDS)
 
 	if ( g_Alive() && ( !m_hit_callback || m_hit_callback( &HDS ) ) )
 	{
-		memory().hit().add( 100.f * HDS.damage(), HDS.direction(), HDS.who, HDS.boneID );
+		float const damage_factor	= invulnerable() ? 0.f : 100.f;
+		memory().hit().add			( damage_factor*HDS.damage(), HDS.direction(), HDS.who, HDS.boneID );
 	}
 
 	//conditions().health()			= 1.f;
@@ -331,6 +335,11 @@ void CAI_Stalker::Hit			(SHit* pHDS)
 
 void CAI_Stalker::HitSignal				(float amount, Fvector& vLocalDir, CObject* who, s16 element)
 {
+	if (getDestroy())
+		return;
+
+	if (g_Alive())
+		memory().hit().add	(amount,vLocalDir,who,element);
 }
 
 void CAI_Stalker::OnItemTake			(CInventoryItem *inventory_item)
@@ -573,6 +582,15 @@ IC BOOL ray_query_callback	(collide::rq_result& result, LPVOID params)
 //	}
 
 	if (!result.O) {
+		// статический объект
+		// получить треугольник и узнать его материал
+		CDB::TRI* T   = Level().ObjectSpace.GetStaticTris() + result.element;
+		SGameMtl* mtl = GMLib.GetMaterialByIdx( T->material );
+		// Если материал полностью простреливаемый, продолжаем
+		// трассировку.
+		if ( fsimilar( mtl->fShootFactor, 1.0f, EPS ) )
+		  return TRUE;
+
 		if (param->m_power > param->m_power_threshold)
 			return						(true);
 
@@ -808,6 +826,9 @@ void CAI_Stalker::notify_on_wounded_or_killed	(CObject *object)
 {
 	CAI_Stalker							*stalker = smart_cast<CAI_Stalker*>(object);
 	if (!stalker)
+		return;
+
+	if ( !stalker->g_Alive() )
 		return;
 
 	stalker->on_enemy_wounded_or_killed	(this);
@@ -1246,7 +1267,10 @@ bool CAI_Stalker::can_cry_enemy_is_wounded		() const
 
 void CAI_Stalker::on_critical_wound_initiator	(const CAI_Stalker *critically_wounded)
 {
-	if (!can_cry_enemy_is_wounded())
+	if ( !g_Alive() )
+		return;
+
+	if ( !can_cry_enemy_is_wounded() )
 		return;
 
 	sound().play					(eStalkerSoundEnemyCriticallyWounded);
@@ -1254,6 +1278,9 @@ void CAI_Stalker::on_critical_wound_initiator	(const CAI_Stalker *critically_wou
 
 void CAI_Stalker::on_enemy_wounded_or_killed	(const CAI_Stalker *wounded_or_killed)
 {
+	if (!g_Alive())
+		return;
+
 	if (!can_cry_enemy_is_wounded())
 		return;
 

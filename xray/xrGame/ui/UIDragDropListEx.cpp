@@ -24,6 +24,7 @@ CUIDragDropListEx::CUIDragDropListEx()
 	m_vScrollBar				= xr_new<CUIScrollBar>();
 	m_vScrollBar->SetAutoDelete	(true);
 	m_selected_item				= NULL;
+	m_bConditionProgBarVisible	= false;
 
 	SetCellSize					(Ivector2().set(50,50));
 	SetCellsCapacity			(Ivector2().set(0,0));
@@ -52,6 +53,12 @@ CUIDragDropListEx::~CUIDragDropListEx()
 	DestroyDragItem		();
 
 	delete_data					(m_container);
+}
+
+void CUIDragDropListEx::OnDragEvent(CUIDragItem* drag_item, bool b_receive)
+{
+	if (m_f_drag_event)
+		m_f_drag_event(drag_item, b_receive);
 }
 
 void CUIDragDropListEx::SetAutoGrow(bool b)						
