@@ -114,8 +114,8 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 	
 	back_tex_size.set			(268,37);
 	back_size.set				(268,37);
-	if(b_ws)
-		back_size.x				*= ws_k; //ws
+	//if(b_ws)
+	//	back_size.x				*= ws_k; //ws
 
 	back_tex_coords.lt.set		(0,768);
 	back_tex_coords.rb.add		(back_tex_coords.lt, back_tex_size);
@@ -197,8 +197,8 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 		r.lt.y						+= offs;
 		back_size.set				(512,256);
 
-		if(b_ws)
-			back_size.x				*= ws_k; //ws 0.625
+		//if(b_ws)
+		//	back_size.x				*= ws_k; //ws 0.625
 
 		r.rb.add					(r.lt,back_size);
 		r.lt.mul					(k);						
