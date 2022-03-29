@@ -14,8 +14,8 @@ void dxApplicationRender::Copy(IApplicationRender &_in)
 void dxApplicationRender::LoadBegin()
 {
 	ll_hGeom.create		(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
-	sh_progress.create	("hud\\default","ui\\ui_load");
-	hLevelLogo_Add.create	("hud\\default","ui\\ui_ingame2_back_add2_w.tga");
+	sh_progress.create	("hud\\default","ui\\a_load");
+	hLevelLogo_Add.create	("hud\\default","ui\\a_load_2.dds");
 
 	ll_hGeom2.create		(FVF::F_TL, RCache.Vertex.Buffer(),NULL);
 }
@@ -214,8 +214,8 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 	owner.pFontSystemAdd->SetAligment	(CGameFont::alCenter);
 	back_size.set					(_w/2,622.0f*k.y);
 	owner.pFontSystemAdd->OutSet		(back_size.x, back_size.y);
-	owner.pFontSystemAdd->OutNext		(owner.ls_header);
-	owner.pFontSystemAdd->OutNext		("");
+	//owner.pFontSystemAdd->OutNext		(owner.ls_header);
+	//owner.pFontSystemAdd->OutNext		("");
 	owner.pFontSystemAdd->OutNext		(owner.ls_tip_number);
 
 	float fTargetWidth				= 600.0f*k.x*(b_ws?0.8f:1.0f);

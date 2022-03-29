@@ -772,10 +772,10 @@ void CGamePersistent::LoadTitleAdd(bool change_tip)
 	if(change_tip)
 	{
 		string512		buff;
-		int			tip_num;
-		tip_num			= ::Random.randI(0,10);
+		int				tip_num;
+		tip_num			= ::Random.randI(1,61);
 	
-		sprintf_s		(buff, "%s%d:", CStringTable().translate("a_ls_tip_number_").c_str(), tip_num);
+		sprintf_s		(buff, "%s%d:", CStringTable().translate("a_ls_tip_number").c_str(), tip_num);
 		shared_str		tmp = buff;
 		sprintf_s		(buff, "a_ls_tip_%d", tip_num);
 		
