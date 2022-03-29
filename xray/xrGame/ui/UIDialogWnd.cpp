@@ -5,6 +5,7 @@
 #include "../../xrEngine/xr_ioconsole.h"
 #include "../level.h"
 #include "../GameObject.h"
+#include "../UIGameSP.h"
 
 CUIDialogWnd:: CUIDialogWnd()
 {
@@ -173,8 +174,8 @@ void CUIDialogWnd::Update(){
 
 void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 {
-	//if(!IsShown())
-	//	CDialogHolder::StartDialog(this,bDoHideIndicators);
+	if(!IsShown())
+		Game().StartDialog(this,bDoHideIndicators);
 }
 void CUIDialogWnd::HideDialog()
 {
