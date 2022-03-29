@@ -81,7 +81,7 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 	//кнопка перехода в режим торговли
 	AttachChild					(&UIToTradeButton);
 	CUIXmlInit::Init3tButtonEx	(*m_uiXml, "button", 0, &UIToTradeButton);
-	/*UIToTradeButton.SetWindowName("trade_btn");
+	UIToTradeButton.SetWindowName("trade_btn");
 
 	AttachChild					(&UIToExitButton);
 	CUIXmlInit::Init3tButtonEx	(*m_uiXml, "button_exit", 0, &UIToExitButton);
@@ -90,7 +90,7 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 	m_btn_pos[0]				= UIToTradeButton.GetWndPos();
 	m_btn_pos[1]				= UIToExitButton.GetWndPos();
 	m_btn_pos[2].x				= (m_btn_pos[0].x+m_btn_pos[1].x)/2.0f;
-	m_btn_pos[2].y				= m_btn_pos[0].y;*/
+	m_btn_pos[2].y				= m_btn_pos[0].y;
 	// шрифт для индикации имени персонажа в окне разговора
 	CUIXmlInit::InitFont		(*m_uiXml, "font", 0, m_iNameTextColor, m_pNameTextFont);
 
@@ -102,9 +102,9 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 
 	Register					(&UIToTradeButton);
 	AddCallback					("question_item",LIST_ITEM_CLICKED,CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnQuestionClicked));
-	AddCallback					(&UIToTradeButton,BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnTradeClicked));
-	//AddCallback					("upgrade_btn",BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnUpgradeClicked));
-	//AddCallback					("exit_btn",BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnExitClicked));
+	AddCallback					("trade_btn",BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnTradeClicked));
+	AddCallback					("upgrade_btn",BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnUpgradeClicked));
+	AddCallback					("exit_btn",BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnExitClicked));
 }
 
 	
@@ -259,10 +259,10 @@ void CUITalkDialogWnd::SetOsoznanieMode(bool b)
 
 void CUITalkDialogWnd::UpdateButtonsLayout(bool b_disable_break, bool trade_enabled)
 {
-	//UIToExitButton.Show			(!b_disable_break);
+	UIToExitButton.Show			(!b_disable_break);
 	UIToTradeButton.Show		(trade_enabled);
 
-	/*if(UIToExitButton.IsShown() && UIToTradeButton.IsShown())
+	if(UIToExitButton.IsShown() && UIToTradeButton.IsShown())
 	{
 		UIToTradeButton.SetWndPos(m_btn_pos[0]);
 		UIToExitButton.SetWndPos(m_btn_pos[1]);
@@ -274,7 +274,7 @@ void CUITalkDialogWnd::UpdateButtonsLayout(bool b_disable_break, bool trade_enab
 	if(UIToTradeButton.IsShown())
 	{
 		UIToTradeButton.SetWndPos(m_btn_pos[2]);
-	}*/
+	}
 }
 
 void CUIQuestionItem::SendMessage				(CUIWindow* pWnd, s16 msg, void* pData)
@@ -300,8 +300,8 @@ CUIQuestionItem::CUIQuestionItem			(CUIXml* xml_doc, LPCSTR path)
 	xml_init.Init3tButtonEx			(*xml_doc, str, 0, m_text);
 
 	Register						(m_text);
-	//m_text->SetWindowName			("text_button");
-	AddCallback						(m_text,BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUIQuestionItem::OnTextClicked));
+	m_text->SetWindowName			("text_button");
+	AddCallback						("text_button",BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUIQuestionItem::OnTextClicked));
 
 	m_num_text						= xr_new<CUIStatic>();
 	m_num_text->SetAutoDelete		(true);

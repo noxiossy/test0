@@ -312,7 +312,7 @@ void CUITalkWnd::AddQuestion(const shared_str& text, const shared_str& value, in
 	{
 		return;
 	}
-	UITalkDialogWnd->AddQuestion(*CStringTable().translate(text).c_str(),value.c_str(), number);
+	UITalkDialogWnd->AddQuestion(CStringTable().translate(text).c_str(),value.c_str(), number);
 }
 
 void CUITalkWnd::AddAnswer(const shared_str& text, LPCSTR SpeakerName)

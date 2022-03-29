@@ -46,7 +46,7 @@ public:
 
 	//Fvector2			m_btn_pos[3];
 	CUI3tButtonEx		UIToTradeButton;
-	//CUI3tButtonEx		UIToExitButton;
+	CUI3tButtonEx		UIToExitButton;
 
 	//информация о персонажах 
 	CUIStatic			UIOurIcon;
