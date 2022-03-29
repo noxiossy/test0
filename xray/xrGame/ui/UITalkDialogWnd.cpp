@@ -7,15 +7,7 @@
 #include "UI3tButton.h"
 #include "../UI.h"
 #include "UITalkWnd.h"
-#include "UIInventoryUtilities.h"
-#include "UIBtnHint.h"
-
-#include "../game_news.h"
-#include "../level.h"
-#include "../actor.h"
-#include "../alife_registry_wrappers.h"
 #include <dinput.h>
-#include "UIHelper.h"
 
 #define				TALK_XML				"talk.xml"
 
@@ -52,28 +44,25 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 	AttachChild					(&UIOthersIcon);
 
 	// Фрейм с нащими фразами
-	//AttachChild					(&UIDialogFrameBottom);
-	//CUIXmlInit::InitStatic		(*m_uiXml, "frame_bottom", 0, &UIDialogFrameBottom);
-	UIDialogFrameBottom			= UIHelper::CreateStatic	( *m_uiXml, "frame_bottom", this );
+	AttachChild					(&UIDialogFrameBottom);
+	CUIXmlInit::InitStatic		(*m_uiXml, "frame_bottom", 0, &UIDialogFrameBottom);
 
 	//основной фрейм диалога
-	//AttachChild					(&UIDialogFrameTop);
-	//CUIXmlInit::InitStatic		(*m_uiXml, "frame_top", 0, &UIDialogFrameTop);
-	UIDialogFrameTop			= UIHelper::CreateStatic	( *m_uiXml, "frame_top", this );
+	AttachChild					(&UIDialogFrameTop);
+	CUIXmlInit::InitStatic		(*m_uiXml, "frame_top", 0, &UIDialogFrameTop);
+
 
 	//Ответы
 	UIAnswersList				= xr_new<CUIScrollView>();
 	UIAnswersList->SetAutoDelete(true);
-	//UIDialogFrameTop.AttachChild(UIAnswersList);
-	AttachChild(UIAnswersList);
+	UIDialogFrameTop.AttachChild(UIAnswersList);
 	CUIXmlInit::InitScrollView	(*m_uiXml, "answers_list", 0, UIAnswersList);
 	UIAnswersList->SetWindowName("---UIAnswersList");
 
 	//Вопросы
 	UIQuestionsList				= xr_new<CUIScrollView>();
 	UIQuestionsList->SetAutoDelete(true);
-	//UIDialogFrameBottom.AttachChild(UIQuestionsList);
-	AttachChild(UIQuestionsList);
+	UIDialogFrameBottom.AttachChild(UIQuestionsList);
 	CUIXmlInit::InitScrollView	(*m_uiXml, "questions_list", 0, UIQuestionsList);
 	UIQuestionsList->SetWindowName("---UIQuestionsList");
 
@@ -107,6 +96,7 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 	AddCallback					("exit_btn",BUTTON_CLICKED,CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnExitClicked));
 }
 
+#include "UIInventoryUtilities.h"
 	
 void CUITalkDialogWnd::Show()
 {
@@ -195,6 +185,10 @@ void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number)
 	Register						(itm);
 }
 
+#include "../game_news.h"
+#include "../level.h"
+#include "../actor.h"
+#include "../alife_registry_wrappers.h"
 
 void CUITalkDialogWnd::AddAnswer(LPCSTR SpeakerName, LPCSTR str, bool bActor)
 {
@@ -291,7 +285,7 @@ CUIQuestionItem::CUIQuestionItem			(CUIXml* xml_doc, LPCSTR path)
 	string512						str;
 	CUIXmlInit						xml_init;
 
-	strcpy_s							(str,path);
+	strcpy_s						(str,path);
 	xml_init.InitWindow				(*xml_doc, str, 0, this);
 
 	m_min_height					= xml_doc->ReadAttribFlt(path,0,"min_height",15.0f);
@@ -307,7 +301,7 @@ CUIQuestionItem::CUIQuestionItem			(CUIXml* xml_doc, LPCSTR path)
 	m_num_text->SetAutoDelete		(true);
 	AttachChild						(m_num_text);
 	strconcat						(sizeof(str),str,path,":num_text");
-	xml_init.InitStatic				(*xml_doc, str, 0, m_num_text);
+	xml_init.InitStatic			(*xml_doc, str, 0, m_num_text);
 }
 
 void CUIQuestionItem::Init			(LPCSTR val, LPCSTR text)
@@ -335,7 +329,7 @@ CUIAnswerItem::CUIAnswerItem			(CUIXml* xml_doc, LPCSTR path)
 	string512						str;
 	CUIXmlInit						xml_init;
 
-	strcpy_s							(str,path);
+	strcpy_s						(str,path);
 	xml_init.InitWindow				(*xml_doc, str, 0, this);
 
 	m_min_height					= xml_doc->ReadAttribFlt(path,0,"min_height",15.0f);
