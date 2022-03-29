@@ -114,9 +114,11 @@ IC	void CTradeParameters::process							(_action_type type, CInifile &ini_file, 
 	_action.clear			();
 
 	CInifile::Sect			&S = ini_file.r_section(section);
-	for ( auto I = S.Unordered.begin(); I != S.Unordered.end(); ++I ) {
+	CInifile::SectCIt		I = S.Data.begin();
+	CInifile::SectCIt		E = S.Data.end();
+	for ( ; I != E; ++I) {
 		if (!(*I).second.size()) {
-			_action.enable( (*I).first, CTradeFactors( 0.f, 0.f, 0.f ) );
+			_action.disable	((*I).first);
 			continue;
 		}
 
