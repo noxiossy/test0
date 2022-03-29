@@ -5,6 +5,7 @@
 #include "../../xrEngine/xr_ioconsole.h"
 #include "../level.h"
 #include "../GameObject.h"
+#include "../UIDialogHolder.h"
 
 CUIDialogWnd:: CUIDialogWnd()
 {
@@ -171,14 +172,15 @@ void CUIDialogWnd::Update(){
 	CUIWindow::Update();
 }
 
+CDialogHolder* CurrentDialogHolder();
+
 void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 {
-	//if(!IsShown())
-	//	CDialogHolder::StartDialog(this,bDoHideIndicators);
+	if(!IsShown())
+		CurrentDialogHolder()->StartDialog(this,bDoHideIndicators);
 }
 void CUIDialogWnd::HideDialog()
 {
-	R_ASSERT2(IsShown(), "dialog already hidden");
-	if (GetHolder())
+	if (IsShown())
 		GetHolder()->StopDialog	(this);
 }
