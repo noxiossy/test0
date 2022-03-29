@@ -16,7 +16,7 @@ public:
 
 private:
 	ref_shader				hLevelLogo;
-	ref_shader				hLevelLogo_Add;
+	//ref_shader				hLevelLogo_Add;
 	ref_geom				ll_hGeom;
 	ref_geom				ll_hGeom2;
 

@@ -15,7 +15,7 @@ void dxApplicationRender::LoadBegin()
 {
 	ll_hGeom.create		(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 	sh_progress.create	("hud\\default","ui\\a_load");
-	hLevelLogo_Add.create	("hud\\default","ui\\a_load_2.dds");
+	//hLevelLogo_Add.create	("hud\\default","ui\\a_load_2.dds");
 
 	ll_hGeom2.create		(FVF::F_TL, RCache.Vertex.Buffer(),NULL);
 }
@@ -24,7 +24,7 @@ void dxApplicationRender::destroy_loading_shaders()
 {
 	hLevelLogo.destroy		();
 	sh_progress.destroy		();
-	hLevelLogo_Add.destroy	();
+	//hLevelLogo_Add.destroy	();
 }
 
 void dxApplicationRender::setLevelLogo(LPCSTR pszLogoName)
@@ -70,8 +70,8 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 	float	_h					= (float)Device.dwHeight;
 	bool	b_ws				= (_w/_h) > 1.34f;
 	bool	b_16x9				= b_ws && ((_w/_h)>1.77f);
-	float	ws_k				= (b_16x9) ? 0.75f : 0.8333f;	//16:9 or 16:10
-	float	ws_w				= b_ws ? (b_16x9?171.0f:102.6f) : 0.0f;
+	float	ws_k				= 0.8f; //(b_16x9) ? 0.75f : 0.8333f;	//16:9 or 16:10
+	float	ws_w				= b_ws ? (102.0f) : 0.0f;
 
 	float bw					= 1024.0f;
 	float bh					= 768.0f;
@@ -79,77 +79,37 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 	k.set						(_w/bw, _h/bh);
 
 	Fvector2					tsz;
-	tsz.set						(1024, 1024);
+	tsz.set						(2048, 2048);
 	Frect						back_tex_coords;
 	Frect						back_coords;
 	Fvector2					back_size;
 	Fvector2					back_tex_size;
 
 	//background picture
-	static float offs			= -0.5f;
+	static float offs			= -0.0f;
 
 	Fvector2					back_offset;
-	if(b_ws)
-		back_offset.set			(ws_w*ws_k, 0.0f); //ws_w == 171
-	else
-		back_offset.set			(0.0f, 0.0f);
+	back_offset.set				(0.0f, 0.0f);
 
 
-	back_tex_size.set			(1024,768);
-	back_size.set				(1024,768);
-	if(b_ws)
-		back_size.x				*= ws_k; //ws
-
-	back_tex_coords.lt.set		(0,0);
-	back_tex_coords.rb.add		(back_tex_coords.lt, back_tex_size);
-
-	back_coords.lt.set			(offs, offs); 
-	back_coords.lt.add			(back_offset); 
-	back_coords.rb.add			(back_coords.lt, back_size);
-
-	back_coords.lt.mul			(k);
-	back_coords.rb.mul			(k);
-	draw_face					(sh_progress, back_coords, back_tex_coords,tsz);
-
-	if(b_ws) //draw additional frames (left&right)
-	{
-		//left
-		back_size.set				(ws_w*ws_k, 768.0f);
-
-		if(b_16x9)
-		{
-			back_tex_coords.lt.set		(682, 0);
-			back_tex_coords.rb.set		(850, 768);
-		}else
-		{
-			back_tex_coords.lt.set		(748, 0);
-			back_tex_coords.rb.set		(850, 768);
-		}
-		back_coords.lt.set			(offs, offs); 
-		back_coords.rb.add			(back_coords.lt, back_size);
-		back_coords.lt.mul			(k);
-		back_coords.rb.mul			(k);
-
-		draw_face					(hLevelLogo_Add, back_coords, back_tex_coords,tsz);
-
-		//right
-		if(b_16x9)
-		{
-			back_tex_coords.lt.set		(850, 0);
-			back_tex_coords.rb.set		(1018, 768);
-		}else
-		{
-			back_tex_coords.lt.set		(850, 0);
-			back_tex_coords.rb.set		(952, 768);
-		}
-
-		back_coords.lt.set			(1024.0f-back_size.x+offs, offs); 
-		back_coords.rb.add			(back_coords.lt, back_size);
-		back_coords.lt.mul			(k);
-		back_coords.rb.mul			(k);
-
-		draw_face					(hLevelLogo_Add, back_coords, back_tex_coords, tsz);
+	back_tex_size.set				(1024,768);
+	if(b_ws){
+		back_tex_coords.lt.set		(0,0);
+		back_tex_coords.rb.set		(1280, 768);
+	}else{
+		back_tex_coords.lt.set		(102,0);
+		back_tex_coords.rb.set		(820, 768);
 	}
+
+	back_coords.lt.set				(offs, offs); 
+	back_coords.lt.add				(back_offset); 
+	back_coords.rb.add				(back_coords.lt, back_tex_size);
+
+	back_coords.lt.mul				(k);
+	back_coords.rb.mul				(k);
+	draw_face						(sh_progress, back_coords, back_tex_coords,tsz);
+
+
 	//progress bar
 	
 	back_tex_size.set			(268,37);
