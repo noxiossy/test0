@@ -49,8 +49,9 @@ void CUITalkWnd::InitTalkWnd()
 {
 	inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
 
-	UITalkDialogWnd = xr_new<CUITalkDialogWnd>();UITalkDialogWnd->SetAutoDelete(true);
-	AttachChild(UITalkDialogWnd);
+	UITalkDialogWnd			= xr_new<CUITalkDialogWnd>();
+	UITalkDialogWnd->SetAutoDelete(true);
+	AttachChild				(UITalkDialogWnd);
 	UITalkDialogWnd->m_pParent = this;
 	UITalkDialogWnd->InitTalkDialogWnd();
 }
@@ -305,13 +306,13 @@ void CUITalkWnd::SayPhrase(const shared_str& phrase_id)
 	if(m_pCurrentDialog->IsFinished()) ToTopicMode();
 }
 
-void CUITalkWnd::AddQuestion(const shared_str& text, const shared_str& value, int i)
+void CUITalkWnd::AddQuestion(const shared_str& text, const shared_str& value, int number)
 {
 	if(text.size() == 0)
 	{
 		return;
 	}
-	UITalkDialogWnd->AddQuestion(*CStringTable().translate(text),value.c_str(), i);
+	UITalkDialogWnd->AddQuestion(*CStringTable().translate(text).c_str(),value.c_str(), number);
 }
 
 void CUITalkWnd::AddAnswer(const shared_str& text, LPCSTR SpeakerName)
