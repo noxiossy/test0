@@ -71,7 +71,7 @@ EFC_Visible	CFrustum::testSphere			(Fvector& c, float r, u32& test_mask) const
 	return test_mask ? fcvPartial:fcvFully;
 }
 
-BOOL	CFrustum::testSphere_dirty		(const Fvector& c, float r) const
+BOOL	CFrustum::testSphere_dirty		(Fvector& c, float r) const
 {
 	switch (p_count) {
 		case 12:if (planes[11].classify(c)>r)	return FALSE;
@@ -299,7 +299,7 @@ sPoly*	CFrustum::ClipPoly(sPoly& S, sPoly& D) const
 		cls[src->size()] = cls[0];
 		src->push_back((*src)[0]);
 		Fvector D; float denum,t;
-		for (int j=0; j<src->size()-1; j++)
+		for (u32 j=0; j<src->size()-1; j++)
 		{
 			if ((*src)[j].similar((*src)[j+1],EPS_S)) continue;
 

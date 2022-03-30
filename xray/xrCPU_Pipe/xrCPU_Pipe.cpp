@@ -48,17 +48,17 @@ extern "C" {
 		T->memFill32 = nullptr;//T->memFill32= xrMemFill32_MMX;
 		
 		// SSE
-		//if (CPU::ID.hasSSE()) {
+		if (CPU::ID.hasSSE()) {
 			//T->memCopy	= xrMemCopy_MMXSSE3DNow;
 			//T->skin2W	= xrSkin2W_SSE;
-		//}
+		}
  
 		// 3dnow!
-		//if (CPU::ID.has3DNOW()) {
+		if (CPU::ID.has3DNOW()) {
  			//T->skin1W	= xrSkin1W_3DNow;
 			// T->blerp	= xrBoneLerp_3DNow;
 			//T->memCopy	= xrMemCopy_MMXSSE3DNow;
 			//T->skin2W	= xrSkin2W_3DNow;
-		//}
+		}
 	}
 };

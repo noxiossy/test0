@@ -1,7 +1,7 @@
 #ifndef XRCDB_H
 #define XRCDB_H
 
-//#pragma once
+#pragma once
 // The following ifdef block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the XRCDB_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
@@ -179,8 +179,8 @@ namespace CDB
 	struct non_copyable {
 						non_copyable	() {}
 	private:
-						non_copyable	(const non_copyable &);
-						non_copyable	&operator=		(const non_copyable &);
+						non_copyable	(const non_copyable &) {}
+						non_copyable	&operator=		(const non_copyable &) {}
 	};
 
 #pragma warning(push)
