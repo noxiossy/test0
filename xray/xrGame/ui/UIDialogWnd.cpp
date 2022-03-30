@@ -176,8 +176,8 @@ void CUIDialogWnd::Update(){
 
 void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 {
-	if(!IsShown())
-		HUD().GetGameUI()->StartDialog(this,bDoHideIndicators);
+	//if(!IsShown())
+		//CurrentDialogHolder()->StartDialog(this,bDoHideIndicators);
 }
 void CUIDialogWnd::HideDialog()
 {
