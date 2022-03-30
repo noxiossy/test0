@@ -73,11 +73,11 @@ public:
 	IDirect3DSurface9*		pBaseRT;
 	IDirect3DSurface9*		pBaseZB;
 
-	CHWCaps					Caps;
+	CHWCaps					Caps{};
 
-	UINT					DevAdapter;
-	D3DDEVTYPE				DevT;
-	D3DPRESENT_PARAMETERS	DevPP;
+	UINT					DevAdapter{};
+	D3DDEVTYPE				DevT{};
+	D3DPRESENT_PARAMETERS	DevPP{};
 #endif	//	USE_DX10
 
 #ifdef	USE_DX10

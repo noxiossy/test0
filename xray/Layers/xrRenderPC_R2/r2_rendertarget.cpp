@@ -13,8 +13,6 @@
 #include "blender_ssao.h"
 
 #include "../xrRender/dxRenderDeviceRender.h"
-#include "../../xrEngine/igame_persistent.h"
-#include "../../xrEngine/environment.h"
 
 void	CRenderTarget::u_setrt			(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb)
 {
@@ -189,7 +187,7 @@ CRenderTarget::CRenderTarget		()
 	param_noise_fps		= 25.f;
 	param_noise_scale	= 1.f;
 
-	im_noise_time		= 1.f/100.0f;
+	im_noise_time		= 1.0f/100.0f;
 	im_noise_shift_w	= 0;
 	im_noise_shift_h	= 0;
 

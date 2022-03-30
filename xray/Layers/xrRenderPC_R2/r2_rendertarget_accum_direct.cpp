@@ -421,13 +421,10 @@ void CRenderTarget::accum_direct_cascade	( u32 sub_phase, Fmatrix& xform, Fmatri
 
 		// nv-DBT
 		float zMin,zMax;
-		if (SE_SUN_NEAR == sub_phase)	
-		{
+		if (SE_SUN_NEAR==sub_phase)	{
 			zMin = 0;
 			zMax = ps_r2_sun_near;
-		} 
-		else 
-		{
+		} else {
 			extern float	OLES_SUN_LIMIT_27_01_07;
 			zMin = ps_r2_sun_near;
 			zMax = OLES_SUN_LIMIT_27_01_07;

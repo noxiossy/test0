@@ -273,10 +273,16 @@ void CDetailManager::UpdateVisibleM()
 	for (u32 _mz=0; _mz<dm_cache1_line; _mz++){
 		for (u32 _mx=0; _mx<dm_cache1_line; _mx++){
 			CacheSlot1& MS		= cache_level1[_mz][_mx];
-			if (MS.empty)		continue;
+			if (MS.empty)
+			{
+				continue;
+			}
 			u32 mask			= 0xff;
 			u32 res				= View.testSAABB		(MS.vis.sphere.P,MS.vis.sphere.R,MS.vis.box.data(),mask);
-			if (fcvNone==res)						 	continue;	// invisible-view frustum
+			if (fcvNone==res)
+			{
+				continue;	// invisible-view frustum
+			}
 			// test slots
 
 			u32 dwCC = dm_cache1_count*dm_cache1_count;
@@ -286,16 +292,25 @@ void CDetailManager::UpdateVisibleM()
 				Slot& 	S 		= *PS;
 
 				// if slot empty - continue
-				if (S.empty)	continue;
+				if (S.empty)
+				{
+					continue;
+				}
 
 				// if upper test = fcvPartial - test inner slots
 				if (fcvPartial==res){
 					u32 _mask	= mask;
 					u32 _res	= View.testSAABB			(S.vis.sphere.P,S.vis.sphere.R,S.vis.box.data(),_mask);
-					if (fcvNone==_res)						continue;	// invisible-view frustum
+					if (fcvNone==_res)
+					{
+						continue;	// invisible-view frustum
+					}
 				}
 #ifndef _EDITOR
-				if (!RImplementation.HOM.visible(S.vis))	continue;	// invisible-occlusion
+				if (!RImplementation.HOM.visible(S.vis))
+				{
+					continue;	// invisible-occlusion
+				}
 #endif
 				// Add to visibility structures
 				if (Device.dwFrame>S.frame){

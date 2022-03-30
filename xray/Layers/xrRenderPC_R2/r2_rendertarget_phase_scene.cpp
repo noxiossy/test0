@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "../../xrEngine/Environment.h"
 
 // startup
 void	CRenderTarget::phase_scene_prepare	()

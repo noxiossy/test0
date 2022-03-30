@@ -80,8 +80,10 @@ BOOL	CDetailManager::cache_Validate	()
 			int		w_z		= cg2w_Z(z);
 			Slot*	D		= cache[z][x];
 
-			if (D->sx	!= w_x)	return FALSE;
-			if (D->sz	!= w_z)	return FALSE;
+			if (D->sx != w_x || D->sz != w_z)
+			{
+				return FALSE;
+			}	
 		}
 	}
 	return TRUE;
