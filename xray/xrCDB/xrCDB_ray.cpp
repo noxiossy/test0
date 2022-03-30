@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "cpuid.h"
 #pragma warning(push)
 #pragma warning(disable:4995)
 #include <xmmintrin.h>
@@ -9,20 +10,14 @@
 using namespace		CDB;
 using namespace		Opcode;
 
-// can you say "barebone"?
-#ifndef _MM_ALIGN16
-#	define _MM_ALIGN16	__declspec(align(16))
-#endif // _MM_ALIGN16
-
-struct	_MM_ALIGN16		vec_t	: public Fvector3	{ 
+struct alignas(16) vec_t : public Fvector3 {
 	float		pad; 
 };
-vec_t	vec_c	( float _x, float _y, float _z)	{ vec_t v; v.x=_x;v.y=_y;v.z=_z;v.pad=0; return v; }
-struct _MM_ALIGN16		aabb_t	{ 
+struct alignas(16) aabb_t {
 	vec_t		min;
 	vec_t		max;
 };
-struct _MM_ALIGN16		ray_t	{
+struct alignas(16) ray_t {
 	vec_t		pos;
 	vec_t		inv_dir;
 	vec_t		fwd_dir;
@@ -118,10 +113,10 @@ ICF BOOL	isect_fpu	(const Fvector& min, const Fvector& max, const ray_t &ray, Fv
 #define muxhps(low,high)	_mm_movehl_ps((low),(high))		// low{a,b,c,d}|high{e,f,g,h} = {c,d,g,h}
 
 
-static const float flt_plus_inf = -logf(0);	// let's keep C and C++ compilers happy.
-static const float _MM_ALIGN16
-	ps_cst_plus_inf	[4]	=	{  flt_plus_inf,  flt_plus_inf,  flt_plus_inf,  flt_plus_inf },
-	ps_cst_minus_inf[4]	=	{ -flt_plus_inf, -flt_plus_inf, -flt_plus_inf, -flt_plus_inf };
+static constexpr auto flt_plus_inf = std::numeric_limits<float>::infinity();
+alignas(16) static constexpr float
+	ps_cst_plus_inf [] = {  flt_plus_inf,  flt_plus_inf,  flt_plus_inf,  flt_plus_inf },
+	ps_cst_minus_inf[] = { -flt_plus_inf, -flt_plus_inf, -flt_plus_inf, -flt_plus_inf };
 
 ICF BOOL isect_sse			(const aabb_t &box, const ray_t &ray, float &dist)	{
 	// you may already have those values hanging around somewhere
@@ -173,7 +168,7 @@ ICF BOOL isect_sse			(const aabb_t &box, const ray_t &ray, float &dist)	{
 }
 
 template <bool bUseSSE, bool bCull, bool bFirst, bool bNearest>
-class _MM_ALIGN16	ray_collider
+class alignas(16) ray_collider
 {
 public:
 	COLLIDER*		dest;
@@ -214,8 +209,18 @@ public:
 	ICF BOOL		_box_sse	(const Fvector& bCenter, const Fvector& bExtents, float&  dist )
 	{
 		aabb_t		box;
+	/*
 		box.min.sub (bCenter,bExtents);	box.min.pad = 0;
 		box.max.add	(bCenter,bExtents); box.max.pad = 0;
+	*/
+		__m128 CN = _mm_unpacklo_ps(_mm_load_ss((float*)&bCenter.x), _mm_load_ss((float*)&bCenter.y));
+		CN = _mm_movelh_ps(CN, _mm_load_ss((float*)&bCenter.z));
+		__m128 EX = _mm_unpacklo_ps(_mm_load_ss((float*)&bExtents.x), _mm_load_ss((float*)&bExtents.y));
+		EX = _mm_movelh_ps(EX, _mm_load_ss((float*)&bExtents.z));
+
+		_mm_store_ps((float*)&box.min, _mm_sub_ps(CN, EX));
+		_mm_store_ps((float*)&box.max, _mm_add_ps(CN, EX));
+
         return 		isect_sse	(box,ray,dist);
 	}
 	
@@ -314,6 +319,9 @@ public:
 	}
 	void			_stab		(const AABBNoLeafNode* node)
 	{
+		// Should help
+		_mm_prefetch((char *)node->GetNeg(), _MM_HINT_NTA);
+
 		// Actual ray/aabb test
 		if (bUseSSE)			{
 			// use SSE

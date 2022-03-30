@@ -4,7 +4,7 @@
 
 #if !defined(AFX_FRUSTUM_H__E66ED755_F741_49CF_8B2A_404CCF7067F2__INCLUDED_)
 #define AFX_FRUSTUM_H__E66ED755_F741_49CF_8B2A_404CCF7067F2__INCLUDED_
-//#pragma once
+#pragma once
 
 #include "../xrcore/fixedvector.h"
 
@@ -79,7 +79,7 @@ public:
 	u32				getMask				() const { return (1<<p_count)-1; }
 
 	EFC_Visible		testSphere			(Fvector& c, float r, u32& test_mask)					const;
-	BOOL			testSphere_dirty	(const Fvector& c, float r)									const;
+	BOOL			testSphere_dirty	(Fvector& c, float r)									const;
 	EFC_Visible		testAABB			(const float* mM, u32& test_mask)						const;
 	EFC_Visible		testSAABB			(Fvector& c, float r, const float* mM, u32& test_mask)	const;
 	BOOL			testPolyInside_dirty(Fvector* p, int count)									const;
