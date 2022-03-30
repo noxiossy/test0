@@ -97,8 +97,8 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 		back_tex_coords.lt.set		(0,0);
 		back_tex_coords.rb.set		(1280, 768);
 	}else{
-		back_tex_coords.lt.set		(102,0);
-		back_tex_coords.rb.set		(820, 768);
+		back_tex_coords.lt.set		(128,0);
+		back_tex_coords.rb.set		(1152, 768);
 	}
 
 	back_coords.lt.set				(offs, offs); 
@@ -189,16 +189,16 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 		Frect						r;
 		r.lt.set					(257,369);
 
-		//if(b_ws)
-		//	r.lt.x					*= ws_k;
+		if(b_ws)
+			r.lt.x					/= ws_k;
 		r.lt.add					(back_offset);
 
 		r.lt.x						+= offs;
 		r.lt.y						+= offs;
 		back_size.set				(512,256);
 
-		//if(b_ws)
-		//	back_size.x				*= ws_k; //ws 0.625
+		if(b_ws)
+			back_size.x				*= ws_k; //ws 0.625
 
 		r.rb.add					(r.lt,back_size);
 		r.lt.mul					(k);						
