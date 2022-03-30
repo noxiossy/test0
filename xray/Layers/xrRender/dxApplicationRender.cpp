@@ -187,13 +187,10 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 	if(hLevelLogo)
 	{
 		Frect						r;
-		//r.lt.set					(257,369);
+		r.lt.set					(257,369);
 
 		if(b_ws)
-			r.lt.set					(308,369);
-		else
-			r.lt.set					(257,369);
-		
+			r.lt.x					/= ws_k;
 		r.lt.add					(back_offset);
 
 		r.lt.x						+= offs;
