@@ -239,7 +239,7 @@ void CWallmarksEngine::AddWallmark_internal	(CDB::TRI* pTri, const Fvector* pVer
 		bb.getsphere					(W->bounds.P, W->bounds.R);
 	}
 
-	if (W->bounds.R < 1.f)	
+//	if (W->bounds.R < 1.f)	
 	{
 		// search if similar wallmark exists
 		wm_slot* slot			= FindSlot	(hShader);
@@ -261,10 +261,10 @@ void CWallmarksEngine::AddWallmark_internal	(CDB::TRI* pTri, const Fvector* pVer
 		// no similar - register _new_
 		slot->static_items.push_back(W);
 	}
-	else
-	{
-		static_wm_destroy(W);
-	}
+	//else
+	//{
+	//	static_wm_destroy(W);
+	//}
 }
 
 void CWallmarksEngine::AddStaticWallmark	(CDB::TRI* pTri, const Fvector* pVerts, const Fvector &contact_point, ref_shader hShader, float sz)

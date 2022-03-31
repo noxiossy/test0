@@ -81,6 +81,7 @@ void	CResourceManager::reset_end				()
 
 	// create everything, renderer may use
 	::Render->reset_end		();
+	Dump					(true);
 }
 
 template<class C>	void mdump(C c)

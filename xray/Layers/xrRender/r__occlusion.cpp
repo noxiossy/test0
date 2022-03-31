@@ -42,13 +42,11 @@ u32		R_occlusion::occq_begin		(u32&	ID		)
 	if (!enabled)		return 0;
 
 	//	Igor: prevent release crash if we issue too many queries
-//#ifndef	DEBUG
 	if (pool.empty())
 	{
 		ID = iInvalidHandle;
 		return 0;
 	}
-//#endif	//	DEBUG
 
 	RImplementation.stats.o_queries	++;
 	if (!fids.empty())	{
@@ -74,9 +72,7 @@ void	R_occlusion::occq_end		(u32&	ID		)
 	if (!enabled)		return;
 
 	//	Igor: prevent release crash if we issue too many queries
-#ifndef	DEBUG
 	if (ID == iInvalidHandle) return;
-#endif	//	DEBUG
 
 	// Msg				("end  : [%2d] - %d", used[ID].order, ID);
 	//CHK_DX			(used[ID].Q->Issue	(D3DISSUE_END));
@@ -87,9 +83,7 @@ R_occlusion::occq_result R_occlusion::occq_get		(u32&	ID		)
 	if (!enabled)		return 0xffffffff;
 
 	//	Igor: prevent release crash if we issue too many queries
-#ifndef	DEBUG
 	if (ID == iInvalidHandle) return 0xFFFFFFFF;
-#endif	//	DEBUG
 
 	occq_result	fragments	= 0;
 	HRESULT hr;

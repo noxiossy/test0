@@ -17,11 +17,11 @@ void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV
 
 void CBackend::dbg_Draw			(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt)
 {
-	OnFrameEnd					();
 #ifdef	USE_DX10
 	//	TODO: DX10: implement
 	//VERIFY(!"CBackend::dbg_Draw not implemented.");
 #else	//	USE_DX10
+	OnFrameEnd					();
 	CHK_DX(HW.pDevice->SetFVF	(FVF::F_L));
 	CHK_DX(HW.pDevice->DrawIndexedPrimitiveUP(T, 0, vcnt, pcnt,
 		pIdx, D3DFMT_INDEX16,
@@ -31,11 +31,11 @@ void CBackend::dbg_Draw			(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pI
 }
 void CBackend::dbg_Draw			(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
-	OnFrameEnd					();
 #ifdef	USE_DX10
 	//	TODO: DX10: implement
 	//VERIFY(!"CBackend::dbg_Draw not implemented.");
 #else	//	USE_DX10
+	OnFrameEnd					();
 	CHK_DX(HW.pDevice->SetFVF	(FVF::F_L));
 	CHK_DX(HW.pDevice->DrawPrimitiveUP(T, pcnt, pVerts, sizeof(FVF::L)	));
 #endif	//	USE_DX10

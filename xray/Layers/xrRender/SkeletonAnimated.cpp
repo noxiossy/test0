@@ -62,8 +62,8 @@ void	CKinematicsAnimated::Bone_Motion_Stop_IM	(CBoneData* bd, CBlend* handle)
 std::pair<LPCSTR,LPCSTR> CKinematicsAnimated::LL_MotionDefName_dbg	(MotionID ID)
 {
 	shared_motions& s_mots	= m_Motions[ID.slot].motions;
-	accel_map::iterator _I, _E=s_mots.motion_map()->end();
-	for (_I	= s_mots.motion_map()->begin(); _I!=_E; ++_I)	if (_I->second==ID.idx) return std::make_pair(*_I->first,*s_mots.id());
+	auto _E = s_mots.motion_map()->end();
+	for (auto _I = s_mots.motion_map()->begin(); _I!=_E; ++_I)	if (_I->second==ID.idx) return std::make_pair(*_I->first,*s_mots.id());
 	return std::make_pair((LPCSTR)0,(LPCSTR)0);
 }
 
@@ -161,7 +161,7 @@ MotionID CKinematicsAnimated::LL_MotionID	(LPCSTR B)
 	MotionID motion_ID;
 	for (int k=int(m_Motions.size())-1; k>=0; --k){
     	shared_motions* s_mots	= &m_Motions[k].motions;
-		accel_map::iterator I 	= s_mots->motion_map()->find(LPSTR(B));
+		auto I 	= s_mots->motion_map()->find(B);
     	if (I!=s_mots->motion_map()->end())	{ motion_ID.set(u16(k),I->second); break; }
     }
     return motion_ID;
@@ -171,7 +171,7 @@ u16 CKinematicsAnimated::LL_PartID		(LPCSTR B)
 	if (0==m_Partition)	return BI_NONE;
 	for (u16 id=0; id<MAX_PARTS; id++) {
 		CPartDef&	P = (*m_Partition)[id];
-		if (0==P.Name)	continue;
+		if (P.Name == nullptr)	continue;
 		if (0==stricmp(B,*P.Name)) return id;
 	}
 	return BI_NONE;
@@ -183,7 +183,7 @@ MotionID CKinematicsAnimated::ID_Cycle_Safe(LPCSTR  N)
 	MotionID motion_ID;
 	for (int k=int(m_Motions.size())-1; k>=0; --k){
     	shared_motions* s_mots			= &m_Motions[k].motions;
-		accel_map::const_iterator I 	= s_mots->cycle()->find(LPSTR(N));
+		auto I 	= s_mots->cycle()->find(N);
 		if (I!=s_mots->cycle()->end())	{	motion_ID.set(u16(k),I->second); break;}
     }
     return motion_ID;
@@ -198,7 +198,7 @@ MotionID CKinematicsAnimated::ID_Cycle_Safe(shared_str  N)
 	MotionID motion_ID;
 	for (int k=int(m_Motions.size())-1; k>=0; --k){
 		shared_motions* s_mots			= &m_Motions[k].motions;
-		accel_map::const_iterator I 	= s_mots->cycle()->find(N);
+		auto I 	= s_mots->cycle()->find(N);
 		if (I!=s_mots->cycle()->end())	{	motion_ID.set(u16(k),I->second); break;}
 	}
 	return motion_ID;
@@ -308,7 +308,7 @@ CBlend*	CKinematicsAnimated::LL_PlayCycle(u16 part, MotionID motion_ID, BOOL  bM
 		return 0;
 	}
 	if (part>=MAX_PARTS)	return 0;
-	if (0==m_Partition->part(part).Name)	return 0;
+	if (m_Partition->part(part).Name == nullptr)	return 0;
 
 //	shared_motions* s_mots	= &m_Motions[motion.slot];
 //	CMotionDef* m_def		= s_mots->motion_def(motion.idx);
@@ -371,7 +371,7 @@ MotionID CKinematicsAnimated::ID_FX_Safe		(LPCSTR  N)
 	MotionID motion_ID;
 	for (int k=int(m_Motions.size())-1; k>=0; --k){
     	shared_motions* s_mots	= &m_Motions[k].motions;
-		accel_map::iterator I 	= s_mots->fx()->find(LPSTR(N));
+		auto I 	= s_mots->fx()->find(LPSTR(N));
 		if (I!=s_mots->fx()->end())	{	motion_ID.set(u16(k),I->second); break;}
     }
     return motion_ID;
@@ -383,7 +383,9 @@ MotionID CKinematicsAnimated::ID_FX			(LPCSTR  N)
 }
 CBlend*	CKinematicsAnimated::PlayFX			(MotionID motion_ID, float power_scale)
 {
-	VERIFY					(motion_ID.valid()); 
+	if (!motion_ID.valid())
+		return nullptr;
+
     CMotionDef* m_def		= m_Motions[motion_ID.slot].motions.motion_def(motion_ID.idx);
     VERIFY					(m_def);
 	return LL_PlayFX		(m_def->bone_or_part,motion_ID,
@@ -431,7 +433,7 @@ void CKinematicsAnimated::LL_UpdateTracks( float dt, bool b_force, bool leave_bl
 	// Cycles
 	for (u16 part=0; part<MAX_PARTS; part++)
 	{
-		if (0==m_Partition->part(part).Name)
+		if (m_Partition->part(part).Name == nullptr)
 			continue;
 		I = blend_cycles[part].begin(); E = blend_cycles[part].end();
 		for (; I!=E; I++)
