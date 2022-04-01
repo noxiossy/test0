@@ -17,6 +17,8 @@
 
 #include "ui/UIMap.h"
 #include "ui/UIXmlInit.h"
+#include "ui/UIHelper.h"
+#include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
 CUIZoneMap::CUIZoneMap()
@@ -47,7 +49,8 @@ void CUIZoneMap::Init()
 
 	xml_init.InitStatic(uiXml, "minimap:center", 0, &m_center);
 	
-	
+	m_clock_wnd						= UIHelper::CreateStatic(uiXml, "minimap:clock_wnd", &m_background);
+
 	m_activeMap						= xr_new<CUIMiniMap>();
 	m_clipFrame.AttachChild			(m_activeMap);
 	m_activeMap->SetAutoDelete		(true);
@@ -88,7 +91,7 @@ void CUIZoneMap::Update()
 	CActor* pActor = smart_cast<CActor*>( Level().CurrentViewEntity() );
 	if ( !pActor ) return;
 
-	if ( !( Device.dwFrame % 20 ) && IsGameTypeSingle() )
+	if ( !( Device.dwFrame % 20 )  )
 	{
 		string16	text_str;
 		strcpy_s( text_str, sizeof(text_str), "" );
@@ -109,6 +112,8 @@ void CUIZoneMap::Update()
 	float h, p;
 	Device.vCameraDirection.getHP( h, p );
 	SetHeading( -h );
+
+	m_clock_wnd->TextItemControl()->SetText( InventoryUtilities::GetGameTimeAsString( InventoryUtilities::etpTimeToMinutes ).c_str() );
 }
 
 void CUIZoneMap::SetHeading		(float angle)

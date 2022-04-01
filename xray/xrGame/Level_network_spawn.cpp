@@ -23,6 +23,12 @@ void CLevel::cl_Process_Spawn(NET_Packet& P)
 	E->Spawn_Read		(P);
 	if (E->s_flags.is(M_SPAWN_UPDATE))
 		E->UPDATE_Read	(P);
+
+	if (!E->match_configuration())
+	{
+		F_entity_Destroy(E);
+		return;
+	}
 //-------------------------------------------------
 //.	Msg ("M_SPAWN - %s[%d][%x] - %d %d", *s_name,  E->ID, E,E->ID_Parent, Device.dwFrame);
 //-------------------------------------------------
@@ -99,7 +105,15 @@ void CLevel::g_sv_Spawn		(CSE_Abstract* E)
 	// Client spawn
 //	T.Start		();
 	CObject*	O		= Objects.Create	(*E->s_name);
+	if (!O)
+	{
+		Msg("! Failed to create entity '%s'", *E->s_name);
+		return;
+	}
 	// Msg				("--spawn--CREATE: %f ms",1000.f*T.GetAsync());
+
+	if (Core.ParamFlags.test(Core.lr_fulllog))
+		Msg("Try Spawning object Name:[%s] Section:[%s] ID:[%d] ParentID:[%d]", E->name_replace(), *E->s_name, E->ID,E->ID_Parent);
 
 //	T.Start		();
 #ifdef DEBUG_MEMORY_MANAGER
@@ -179,6 +193,10 @@ void CLevel::g_sv_Spawn		(CSE_Abstract* E)
 	//---------------------------------------------------------
 	Game().OnSpawn				(O);
 	//---------------------------------------------------------
+
+	if (Core.ParamFlags.test(Core.lr_fulllog))
+		Msg("[%d] net_Spawn successful", E->ID);
+
 #ifdef DEBUG_MEMORY_MANAGER
 	if (g_bMEMO) {
 		lua_gc					(ai().script_engine().lua(),LUA_GCCOLLECT,0);

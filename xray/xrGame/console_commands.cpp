@@ -1056,22 +1056,40 @@ struct CCC_ClearSmartCastStats : public IConsole_Command {
 struct CCC_JumpToLevel : public IConsole_Command {
 	CCC_JumpToLevel(LPCSTR N) : IConsole_Command(N)  {};
 
-	virtual void Execute(LPCSTR args) {
-		if (!ai().get_alife()) {
+	virtual void Execute(LPCSTR level)
+	{
+		if ( !ai().get_alife() )
+		{
 			Msg				("! ALife simulator is needed to perform specified command!");
 			return;
 		}
-		string256		level;
-		sscanf(args,"%s",level);
 
 		GameGraph::LEVEL_MAP::const_iterator	I = ai().game_graph().header().levels().begin();
 		GameGraph::LEVEL_MAP::const_iterator	E = ai().game_graph().header().levels().end();
 		for ( ; I != E; ++I)
-			if (!xr_strcmp((*I).second.name(),level)) {
+			if ( !xr_strcmp((*I).second.name(),level) )
+			{
 				ai().alife().jump_to_level(level);
 				return;
 			}
 		Msg							("! There is no level \"%s\" in the game graph!",level);
+	}
+
+	virtual void	Save	(IWriter *F)	{};
+	virtual void	fill_tips(vecTips& tips, u32 mode)
+	{
+		if ( !ai().get_alife() )
+		{
+			Msg				("! ALife simulator is needed to perform specified command!");
+			return;
+		}
+
+		GameGraph::LEVEL_MAP::const_iterator	itb = ai().game_graph().header().levels().begin();
+		GameGraph::LEVEL_MAP::const_iterator	ite = ai().game_graph().header().levels().end();
+		for ( ; itb != ite; ++itb )
+		{
+			tips.push_back( (*itb).second.name() );
+		}
 	}
 };
 
@@ -1710,15 +1728,15 @@ CMD4(CCC_Integer,			"hit_anims_tune",						&tune_hit_anims,		0, 1);
 	CMD4(CCC_FloatBlock,		"ph_tri_query_ex_aabb_rate",	&ph_tri_query_ex_aabb_rate	,			1.01f	,3.f			);
 #endif // DEBUG
 
-if (strstr(Core.Params,"-lrdev"))
-{
-	CMD1(CCC_JumpToLevel,	"jump_to_level"		);
-	CMD3(CCC_Mask,			"g_god",			&psActorFlags,	AF_GODMODE	);
-	CMD3(CCC_Mask,			"g_unlimitedammo",	&psActorFlags,	AF_UNLIMITEDAMMO);
-	CMD1(CCC_Script,		"run_script");
-	CMD1(CCC_ScriptCommand,	"run_string");
-	CMD1(CCC_TimeFactor,	"time_factor");		
-}
+	if (Core.ParamFlags.test(Core.lr_dev))
+	{
+		CMD1(CCC_JumpToLevel,	"jump_to_level"		);
+		CMD3(CCC_Mask,			"g_god",			&psActorFlags,	AF_GODMODE	);
+		CMD3(CCC_Mask,			"g_unlimitedammo",	&psActorFlags,	AF_UNLIMITEDAMMO);
+		CMD1(CCC_Script,		"run_script");
+		CMD1(CCC_ScriptCommand,	"run_string");
+		CMD1(CCC_TimeFactor,	"time_factor");		
+	}
 
 	CMD3(CCC_Mask,		"g_autopickup",			&psActorFlags,	AF_AUTOPICKUP);
 	CMD3(CCC_Mask,		"g_dynamic_music",		&psActorFlags,	AF_DYNAMIC_MUSIC);

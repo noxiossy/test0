@@ -18,6 +18,7 @@ private:
 //	float						m_fScale;
 
 	CUIStatic					m_background;
+	CUIStatic*					m_clock_wnd;
 	CUIStatic					m_center;
 	CUIStatic					m_compass;
 	CUIStatic					m_clipFrame;
