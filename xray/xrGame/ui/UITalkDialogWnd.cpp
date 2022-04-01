@@ -9,7 +9,7 @@
 #include "UITalkWnd.h"
 #include <dinput.h>
 
-#define				TALK_XML				"talk.xml"
+#define				TALK_XML				"a_talk.xml"
 
 CUITalkDialogWnd::CUITalkDialogWnd()
 	:	m_pNameTextFont		(NULL)

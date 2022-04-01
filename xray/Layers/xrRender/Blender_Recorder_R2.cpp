@@ -34,6 +34,7 @@ void	CBlender_Compile::r_Pass		(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, 
 #endif	//	USE_DX10
 	ctable.merge			(&ps->constants);
 	ctable.merge			(&vs->constants);
+	SetMapping				();
 
 	// Last Stage - disable
 	if (0==stricmp(_ps,"null"))	{
@@ -163,7 +164,6 @@ void	CBlender_Compile::r_Sampler_clw	(LPCSTR name, LPCSTR texture, bool b_ps1x_P
 
 void	CBlender_Compile::r_End			()
 {
-	SetMapping				();
 	dest.constants			= DEV->_CreateConstantTable(ctable);
 	dest.state				= DEV->_CreateState		(RS.GetContainer());
 	dest.T					= DEV->_CreateTextureList	(passTextures);

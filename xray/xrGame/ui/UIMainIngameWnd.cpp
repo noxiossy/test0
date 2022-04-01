@@ -74,7 +74,7 @@ const u32	g_clWhite					= 0xffffffff;
 #define		C_ON_ENEMY					D3DCOLOR_XRGB(0xff,0,0)
 #define		C_DEFAULT					D3DCOLOR_XRGB(0xff,0xff,0xff)
 
-#define				MAININGAME_XML				"maingame.xml"
+#define				MAININGAME_XML				"a_hud.xml"
 
 CUIMainIngameWnd::CUIMainIngameWnd()
 {

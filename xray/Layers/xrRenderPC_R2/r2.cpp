@@ -381,7 +381,7 @@ void CRender::reset_end()
 
 	// Set this flag true to skip the first render frame,
 	// that some data is not ready in the first frame (for example device camera position)
-	m_bFirstFrameAfterReset = false;
+	m_bFirstFrameAfterReset = true;
 }
 /*
 void CRender::OnFrame()
