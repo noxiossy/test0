@@ -113,7 +113,7 @@ void CUIZoneMap::Update()
 	Device.vCameraDirection.getHP( h, p );
 	SetHeading( -h );
 
-	m_clock_wnd->TextItemControl()->SetText( InventoryUtilities::GetGameTimeAsString( InventoryUtilities::etpTimeToMinutes ).c_str() );
+	m_clock_wnd->SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
 }
 
 void CUIZoneMap::SetHeading		(float angle)
