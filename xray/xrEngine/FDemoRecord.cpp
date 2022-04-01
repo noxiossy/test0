@@ -405,7 +405,7 @@ void CDemoRecord::IR_OnKeyboardPress	(int dik)
 	if (dik == DIK_F12)		MakeScreenshot			();
 	if (dik == DIK_ESCAPE)	fLifeTime				= -1;
 
-	if (strstr(Core.Params,"-lrdev") && dik == DIK_T && g_pGameLevel->CurrentEntity())
+	if (Core.ParamFlags.test(Core.lr_dev)) && dik == DIK_T && g_pGameLevel->CurrentEntity())
 	{
 		g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
 		fLifeTime		= -1; 
