@@ -202,6 +202,7 @@ void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 	if(m_f_item_db_click && m_f_item_db_click(itm) ){
 		DestroyDragItem						();
 		return;
+	}
 
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	VERIFY								(m_drag_item==NULL);
