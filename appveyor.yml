@@ -3,8 +3,6 @@ image: Visual Studio 2019
 configuration: Release
 platform: x64
 shallow_clone: true
-environment:
-  DXSDK: '%DXSDK_DIR%'
 before_build:
 - cmd: >-
     echo %PLATFORM%

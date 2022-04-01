@@ -171,11 +171,14 @@ void destroySound	()
 {
 	CSound_manager_interface::_destroy				( );
 }
+
 void destroySettings()
 {
-	xr_delete					( pSettings		);
+	CInifile** s				= (CInifile**)(&pSettings);
+	xr_delete					( *s		);
 	xr_delete					( pGameIni		);
 }
+
 void destroyConsole	()
 {
 	Console->Execute			("cfg_save");
@@ -533,7 +536,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
 	// Check for another instance
 #ifdef NO_MULTI_INSTANCES
-	#define STALKER_PRESENCE_MUTEX "STALKER-SoC"
+	#define STALKER_PRESENCE_MUTEX "STALKER-LR"
 	
 	HANDLE hCheckPresenceMutex = INVALID_HANDLE_VALUE;
 	hCheckPresenceMutex = OpenMutex( READ_CONTROL , FALSE ,  STALKER_PRESENCE_MUTEX );
@@ -783,7 +786,7 @@ CApplication::CApplication()
 	eConsole					= Engine.Event.Handler_Attach("KERNEL:console",this);
 
 	// levels
-	Level_Current				= 0;
+	Level_Current				= u32(-1);
 	Level_Scan					( );
 
 	// Font
@@ -848,6 +851,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 	{
 		LPSTR		op_server		= LPSTR	(P1);
 		LPSTR		op_client		= LPSTR	(P2);
+		Level_Current				= u32(-1);
 		R_ASSERT	(0==g_pGameLevel);
 		R_ASSERT	(0!=g_pGamePersistent);
 
@@ -911,7 +915,9 @@ void CApplication::LoadBegin	()
 		_InitializeFont		(pFontSystemAdd,"ui_font_letterica18_russian",0);
 
 		m_pRender->LoadBegin();
-		phase_timer.Start	();
+
+		if (Core.ParamFlags.test(Core.lr_fulllog))
+			phase_timer.Start();
 		load_stage			= 0;
 	}
 }
@@ -920,9 +926,12 @@ void CApplication::LoadEnd		()
 {
 	ll_dwReference--;
 	if (0==ll_dwReference)		{
-		Msg						("* phase time: %d ms",phase_timer.GetElapsed_ms());
-		Msg						("* phase cmem: %d K", Memory.mem_usage()/1024);
-		Console->Execute		("stat_memory");
+		if (Core.ParamFlags.test(Core.lr_fulllog))
+		{
+			Msg						("* phase time: %d ms",phase_timer.GetElapsed_ms());
+			Msg						("* phase cmem: %d K", Memory.mem_usage()/1024);
+			Console->Execute		("stat_memory");
+		}
 		g_appLoaded				= TRUE;
 //		DUMP_PHASE;
 	}
@@ -958,10 +967,13 @@ void CApplication::LoadTitleInt(LPCSTR str)
 	VERIFY						(ll_dwReference);
 	VERIFY						(str && xr_strlen(str)<256);
 	strcpy_s						(app_title, str);
-	Msg							("* phase time: %d ms",phase_timer.GetElapsed_ms());	phase_timer.Start();
-	Msg							("* phase cmem: %d K", Memory.mem_usage()/1024);
-//.	Console->Execute			("stat_memory");
-	Log							(app_title);
+	if (Core.ParamFlags.test(Core.lr_fulllog))
+	{
+		Msg							("* phase time: %d ms",phase_timer.GetElapsed_ms());	phase_timer.Start();
+		Msg							("* phase cmem: %d K", Memory.mem_usage()/1024);
+		//.	Console->Execute			("stat_memory");
+		Log							(app_title);
+	}
 	
 	if (g_pGamePersistent->GameType()==1 && !xr_strcmp(g_pGamePersistent->m_game_params.m_alife,"alife"))
 		max_load_stage			= 17;

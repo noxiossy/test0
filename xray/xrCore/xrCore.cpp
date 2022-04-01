@@ -49,6 +49,15 @@ void xrCore::_initialize	(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
 		strcpy_s			(Params,sizeof(Params),GetCommandLine());
 		_strlwr_s			(Params,sizeof(Params));
 
+		if (strstr(GetCommandLine(), "-lr_fulllog"))
+			ParamFlags.set(ParamFlag::lr_fulllog, TRUE);
+	
+		if (strstr(GetCommandLine(), "-lr_thmlog"))
+			ParamFlags.set(ParamFlag::lr_thmlog, TRUE);
+
+		if (strstr(GetCommandLine(), "-lr_dev"))
+			ParamFlags.set(ParamFlag::lr_dev, TRUE);
+									
 		string_path		fn,dr,di;
 
 		// application path

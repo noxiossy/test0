@@ -1,7 +1,7 @@
 #ifndef logH
 #define logH
 
-#define VPUSH(a)	a.x,a.y,a.z
+#define VPUSH(a)	((a).x), ((a).y), ((a).z)
 
 void 	XRCORE_API	__cdecl		Msg	(LPCSTR format, ...);
 void 	XRCORE_API		Log			(LPCSTR msg);

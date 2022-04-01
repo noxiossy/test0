@@ -281,6 +281,13 @@ public:
 	string64	CompName;
 	string512	Params;
 
+	Flags16 ParamFlags;		
+	enum ParamFlag{
+		lr_fulllog		= (1 << 0),
+		lr_thmlog		= (1 << 1),
+		lr_dev			= (1 << 2),
+	};
+	
 public:
 	void		_initialize	(LPCSTR ApplicationName, LogCallback cb=0, BOOL init_fs=TRUE, LPCSTR fs_fname=0);
 	void		_destroy	();

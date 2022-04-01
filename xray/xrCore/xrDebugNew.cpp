@@ -360,7 +360,7 @@ void SetupExceptionHandler	(const bool &dedicated)
 {
 	BT_InstallSehFilter		();
 #if 1//ndef USE_OWN_ERROR_MESSAGE_WINDOW
-	if (!dedicated && !strstr(GetCommandLine(),"-silent_error_mode"))
+	if (!strstr(GetCommandLine(),"-silent_error_mode"))
 		BT_SetActivityType	(BTA_SHOWUI);
 	else
 		BT_SetActivityType	(BTA_SAVEREPORT);
@@ -592,7 +592,7 @@ LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
 		*pExceptionInfo->ContextRecord = save;
 
 		if (shared_str_initialized)
-			Msg				("stack trace:");
+			Msg				("stack trace:\n");
 
 		if (!IsDebuggerPresent())
 		{
