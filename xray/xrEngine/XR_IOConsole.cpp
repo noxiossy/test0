@@ -37,8 +37,11 @@ static u32 const tips_scroll_pos_color   = color_rgba( 70, 70, 70, 240 );
 
 ENGINE_API CConsole*		Console		=	NULL;
 
-const char *			ioc_prompt	=	">>> ";
-const char *			ch_cursor	=	"_"; //"|";
+extern char const * const	ioc_prompt;
+       char const * const	ioc_prompt	=	">>> ";
+
+extern char const * const	ch_cursor;
+       char const * const	ch_cursor	=	"_";
 
 text_editor::line_edit_control& CConsole::ec()
 {
@@ -172,7 +175,7 @@ void CConsole::OutFont( LPCSTR text, float& pos_y )
 		int ln	= 0;
 		PSTR one_line = (PSTR)_alloca( (CONSOLE_BUF_SIZE + 1) * sizeof(char) );
 		
-		while( text[sz] && (ln + sz < CONSOLE_BUF_SIZE-5) )
+		while( text[sz] && (ln + sz < CONSOLE_BUF_SIZE-5) )// перенос строк
 		{
 			one_line[ln+sz]   = text[sz];
 			one_line[ln+sz+1] = 0;
