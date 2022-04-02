@@ -448,6 +448,7 @@ public:
 */
 
 ENGINE_API BOOL r2_sun_static = TRUE;
+ENGINE_API BOOL r2_simple_static = TRUE;
 ENGINE_API BOOL r2_advanced_pp = FALSE;	//	advanced post process and effects
 
 u32	renderer_value	= 0;
@@ -470,12 +471,13 @@ public:
 		tokens					= vid_quality_token;
 
 		inherited::Execute		(args);
-		//	0 - r1
+		//	0 - r1_plus
 		//	1..3 - r2
 		//	4 - r3
-		psDeviceFlags.set		(rsR2, ((renderer_value>0) && renderer_value<4) );
-		psDeviceFlags.set		(rsR3, (renderer_value>=4) );
+		psDeviceFlags.set		(rsR2, (renderer_value<4) );
+		//psDeviceFlags.set		(rsR3, (renderer_value>=4) );
 
+		r2_simple_static= (renderer_value<1);
 		r2_sun_static	= (renderer_value<2);
 
 		r2_advanced_pp  = (renderer_value>=3);
