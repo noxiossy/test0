@@ -300,7 +300,6 @@ void CTexture::Unload	()
 		seqDATA.clear();
 		pSurface	= 0;
 	}
-	flags.MemoryUsage = 0;
 
 #ifdef DEBUG
 	_SHOW_REF		(msg_buff, pSurface);

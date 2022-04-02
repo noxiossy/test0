@@ -97,8 +97,6 @@ xr_token							qminmax_sm_token					[ ]={
 extern int			psSkeletonUpdate;
 extern float		r__dtex_range;
 
-Flags32 ps_r__common_flags = { RFLAG_NO_RAM_TEXTURES }; // All renders
-
 //int		ps_r__Supersample			= 1		;
 int			ps_r__LightSleepFrames		= 10	;
 
@@ -690,8 +688,6 @@ void		xrRender_initconsole	()
 	tw_max.set			(2,2,2);
 	CMD4(CCC_Vector3,	"r__d_tree_wave",		&ps_r__Tree_Wave,			tw_min, tw_max	);
 #endif // DEBUG
-
-	CMD3(CCC_Mask,		"r__no_ram_textures",	&ps_r__common_flags,		RFLAG_NO_RAM_TEXTURES);
 
 	CMD2(CCC_tf_Aniso,	"r__tf_aniso",			&ps_r__tf_Anisotropic		); //	{1..16}
 

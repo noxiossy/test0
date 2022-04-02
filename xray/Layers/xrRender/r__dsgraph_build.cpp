@@ -76,17 +76,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fv
 	{
 		if (sh->flags.bStrictB2F)	
 		{
-#if RENDER!=R_R1
-			if (sh->flags.bEmissive) {
-				mapSorted_Node* N = mapHUDEmissive.insertInAnyWay(distSQ);
-				N->val.ssa = SSA;
-				N->val.pObject = RI.val_pObject;
-				N->val.pVisual = pVisual;
-				N->val.Matrix = *RI.val_pTransform;
-				N->val.se = &*pVisual->shader->E[4];		// 4=L_special
-			}
-#endif // RENDER!=R_R1			
-			mapSorted_Node* N		= mapHUDSorted.insertInAnyWay	(distSQ);
+			mapSorted_Node* N		= mapSorted.insertInAnyWay	(distSQ);
 			N->val.ssa				= SSA;
 			N->val.pObject			= RI.val_pObject;
 			N->val.pVisual			= pVisual;
@@ -487,11 +477,7 @@ void CRender::add_leafs_Static(dxRender_Visual *pVisual)
 				N->val.ssa			=	ssa;
 				N->val.pVisual		=	pVisual;
 			}
-#if RENDER!=R_R1
-			if (ssa>r_ssaLOD_B || phase==PHASE_SMAP)
-#else
 			if (ssa>r_ssaLOD_B)
-#endif
 			{
 				// Add all children, doesn't perform any tests
 				I = pV->children.begin	();
