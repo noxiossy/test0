@@ -107,7 +107,7 @@ public:
 	virtual void	Destroy				();
 
 	virtual void		OnRender			();
-	virtual void		OnFrame				();
+	virtual void _BCL	OnFrame				();
 	
 	string64		ConfigFile;
 	bool			bVisible;
