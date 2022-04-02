@@ -23,34 +23,34 @@ struct TipString
 	shared_str	text;
 	int			HL_start; // Highlight
 	int			HL_finish;
-
+	
 	TipString()
 	{
-		text._set("");
+		text._set( "" );
 		HL_start = 0;
 		HL_finish = 0;
 	}
-	TipString(shared_str const& tips_text, int start_pos, int finish_pos)
+	TipString( shared_str const& tips_text, int start_pos, int finish_pos )
 	{
-		text._set(tips_text);
+		text._set( tips_text );
 		HL_start = start_pos;
 		HL_finish = finish_pos;
 	}
-	TipString(LPCSTR tips_text, int start_pos, int finish_pos)
+	TipString( LPCSTR tips_text, int start_pos, int finish_pos )
 	{
-		text._set(tips_text);
+		text._set( tips_text );
 		HL_start = start_pos;
 		HL_finish = finish_pos;
 	}
-	TipString(shared_str const& tips_text)
+	TipString( shared_str const& tips_text )
 	{
-		text._set(tips_text);
+		text._set( tips_text );
 		HL_start = 0;
 		HL_finish = 0;
 	}
-	IC bool operator== (shared_str const& tips_text)
+	IC bool operator== ( shared_str const& tips_text )
 	{
-		return (text == tips_text);
+		return ( text == tips_text );
 	}
 };
 
@@ -74,8 +74,8 @@ public:
 	typedef  xr_vector<shared_str>						vecTips;
 	typedef  xr_vector<TipString>						vecTipsEx;
 
-	enum { CONSOLE_BUF_SIZE = 1024 };
-	enum { VIEW_TIPS_COUNT = 14, MAX_TIPS_COUNT = 220 };
+	enum			{ CONSOLE_BUF_SIZE = 1024 };
+	enum			{ VIEW_TIPS_COUNT = 14, MAX_TIPS_COUNT = 220 };
 
 protected:
 	int				scroll_delta;
@@ -106,8 +106,8 @@ public:
 	virtual	void	Initialize			();
 	virtual void	Destroy				();
 
-	void			OnRender			() override;
-	void			OnFrame				() override;
+	virtual void		OnRender			();
+	virtual void _BCL	OnFrame				();
 	
 	string64		ConfigFile;
 	bool			bVisible;
@@ -119,25 +119,24 @@ public:
 	void			Show				();
 	void			Hide				();
 
-//	void			Save				();
 	void			Execute				( LPCSTR cmd );
 	void			ExecuteScript		( LPCSTR str );
 	void			ExecuteCommand		( LPCSTR cmd, bool record_cmd = true );
 	void			SelectCommand		();
 
-	bool			GetBool				( LPCSTR cmd );
-	float			GetFloat			( LPCSTR cmd, float& min, float& max);
-	int				GetInteger			( LPCSTR cmd, int& min, int& max);
-	LPCSTR			GetString			( LPCSTR cmd );
-	LPCSTR			GetToken			( LPCSTR cmd );
-	xr_token*		GetXRToken			( LPCSTR cmd );
-	Fvector			GetFVector			( LPCSTR cmd );
-	Fvector*		GetFVectorPtr		( LPCSTR cmd );
-	IConsole_Command* GetCommand		(LPCSTR cmd) const;
-
+	bool			GetBool				( LPCSTR cmd ) const;
+	float			GetFloat			( LPCSTR cmd, float& min, float& max) const;
+	int				GetInteger			( LPCSTR cmd, int& min, int& max) const;
+	LPCSTR			GetString			( LPCSTR cmd ) const;
+	LPCSTR			GetToken			( LPCSTR cmd ) const;
+	xr_token*		GetXRToken			( LPCSTR cmd ) const;
+	Fvector			GetFVector			( LPCSTR cmd ) const;
+	Fvector*		GetFVectorPtr		( LPCSTR cmd ) const;
+	IConsole_Command* GetCommand		( LPCSTR cmd ) const;
 protected:
 	text_editor::line_editor*			m_editor = nullptr;
 	text_editor::line_edit_control&		ec();
+
 
 	enum Console_mark // (int)=char
 	{
@@ -160,8 +159,8 @@ protected:
 	bool	is_mark				( Console_mark type );
 	u32		get_mark_color		( Console_mark type );
 
-	void	DrawBackgrounds		(bool bGame);
-	void	DrawRect			(Frect const& r, u32 color);
+	void	DrawBackgrounds		( bool bGame );
+	void	DrawRect			( Frect const& r, u32 color );
 	void	OutFont				( LPCSTR text, float& pos_y );
 	void	Register_callbacks	();
 	
@@ -177,7 +176,7 @@ protected:
 	void xr_stdcall Next_cmd	();
 	void xr_stdcall Prev_tip	();
 	void xr_stdcall Next_tip	();
-
+	
 	void xr_stdcall Begin_tips	();
 	void xr_stdcall End_tips	();
 	void xr_stdcall PageUp_tips	();
@@ -187,6 +186,7 @@ protected:
 	void xr_stdcall Show_cmd	();
 	void xr_stdcall Hide_cmd	();
 	void xr_stdcall Hide_cmd_esc();
+
 	void xr_stdcall GamePause	();
 	void xr_stdcall SwitchKL	();
 
@@ -196,18 +196,19 @@ protected:
 	void	prev_cmd_history_idx();
 	void	reset_cmd_history_idx();
 
-	void	next_selected_tip();
+	void	next_selected_tip	();
 	void	check_next_selected_tip();
-	void	prev_selected_tip();
+	void	prev_selected_tip	();
 	void	check_prev_selected_tip();
-	void	reset_selected_tip();
+	void	reset_selected_tip	();
 
-	IConsole_Command* find_next_cmd(LPCSTR in_str, shared_str& out_str);
-	bool	add_next_cmds(LPCSTR in_str, vecTipsEx& out_v);
-	bool	add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v);
+	IConsole_Command* find_next_cmd( LPCSTR in_str, shared_str& out_str );
+	bool	add_next_cmds		( LPCSTR in_str, vecTipsEx& out_v );
+	bool	add_internal_cmds	( LPCSTR in_str, vecTipsEx& out_v );
+	
+	void	update_tips			();
+	void	select_for_filter	( LPCSTR filter_str, vecTips& in_v, vecTipsEx& out_v );
 
-	void	update_tips();
-	void	select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& out_v);
 }; // class CConsole
 
 ENGINE_API extern CConsole* Console;

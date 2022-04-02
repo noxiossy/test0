@@ -9,25 +9,17 @@
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
 
-IConsole_Command* CConsole::GetCommand(LPCSTR cmd) const
-{
-	vecCMD_CIT it = Commands.find(cmd);
-	if (it == Commands.end())
-		return NULL;
-	else
-		return it->second;
-}
 
-bool CConsole::GetBool( LPCSTR cmd )
+bool CConsole::GetBool( LPCSTR cmd ) const
 {
-	IConsole_Command* cc = GetCommand(cmd);
-	CCC_Mask* cf = dynamic_cast<CCC_Mask*>(cc);
+	IConsole_Command* cc	= GetCommand(cmd);
+	CCC_Mask* cf			= dynamic_cast<CCC_Mask*>(cc);
 	if ( cf )
 	{
 		return ( cf->GetValue() != 0 );
 	}
 
-	CCC_Integer* ci = dynamic_cast<CCC_Integer*>(cc);
+	CCC_Integer* ci			= dynamic_cast<CCC_Integer*>(cc);
 	if ( ci )
 	{
 		return ( ci->GetValue() != 0 );
@@ -35,12 +27,12 @@ bool CConsole::GetBool( LPCSTR cmd )
 	return false;
 }
 
-float CConsole::GetFloat( LPCSTR cmd, float& min, float& max )
+float CConsole::GetFloat( LPCSTR cmd, float& min, float& max ) const
 {
-	min = 0.0f;
-	max = 0.0f;
-	IConsole_Command* cc = GetCommand(cmd);
-	CCC_Float* cf = dynamic_cast<CCC_Float*>(cc);
+	min						= 0.0f;
+	max						= 0.0f;
+	IConsole_Command* cc	= GetCommand(cmd);
+	CCC_Float* cf			= dynamic_cast<CCC_Float*>(cc);
 	if ( cf )
 	{
 		min = cf->GetMin();
@@ -50,12 +42,23 @@ float CConsole::GetFloat( LPCSTR cmd, float& min, float& max )
 	return 0.0f;
 }
 
-int CConsole::GetInteger( LPCSTR cmd, int& min, int& max )
+IConsole_Command* CConsole::GetCommand( LPCSTR cmd ) const
 {
-	min = 0;
-	max = 1;
-	IConsole_Command* cc = GetCommand(cmd);
-	CCC_Integer* cf = dynamic_cast<CCC_Integer*>(cc);
+	vecCMD_CIT it = Commands.find( cmd );
+	if ( it == Commands.end() )
+		return NULL;
+	else
+		return it->second;
+}
+
+
+int CConsole::GetInteger( LPCSTR cmd, int& min, int& max ) const
+{
+	min						= 0;
+	max						= 1;
+	IConsole_Command* cc	= GetCommand(cmd);
+
+	CCC_Integer* cf			= dynamic_cast<CCC_Integer*>(cc);
 	if ( cf )
 	{
 		min = cf->GetMin();
@@ -72,45 +75,46 @@ int CConsole::GetInteger( LPCSTR cmd, int& min, int& max )
 	return 0;
 }
 
-LPCSTR CConsole::GetString( LPCSTR cmd )
+LPCSTR CConsole::GetString( LPCSTR cmd ) const
 {
-	IConsole_Command* cc = GetCommand(cmd);
-	if (!cc)
+	IConsole_Command* cc	= GetCommand(cmd);
+	if(!cc)
 		return nullptr;
 
 	static IConsole_Command::TStatus stat;
-	cc->Status( stat );
-	return stat;
+	cc->Status				( stat );
+	return					stat;
 }
 
-LPCSTR CConsole::GetToken( LPCSTR cmd )
+LPCSTR CConsole::GetToken( LPCSTR cmd ) const
 {
 	return GetString( cmd );
 }
 
-xr_token* CConsole::GetXRToken( LPCSTR cmd )
+xr_token* CConsole::GetXRToken( LPCSTR cmd ) const
 {
-	IConsole_Command* cc = GetCommand(cmd);
-	CCC_Token* cf = dynamic_cast<CCC_Token*>(cc);
+	IConsole_Command* cc	= GetCommand(cmd);
+	
+	CCC_Token* cf			= dynamic_cast<CCC_Token*>(cc);
 	if ( cf )
 	{
 		return cf->GetToken();
 	}
-	return NULL;
+	return					NULL;
 }
 
-Fvector* CConsole::GetFVectorPtr( LPCSTR cmd )
+Fvector* CConsole::GetFVectorPtr( LPCSTR cmd ) const
 {
-	IConsole_Command* cc = GetCommand(cmd);
-	CCC_Vector3* cf = dynamic_cast<CCC_Vector3*>(cc);
+	IConsole_Command* cc	= GetCommand(cmd);
+	CCC_Vector3* cf			= dynamic_cast<CCC_Vector3*>(cc);
 	if ( cf )
 	{
 		return cf->GetValuePtr();
 	}
-	return NULL;
+	return					NULL;
 }
 
-Fvector CConsole::GetFVector( LPCSTR cmd )
+Fvector CConsole::GetFVector( LPCSTR cmd ) const
 {
 	Fvector* pV = GetFVectorPtr( cmd );
 	if ( pV )

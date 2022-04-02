@@ -14,17 +14,18 @@ public		:
 	friend class	CConsole;
 	typedef char	TInfo	[256];
 	typedef char	TStatus	[256];
-	typedef xr_vector<shared_str> vecTips;
-	typedef xr_vector<shared_str> vecLRU;
+	typedef xr_vector<shared_str>	vecTips;
+	typedef xr_vector<shared_str>	vecLRU;
 
 protected	:
 	LPCSTR			cName;
 	bool			bEnabled;
 	bool			bLowerCaseArgs;
 	bool			bEmptyArgsHandled;
+	
 	vecLRU			m_LRU;
-	enum { LRU_MAX_COUNT = 10 };
 
+	enum			{ LRU_MAX_COUNT = 10 };
 
 	IC	bool		EQ(LPCSTR S1, LPCSTR S2) { return xr_strcmp(S1,S2)==0; }
 public		:
@@ -33,15 +34,16 @@ public		:
 	  bEnabled			(TRUE),
 	  bLowerCaseArgs	(TRUE),
 	  bEmptyArgsHandled	(FALSE)
-	{
-		m_LRU.reserve(LRU_MAX_COUNT + 1);
-		m_LRU.clear_not_free();
-	}
+	  {
+		  m_LRU.reserve(LRU_MAX_COUNT + 1);
+		  m_LRU.clear_not_free();
+	  }
 	virtual ~IConsole_Command()
 	{
 		if(Console)
 			Console->RemoveCommand(this);
-	}
+	};
+
 	LPCSTR			Name()			{ return cName;	}
 	void			InvalidSyntax() {
 		TInfo I; Info(I);
@@ -58,13 +60,16 @@ public		:
 		TStatus		S;	Status(S);
 		if (S[0])	F->w_printf("%s %s\r\n",cName,S); 
 	}
-	virtual void	fill_tips(vecTips& tips, u32 mode)
+
+	virtual void	fill_tips		(vecTips& tips, u32 mode)
 	{
-		add_LRU_to_tips(tips);
+		add_LRU_to_tips( tips );
 	}
-	virtual void	add_to_LRU(shared_str const& arg);
-	void			add_LRU_to_tips(vecTips& tips);
-};
+//			vecLRU&	LRU				() { return m_LRU; }
+	virtual void	add_to_LRU		(shared_str const& arg);
+			void	add_LRU_to_tips	(vecTips& tips);
+
+}; // class IConsole_Command
 
 class ENGINE_API	CCC_Mask : public IConsole_Command
 {
@@ -78,7 +83,7 @@ public		:
 	  mask(M)
 	{};
 	  const BOOL GetValue()const{ return value->test(mask); }
-	void	Execute	(LPCSTR args) override
+	virtual void	Execute	(LPCSTR args)
 	{
 		if (EQ(args,"on"))			value->set(mask,TRUE);
 		else if (EQ(args,"off"))	value->set(mask,FALSE);
@@ -86,16 +91,18 @@ public		:
 		else if (EQ(args,"0"))		value->set(mask,FALSE);
 		else InvalidSyntax();
 	}
-	void	Status	(TStatus& S) override
+	virtual void	Status	(TStatus& S)
 	{	strcpy_s(S,value->test(mask)?"on":"off"); }
-	void	Info	(TInfo& I) override
+	virtual void	Info	(TInfo& I)
 	{	strcpy_s(I,"'on/off' or '1/0'"); }
-	void	fill_tips(vecTips& tips, u32 mode) override
+
+	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
 		TStatus  str;
 		sprintf_s(str, sizeof(str), "%s  (current)  [on/off]", value->test(mask) ? "on" : "off");
-		tips.push_back(str);
+		tips.push_back( str );
 	}
+
 };
 
 class ENGINE_API	CCC_ToggleMask : public IConsole_Command
@@ -110,23 +117,25 @@ public		:
 	  mask(M)
 	{bEmptyArgsHandled=TRUE;};
 	  const BOOL GetValue()const{ return value->test(mask); }
-	void	Execute	(LPCSTR args) override
+	virtual void	Execute	(LPCSTR args)
 	{
 		value->set(mask,!GetValue());
 		TStatus S;
 		strconcat(sizeof(S),S,cName," is ", value->test(mask)?"on":"off");
 		Log(S);
 	}
-	void	Status	(TStatus& S) override
+	virtual void	Status	(TStatus& S)
 	{	strcpy_s(S,value->test(mask)?"on":"off"); }
-	void	Info	(TInfo& I) override
+	virtual void	Info	(TInfo& I)
 	{	strcpy_s(I,"'on/off' or '1/0'"); }
-	void	fill_tips(vecTips& tips, u32 mode) override
+
+	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
 		TStatus  str;
 		sprintf_s(str, sizeof(str), "%s  (current)  [on/off]", value->test(mask) ? "on" : "off");
-		tips.push_back(str);
+		tips.push_back( str );
 	}
+
 };
 
 class ENGINE_API	CCC_Token : public IConsole_Command
@@ -141,7 +150,7 @@ public		:
 	  tokens(T)
 	{};
 
-	void	Execute	(LPCSTR args) override
+	virtual void	Execute	(LPCSTR args)
 	{
 		xr_token* tok = tokens;
 		while (tok->name) {
@@ -153,7 +162,7 @@ public		:
 		}
 		if (!tok->name) InvalidSyntax();
 	}
-	void	Status	(TStatus& S) override
+	virtual void	Status	(TStatus& S)
 	{
 		xr_token *tok = tokens;
 		while (tok->name) {
@@ -166,7 +175,7 @@ public		:
 		strcpy_s(S,"?");
 		return;
 	}
-	void	Info	(TInfo& I) override
+	virtual void	Info	(TInfo& I)
 	{	
 		I[0]=0;
 		xr_token *tok = tokens;
@@ -177,32 +186,34 @@ public		:
 		}
 	}
 	virtual xr_token* GetToken(){return tokens;}
-	void	fill_tips(vecTips& tips, u32 mode) override
+	
+	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
 		TStatus  str;
 		bool res = false;
 		xr_token* tok = GetToken();
-		while (tok->name && !res)
+		while ( tok->name && !res )
 		{
-			if (tok->id == (int)(*value))
+			if ( tok->id == (int)(*value) )
 			{
 				sprintf_s(str, sizeof(str), "%s  (current)", tok->name);
-				tips.push_back(str);
+				tips.push_back( str );
 				res = true;
 			}
 			tok++;
 		}
-		if (!res)
+		if ( !res )
 		{
-			tips.push_back("---  (current)");
+			tips.push_back( "---  (current)" );
 		}
 		tok = GetToken();
-		while (tok->name)
+		while ( tok->name )
 		{
-			tips.push_back(tok->name);
+			tips.push_back( tok->name );
 			tok++;
 		}
 	}
+
 };
 
 class ENGINE_API	CCC_Float : public IConsole_Command
@@ -221,28 +232,29 @@ public		:
 	  const float	GetMin		() const {return min;};
 	  const float	GetMax		() const {return max;};
 
-	void	Execute	(LPCSTR args) override
+	virtual void	Execute	(LPCSTR args)
 	{
 		float v = float(atof(args));
 		if (v<(min-EPS) || v>(max+EPS) ) InvalidSyntax();
 		else	*value = v;
 	}
-	void	Status	(TStatus& S) override
+	virtual void	Status	(TStatus& S)
 	{	
 		sprintf_s	(S,sizeof(S),"%3.5f",*value);
 		while	(xr_strlen(S) && ('0'==S[xr_strlen(S)-1]))	S[xr_strlen(S)-1] = 0;
 	}
-	void	Info	(TInfo& I) override
+	virtual void	Info	(TInfo& I)
 	{	
 		sprintf_s(I,sizeof(I),"float value in range [%3.3f,%3.3f]",min,max);
 	}
-	void	fill_tips(vecTips& tips, u32 mode) override
+	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
 		TStatus  str;
 		sprintf_s(str, sizeof(str), "%3.5f  (current)  [%3.3f,%3.3f]", *value, min, max);
-		tips.push_back(str);
-		IConsole_Command::fill_tips(tips, mode);
+		tips.push_back( str );
+		IConsole_Command::fill_tips( tips, mode );
 	}
+
 };
 
 class ENGINE_API	CCC_Vector3 : public IConsole_Command
@@ -262,29 +274,30 @@ public
 	const Fvector	GetValue	() const {return *value;};
 	Fvector*		GetValuePtr	() const {return value;};
 
-	void	Execute	(LPCSTR args) override
+	virtual void	Execute	(LPCSTR args)
 	{
 		Fvector v;
-		if (3!=sscanf(args,"%f,%f,%f",&v.x,&v.y,&v.z))	{ InvalidSyntax(); return; }
+		if ((3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z)) && (3 != sscanf(args, "(%f, %f, %f)", &v.x, &v.y, &v.z)) ) { InvalidSyntax(); return; }
 		if (v.x<min.x || v.y<min.y || v.z<min.z)		{ InvalidSyntax(); return; }
 		if (v.x>max.x || v.y>max.y || v.z>max.z)		{ InvalidSyntax(); return; }
 		value->set(v);
 	}
-	void	Status	(TStatus& S) override
+	virtual void	Status	(TStatus& S)
 	{	
 		sprintf_s	(S,sizeof(S),"(%f,%f,%f)",value->x,value->y,value->z);
 	}
-	void	Info	(TInfo& I) override
+	virtual void	Info	(TInfo& I)
 	{	
 		sprintf_s(I,sizeof(I),"vector3 in range [%e,%e,%e]-[%e,%e,%e]",min.x,min.y,min.z,max.x,max.y,max.z);
 	}
-	void	fill_tips(vecTips& tips, u32 mode) override
+	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
 		TStatus  str;
 		sprintf_s(str, sizeof(str), "(%e, %e, %e)  (current)  [(%e,%e,%e)-(%e,%e,%e)]", value->x, value->y, value->z, min.x, min.y, min.z, max.x, max.y, max.z);
-		tips.push_back(str);
-		IConsole_Command::fill_tips(tips, mode);
+		tips.push_back( str );
+		IConsole_Command::fill_tips( tips, mode );
 	}
+
 };
 
 class ENGINE_API	CCC_Integer : public IConsole_Command
@@ -304,28 +317,27 @@ public		:
 	  max(_max)
 	{};
 
-	void	Execute	(LPCSTR args) override
+	virtual void	Execute	(LPCSTR args)
 	{
 		int v = atoi(args);
 		if (v<min || v>max) InvalidSyntax();
 		else	*value = v;
 	}
-	void	Status	(TStatus& S) override
+	virtual void	Status	(TStatus& S)
 	{	
 		itoa(*value,S,10);
 	}
-	void	Info	(TInfo& I) override
+	virtual void	Info	(TInfo& I)
 	{	
 		sprintf_s(I,sizeof(I),"integer value in range [%d,%d]",min,max);
 	}
-	void	fill_tips(vecTips& tips, u32 mode) override
+	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
 		TStatus  str;
 		sprintf_s(str, sizeof(str), "%d  (current)  [%d,%d]", *value, min, max);
-		tips.push_back(str);
-		IConsole_Command::fill_tips(tips, mode);
+		tips.push_back( str );
+ 		IConsole_Command::fill_tips( tips, mode );
 	}
-
 };
 
 class ENGINE_API	CCC_String : public IConsole_Command
@@ -344,23 +356,24 @@ public:
 		R_ASSERT(size>1);
 	};
 
-	void	Execute	(LPCSTR args) override
+	virtual void	Execute	(LPCSTR args)
 	{
 		strncpy	(value,args,size-1);
 	}
-	void	Status	(TStatus& S) override
+	virtual void	Status	(TStatus& S)
 	{	
 		strcpy_s	(S,value);
 	}
-	void	Info	(TInfo& I) override
+	virtual void	Info	(TInfo& I)
 	{	
 		sprintf_s(I,sizeof(I),"string with up to %d characters",size);
 	}
-	void	fill_tips(vecTips& tips, u32 mode) override
+	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
-		tips.push_back((LPCSTR)value);
-		IConsole_Command::fill_tips(tips, mode);
+		tips.push_back( (LPCSTR)value );
+		IConsole_Command::fill_tips( tips, mode );
 	}
+
 };
 
 class ENGINE_API CCC_LoadCFG : public IConsole_Command
