@@ -304,14 +304,14 @@ void CResourceManager::DeferredUpload()
 		t->second->Load();
 	}
 }
-/*
+
 void	CResourceManager::DeferredUnload	()
 {
 	if (!Device.b_is_Ready)				return;
 	for (map_TextureIt t=m_textures.begin(); t!=m_textures.end(); t++)
 		t->second->Unload();
 }
-*/
+
 #ifdef _EDITOR
 void	CResourceManager::ED_UpdateTextures(AStringVec* names)
 {
