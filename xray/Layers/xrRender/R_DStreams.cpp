@@ -35,8 +35,8 @@ void _VertexStream::Create	()
 
 	mPosition				= 0;
 	mDiscardID				= 0;
-
-	Msg("* DVB created: %dK", mSize/1024);
+	if (Core.ParamFlags.test(Core.lr_fulllog))
+		Msg("* DVB created: %dK", mSize/1024);
 }
 
 void _VertexStream::Destroy	()
@@ -74,7 +74,11 @@ void* _VertexStream::Lock	( u32 vl_Count, u32 Stride, u32& vOffset )
 		pVB->Map(D3D10_MAP_WRITE_DISCARD, 0, (void**)&pData);
 		pData += vOffset;
 #else	//	USE_DX10
-		pVB->Lock( mPosition, bytes_need, (void**)&pData, LOCKFLAGS_FLUSH);
+		HRESULT res = pVB->Lock( mPosition, bytes_need, (void**)&pData, LOCKFLAGS_FLUSH);
+
+		if( res != D3D_OK )
+			Msg( " pVB->Lock - failed: res = %d,mPosition = %d, bytes_need = %d, &pData = %x, LOCKFLAGS_FLUSH", res, mPosition, bytes_need, (void**)&pData );
+
 #endif	//	USE_DX10
 	} else {
 		// APPEND-LOCK
@@ -85,7 +89,11 @@ void* _VertexStream::Lock	( u32 vl_Count, u32 Stride, u32& vOffset )
 		pVB->Map(D3D10_MAP_WRITE_NO_OVERWRITE, 0, (void**)&pData);
 		pData += vOffset*Stride;
 #else	//	USE_DX10
-		pVB->Lock			( mPosition, bytes_need, (void**)&pData, LOCKFLAGS_APPEND);
+		HRESULT res = pVB->Lock			( mPosition, bytes_need, (void**)&pData, LOCKFLAGS_APPEND);
+		
+		if( res != D3D_OK )
+			Msg( " pVB->Lock - failed: res = %d,mPosition = %d, bytes_need = %d, &pData = %x, LOCKFLAGS_APPEND", res, mPosition, bytes_need, (void**)&pData );
+
 #endif	//	USE_DX10
 	}
 	VERIFY				( pData );
@@ -163,7 +171,8 @@ void	_IndexStream::Create	()
 	mPosition				= 0;
 	mDiscardID				= 0;
 
-	Msg("* DIB created: %dK", mSize/1024);
+	if (Core.ParamFlags.test(Core.lr_fulllog))
+		Msg("* DIB created: %dK", mSize/1024);
 }
 
 void	_IndexStream::Destroy()
