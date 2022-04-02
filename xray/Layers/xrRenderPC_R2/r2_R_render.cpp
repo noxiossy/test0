@@ -204,7 +204,7 @@ void CRender::Render		()
 	if( m_bFirstFrameAfterReset )
 	{
 		m_bFirstFrameAfterReset = false;
-		//return;
+		return;
 	}
 
 //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
