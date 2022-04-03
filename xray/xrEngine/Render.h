@@ -108,7 +108,6 @@ public:
 	virtual	void						force_mode			(u32 mode)							= 0;
 	virtual float						get_luminocity		()									= 0;
 	virtual float						get_luminocity_hemi	()									= 0;
-	virtual float*						get_luminocity_hemi_cube		()							= 0;
 
 	virtual ~IRender_ObjectSpecific()	{};
 };
@@ -182,7 +181,6 @@ public:
 	virtual	GenerationLevel			get_generation			()											= 0;
 
 	virtual bool					is_sun_static			() =0;
-	virtual bool					is_simple_static		() =0;
 	virtual DWORD					get_dx_level			() =0;
 
 	// Loading / Unloading
