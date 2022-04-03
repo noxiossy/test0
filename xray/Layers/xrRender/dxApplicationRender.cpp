@@ -122,7 +122,7 @@ void dxApplicationRender::load_draw_internal(CApplication &owner)
 
 	//back_coords.lt.set			(379 ,726);
 	if(b_ws)
-		back_coords.lt.set					(454 ,726);
+		back_coords.lt.set					(406 ,726);
 	else
 		back_coords.lt.set					(379 ,726);
 
