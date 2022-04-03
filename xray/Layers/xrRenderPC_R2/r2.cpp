@@ -98,7 +98,6 @@ static class cl_sun_shafts_intensity : public R_constant_setup
 }	binder_sun_shafts_intensity;
 
 extern ENGINE_API BOOL r2_sun_static;
-extern ENGINE_API BOOL r2_simple_static;
 extern ENGINE_API BOOL r2_advanced_pp;	//	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
@@ -257,7 +256,6 @@ void					CRender::create					()
 	o.sunfilter			= (strstr(Core.Params,"-sunfilter"))?	TRUE	:FALSE	;
 	//.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
 	o.sunstatic			= r2_sun_static;
-	o.simplestatic		= r2_simple_static;
 	o.advancedpp		= r2_advanced_pp;
 	o.sjitter			= (strstr(Core.Params,"-sjitter"))?		TRUE	:FALSE	;
 	o.depth16			= (strstr(Core.Params,"-depth16"))?		TRUE	:FALSE	;
@@ -378,10 +376,6 @@ void CRender::reset_end()
 	//-AVO
 
 	xrRender_apply_tf			();
-
-	// Set this flag true to skip the first render frame,
-	// that some data is not ready in the first frame (for example device camera position)
-	m_bFirstFrameAfterReset = true;
 }
 /*
 void CRender::OnFrame()
@@ -554,9 +548,7 @@ void					CRender::rmNormal			()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 CRender::CRender()
-:m_bFirstFrameAfterReset(false)
 {
-	init_cascades();
 }
 
 CRender::~CRender()
@@ -687,11 +679,6 @@ HRESULT	CRender::shader_compile			(
 	}
 	if (o.sunstatic)		{
 		defines[def_it].Name		=	"USE_R2_STATIC_SUN";
-		defines[def_it].Definition	=	"1";
-		def_it						++	;
-	}
-	if (o.simplestatic)		{
-		defines[def_it].Name		=	"USE_R2_SIMPLE_STATIC";
 		defines[def_it].Definition	=	"1";
 		def_it						++	;
 	}

@@ -144,9 +144,6 @@ void CTexture::Preload	()
 
 void CTexture::Load		()
 {
-	if (flags.bLoaded)
-		return;
-
 	flags.bLoaded					= true;
 	desc_cache						= 0;
 	if (pSurface)					return;

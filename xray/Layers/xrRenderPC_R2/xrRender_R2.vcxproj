@@ -274,7 +274,6 @@
     <ClInclude Include="..\xrRender\Blender_Particle.h" />
     <ClInclude Include="..\xrRender\Blender_Screen_SET.h" />
     <ClInclude Include="..\xrRender\Blender_tree.h" />
-    <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\DetailManager.h" />
     <ClInclude Include="..\xrRender\DetailModel.h" />
@@ -336,7 +335,6 @@
     <ClInclude Include="..\xrRender\r_constants.h" />
     <ClInclude Include="..\xrRender\r_constants_cache.h" />
     <ClInclude Include="..\xrRender\R_DStreams.h" />
-    <ClInclude Include="..\xrRender\r_sun_cascades.h" />
     <ClInclude Include="..\xrRender\r__dsgraph_structure.h" />
     <ClInclude Include="..\xrRender\r__dsgraph_types.h" />
     <ClInclude Include="..\xrRender\r__occlusion.h" />
@@ -367,7 +365,6 @@
     <ClInclude Include="blender_deffer_flat.h" />
     <ClInclude Include="blender_deffer_model.h" />
     <ClInclude Include="blender_light_direct.h" />
-    <ClInclude Include="blender_light_direct_cascade.h" />
     <ClInclude Include="blender_light_mask.h" />
     <ClInclude Include="blender_light_occq.h" />
     <ClInclude Include="blender_light_point.h" />
@@ -408,7 +405,6 @@
     <ClCompile Include="..\xrRender\Blender_Recorder_StandartBinding.cpp" />
     <ClCompile Include="..\xrRender\Blender_Screen_SET.cpp" />
     <ClCompile Include="..\xrRender\Blender_tree.cpp" />
-    <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
     <ClCompile Include="..\xrRender\D3DUtils.cpp" />
     <ClCompile Include="..\xrRender\DetailManager.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp" />
@@ -534,7 +530,6 @@
     <ClCompile Include="blender_deffer_flat.cpp" />
     <ClCompile Include="blender_deffer_model.cpp" />
     <ClCompile Include="blender_light_direct.cpp" />
-    <ClCompile Include="blender_light_direct_cascade.cpp" />
     <ClCompile Include="blender_light_mask.cpp" />
     <ClCompile Include="blender_light_occq.cpp" />
     <ClCompile Include="blender_light_point.cpp" />

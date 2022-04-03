@@ -34,6 +34,7 @@ void	CBlender_Compile::r_Pass		(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, 
 #endif	//	USE_DX10
 	ctable.merge			(&ps->constants);
 	ctable.merge			(&vs->constants);
+	SetMapping				();
 
 	// Last Stage - disable
 	if (0==stricmp(_ps,"null"))	{
@@ -98,10 +99,6 @@ void	CBlender_Compile::i_Address		(u32 s, u32	address)
 	RS.SetSAMP			(s,D3DSAMP_ADDRESSV,	address);
 	RS.SetSAMP			(s,D3DSAMP_ADDRESSW,	address);
 }
-void	CBlender_Compile::i_BorderColor	(u32 s, u32	color)
-{
-	RS.SetSAMP			(s,D3DSAMP_BORDERCOLOR,	color);
-}
 void	CBlender_Compile::i_Filter_Min		(u32 s, u32	f)
 {
 	RS.SetSAMP			(s,D3DSAMP_MINFILTER,	f);
@@ -163,7 +160,6 @@ void	CBlender_Compile::r_Sampler_clw	(LPCSTR name, LPCSTR texture, bool b_ps1x_P
 
 void	CBlender_Compile::r_End			()
 {
-	SetMapping				();
 	dest.constants			= DEV->_CreateConstantTable(ctable);
 	dest.state				= DEV->_CreateState		(RS.GetContainer());
 	dest.T					= DEV->_CreateTextureList	(passTextures);

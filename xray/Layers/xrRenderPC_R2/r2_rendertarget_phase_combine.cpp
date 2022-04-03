@@ -337,14 +337,9 @@ void	CRenderTarget::phase_combine	()
 	}
 
 	static	xr_vector<dbg_line_t>	saved_dbg_lines;
-	if (bDebug)
-		saved_dbg_lines	= dbg_lines;
-	else
-		dbg_lines		= saved_dbg_lines;
 
-	HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-	HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-	HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	if (bDebug)		saved_dbg_lines	= dbg_lines;
+	else			dbg_lines		= saved_dbg_lines;
 	if (1) for (u32 it=0; it<dbg_lines.size(); it++)
 	{
 		RCache.dbg_DrawLINE		(Fidentity,dbg_lines[it].P0,dbg_lines[it].P1,dbg_lines[it].color);

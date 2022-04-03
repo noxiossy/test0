@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../xrRender/ColorMapManager.h"
-
 class light;
 
 //#define DU_SPHERE_NUMVERTEX 92
@@ -23,7 +21,6 @@ public:
 	IBlender*					b_occq;
 	IBlender*					b_accum_mask;
 	IBlender*					b_accum_direct;
-	IBlender*					b_accum_direct_cascade;
 	IBlender*					b_accum_point;
 	IBlender*					b_accum_spot;
 	IBlender*					b_accum_reflected;
@@ -88,9 +85,7 @@ private:
 	// Accum
 	ref_shader					s_accum_mask	;
 	ref_shader					s_accum_direct	;
-	ref_shader					s_accum_direct_cascade;
 	ref_shader					s_accum_direct_volumetric;
-	ref_shader					s_accum_direct_volumetric_cascade;
 	ref_shader					s_accum_point	;
 	ref_shader					s_accum_spot	;
 	ref_shader					s_accum_reflected;
@@ -134,7 +129,6 @@ private:
 	ref_geom					g_combine;
 	ref_geom					g_combine_VP;		// xy=p,zw=tc
 	ref_geom					g_combine_2UV;
-	ref_geom					g_combine_cuboid;
 	ref_geom					g_aa_blur;
 	ref_geom					g_aa_AA;
 	ref_shader					s_combine_dbg_0;
@@ -163,11 +157,6 @@ private:
 	u32							param_color_gray;
 	Fvector						param_color_add;
 
-	//	Color mapping
-	float						param_color_map_influence;
-	float						param_color_map_interpolate;
-	ColorMapManager				color_map_manager;
-
 	//	Igor: used for volumetric lights
 	bool						m_bHasActiveVolumetric;
 public:
@@ -184,15 +173,13 @@ public:
 	void						accum_volumetric_geom_destroy();
 
 	void						u_stencil_optimize		(BOOL		common_stencil=TRUE);
-	void						u_compute_texgen_screen		(Fmatrix&	dest);
-	void						u_compute_texgen_screen_asd	(Fmatrix&	dest);
+	void						u_compute_texgen_screen	(Fmatrix&	dest);
 	void						u_compute_texgen_jitter	(Fmatrix&	dest);
 	void						u_setrt					(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb);
 	void						u_setrt					(u32 W, u32 H, IDirect3DSurface9* _1, IDirect3DSurface9* _2, IDirect3DSurface9* _3, IDirect3DSurface9* zb);
 	void						u_calc_tc_noise			(Fvector2& p0, Fvector2& p1);
 	void						u_calc_tc_duality_ss	(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
 	BOOL						u_need_PP				();
-	bool						u_need_CM				();
 	BOOL						u_DBT_enable			(float zMin, float zMax);
 	void						u_DBT_disable			();
 
@@ -219,7 +206,6 @@ public:
 
 	void						draw_volume				(light* L);
 	void						accum_direct			(u32	sub_phase);
-	void						accum_direct_cascade	(u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias); 
 	void						accum_direct_f			(u32	sub_phase);
 	void						accum_direct_lum		();
 	void						accum_direct_blend		();
@@ -249,10 +235,6 @@ public:
 	virtual u32					get_width				()				{ return dwWidth;					}
 	virtual u32					get_height				()				{ return dwHeight;					}
 
-	virtual void				set_cm_imfluence	(float	f)		{ param_color_map_influence = f;							}
-	virtual void				set_cm_interpolate	(float	f)		{ param_color_map_interpolate = f;							}
-	virtual void				set_cm_textures		(const shared_str &tex0, const shared_str &tex1) {color_map_manager.SetTextures(tex0, tex1);}
-
 	//	Need to reset stencil only when marker overflows.
 	//	Don't clear when render for the first time
 	void						reset_light_marker( bool bResetStencil = false);
@@ -266,42 +248,6 @@ public:
 		dbg_lines.back().P0		= P0;
 		dbg_lines.back().P1		= P1;
 		dbg_lines.back().color	= c;
-	}
-	IC void						dbg_addbox(const Fbox &box, const u32 &color)
-	{
-		Fvector c, r;
-		box.getcenter(c);
-		box.getradius(r);
-		dbg_addbox(c, r.x, r.y, r.z, color);
-	}
-	IC void						dbg_addbox(const Fvector &c, float rx, float ry, float rz, u32 color)
-	{
-		Fvector p1, p2, p3, p4, p5, p6, p7, p8;
-		
-		p1.set(c.x+rx, c.y+ry, c.z+rz);
-		p2.set(c.x+rx, c.y-ry, c.z+rz);
-		p3.set(c.x-rx, c.y-ry, c.z+rz);
-		p4.set(c.x-rx, c.y+ry, c.z+rz);
-		
-		p5.set(c.x+rx, c.y+ry, c.z-rz);
-		p6.set(c.x+rx, c.y-ry, c.z-rz);
-		p7.set(c.x-rx, c.y-ry, c.z-rz);
-		p8.set(c.x-rx, c.y+ry, c.z-rz);
-
-		dbg_addline(p1, p2, color);
-		dbg_addline(p2, p3, color);
-		dbg_addline(p3, p4, color);
-		dbg_addline(p4, p1, color);
-
-		dbg_addline(p5, p6, color);
-		dbg_addline(p6, p7, color);
-		dbg_addline(p7, p8, color);
-		dbg_addline(p8, p5, color);
-
-		dbg_addline(p1, p5, color);
-		dbg_addline(p2, p6, color);
-		dbg_addline(p3, p7, color);
-		dbg_addline(p4, p8, color);
 	}
 	IC void						dbg_addplane			(Fplane& P0,  u32 c)								{
 		dbg_planes.push_back(P0);
