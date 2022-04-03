@@ -1056,15 +1056,13 @@ struct CCC_ClearSmartCastStats : public IConsole_Command {
 struct CCC_JumpToLevel : public IConsole_Command {
 	CCC_JumpToLevel(LPCSTR N) : IConsole_Command(N)  {};
 
-	virtual void Execute(LPCSTR args)
+	virtual void Execute(LPCSTR level)
 	{
 		if ( !ai().get_alife() )
 		{
 			Msg				("! ALife simulator is needed to perform specified command!");
 			return;
 		}
-		string256		level;
-		sscanf(args,"%s",level);
 
 		GameGraph::LEVEL_MAP::const_iterator	I = ai().game_graph().header().levels().begin();
 		GameGraph::LEVEL_MAP::const_iterator	E = ai().game_graph().header().levels().end();
@@ -1077,7 +1075,7 @@ struct CCC_JumpToLevel : public IConsole_Command {
 		Msg							("! There is no level \"%s\" in the game graph!",level);
 	}
 
-	/*virtual void	Save	(IWriter *F)	{};
+	virtual void	Save	(IWriter *F)	{};
 	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
 		if ( !ai().get_alife() )
@@ -1092,7 +1090,7 @@ struct CCC_JumpToLevel : public IConsole_Command {
 		{
 			tips.push_back( (*itb).second.name() );
 		}
-	}*/
+	}
 };
 
 class CCC_Script : public IConsole_Command {
