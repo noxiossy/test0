@@ -16,6 +16,7 @@
 //#include "shader.h"
 //#include "R_Backend.h"
 
+extern u32 g_dwFPSlimit;
 #define VIEWPORT_NEAR 0.2f
 #define HUD_VIEWPORT_NEAR 0.05f
 

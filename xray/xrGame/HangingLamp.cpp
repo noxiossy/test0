@@ -276,7 +276,7 @@ void CHangingLamp::TurnOff	()
 		K->LL_SetBoneVisible(light_bone, FALSE, TRUE);
 		VERIFY2( K->LL_GetBonesVisible() != 0, make_string("can not Turn Off lamp: %s, visual %s - because all bones become invisible", cNameVisual().c_str(), cName().c_str() ));
 	}
-	if(!PPhysicsShell())//if we have physiccs_shell it will call processing deactivate when disable
+	//if(!PPhysicsShell())//if we have physiccs_shell it will call processing deactivate when disable
 		processing_deactivate	();
 		
 }
@@ -297,8 +297,10 @@ void	CHangingLamp::Hit					(SHit* pHDS)
 
 	if(m_pPhysicsShell) m_pPhysicsShell->applyHit(pHDS->p_in_bone_space,pHDS->dir,pHDS->impulse,pHDS->boneID,pHDS->hit_type);
 
-	if (pHDS->boneID==light_bone)fHealth =	0.f;
-	else	fHealth -=	pHDS->damage()*100.f;
+	if (pHDS->boneID == light_bone)
+		fHealth = 0.f;
+	else if (pHDS->hit_type == ALife::eHitTypeExplosion)
+		fHealth -= pHDS->damage()*100.f;
 
 	if (bWasAlive && (!Alive()))		TurnOff	();
 }
