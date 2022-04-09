@@ -1,8 +1,4 @@
-// XR_IOConsole.h: interface for the CConsole class.
-//
-//////////////////////////////////////////////////////////////////////
-#ifndef XR_IOCONSOLE_H_INCLUDED
-#define XR_IOCONSOLE_H_INCLUDED
+#pragma once
 
 #include "../Include/xrRender/FactoryPtr.h"
 #include "../Include/xrRender/ConsoleRender.h"
@@ -109,7 +105,8 @@ public:
 
 	void			OnRender			() override;
 	void			OnFrame				() override;
-	
+	void			OnScreenResolutionChanged() override;
+
 	string64		ConfigFile;
 	bool			bVisible;
 	vecCMD			Commands;
@@ -212,5 +209,3 @@ protected:
 }; // class CConsole
 
 ENGINE_API extern CConsole* Console;
-
-#endif // XR_IOCONSOLE_H_INCLUDED
