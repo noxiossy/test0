@@ -551,6 +551,7 @@ void					CRender::rmNormal			()
 //////////////////////////////////////////////////////////////////////
 CRender::CRender()
 {
+	init_cascades();
 }
 
 CRender::~CRender()

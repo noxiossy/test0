@@ -192,6 +192,9 @@
     <ClInclude Include="..\xrRender\r__pixel_calculator.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\r_sun_cascades.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="doug_lea_memory_allocator.h">
       <Filter>Core\memory</Filter>
     </ClInclude>
@@ -268,6 +271,9 @@
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="blender_light_direct.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="blender_light_direct_cascade.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="blender_light_mask.h">
@@ -777,6 +783,9 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="blender_light_direct.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="blender_light_direct_cascade.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="blender_light_mask.cpp">
