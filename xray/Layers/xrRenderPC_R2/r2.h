@@ -17,6 +17,7 @@
 #include "../xrRender/light_db.h"
 #include "light_render_direct.h"
 #include "../xrRender/LightTrack.h"
+#include "../xrRender/r_sun_cascades.h"
 
 #include "../../xrEngine/irenderable.h"
 #include "../../xrEngine/fmesh.h"
