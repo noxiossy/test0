@@ -56,7 +56,8 @@ struct TipString
 
 class ENGINE_API CConsole :
 	public pureRender,
-	public pureFrame
+	public pureFrame,
+	public pureScreenResolutionChanged
 {
 public:
 	struct str_pred : public std::binary_function<char*, char*, bool>
