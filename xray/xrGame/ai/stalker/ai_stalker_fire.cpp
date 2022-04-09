@@ -50,6 +50,7 @@
 #include "../../stalker_decision_space.h"
 #include "../../script_game_object.h"
 #include "../../inventory.h"
+#include "../../torch.h"
 
 using namespace StalkerSpace;
 
@@ -313,6 +314,28 @@ void CAI_Stalker::Hit			(SHit* pHDS)
 							stalker->on_critical_wound_initiator	(this);
 					}
 				}
+			}
+		}
+	}
+
+	// ZergO: break torch on head hit
+	IKinematics *tpKinematics = smart_cast<IKinematics*>(Visual());
+	tpKinematics->LL_GetBoneInstance (HDS.bone());
+	if (HDS.boneID == tpKinematics->LL_BoneID("bip01_head"))
+	{
+		const xr_vector<CAttachableItem*>& all = CAttachmentOwner::attached_objects();
+		xr_vector<CAttachableItem*>::const_iterator it		= all.begin();
+		xr_vector<CAttachableItem*>::const_iterator it_e	= all.end();
+		for (; it != it_e; ++it)
+		{
+			CTorch* torch = smart_cast<CTorch*>(*it);
+			if (torch)
+			{
+				// если фонарь уже мигает, то разбить полностью, иначе шанс 50%
+				bool fatal = torch->Broken(false) ? true : Random.randI(2) == 1;
+				torch->Break(fatal);
+				//torch->SetBatteryStatus(0);
+				break;
 			}
 		}
 	}

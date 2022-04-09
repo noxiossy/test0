@@ -196,7 +196,8 @@ void CPoltergeist::shedule_Update(u32 dt)
 
 	UpdateHeight();
 
-	ability()->update_schedule();
+	if (state_invisible)
+		ability()->update_schedule();
 }
 
 
@@ -239,7 +240,8 @@ void CPoltergeist::Die(CObject* who)
 	inherited::Die				(who);
 	Energy::disable				();
 
-	ability()->on_die			();
+	if (state_invisible)
+		ability()->on_die		();
 }
 
 void CPoltergeist::Hit(SHit* pHDS)

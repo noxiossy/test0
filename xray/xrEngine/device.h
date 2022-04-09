@@ -95,6 +95,7 @@ public:
 	CRegistrator	<pureFrame			>			seqFrameMT;
 	CRegistrator	<pureDeviceReset	>			seqDeviceReset;
 	xr_vector		<fastdelegate::FastDelegate0<> >	seqParallel;
+	CRegistrator	<pureScreenResolutionChanged>	seqResolutionChanged;
 
 	// Dependent classes
 	//CResourceManager*						Resources;	  

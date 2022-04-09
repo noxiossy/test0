@@ -15,6 +15,7 @@ private:
 protected:
 	float			fBrightness;
 	CLAItem*		lanim;
+	CLAItem*		lanim_flickering;
 	float			time2hide;
 
 	u16				guid_bone;
@@ -28,6 +29,8 @@ protected:
 	ref_glow		glow_render;
 	Fvector			m_focus;
 private:
+	bool			m_is_flickering;
+	bool			m_is_broken;
 	inline	bool	can_use_dynamic_lights	();
 
 public:
@@ -45,8 +48,11 @@ public:
 
 	virtual void	UpdateCL			();
 
+			bool	Enabled				()				const;
+			bool	Broken				(bool fatal)	const;
 			void	Switch				();
 			void	Switch				(bool light_on);
+			void	Break				(bool fatal);
 
 	virtual bool	can_be_attached		() const;
 
@@ -70,7 +76,8 @@ protected:
 	enum EStats{
 		eTorchActive				= (1<<0),
 		eNightVisionActive			= (1<<1),
-		eAttached					= (1<<2)
+		eAttached					= (1<<2),
+		eFlickering					= (1<<3), // ZergO: added
 	};
 
 public:

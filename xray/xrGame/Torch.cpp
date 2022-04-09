@@ -40,6 +40,7 @@ CTorch::CTorch(void)
 	m_switched_on				= false;
 	glow_render					= ::Render->glow_create();
 	lanim						= 0;
+	lanim_flickering			= 0;
 	time2hide					= 0;
 	fBrightness					= 1.f;
 
@@ -50,6 +51,8 @@ CTorch::CTorch(void)
 
 	m_prev_hp.set				(0,0);
 	m_delta_h					= 0;
+	m_is_flickering				= false;
+	m_is_broken					= false;
 }
 
 CTorch::~CTorch(void) 
@@ -176,6 +179,29 @@ void CTorch::UpdateSwitchNightVision   ()
 	}*/
 }
 
+void CTorch::Break(bool fatal)
+{
+	if (OnClient()) return;
+	if (m_is_broken) return;
+
+	if (m_switched_on)
+		Switch(false);
+
+	if (fatal)	m_is_broken		= true;
+	else		m_is_flickering = true;
+
+//	sndBreaking.play_at_pos(0, Position());
+}
+
+bool CTorch::Enabled() const
+{
+	return m_switched_on;
+}
+
+bool CTorch::Broken(bool fatal) const
+{
+	return fatal ? m_is_broken : m_is_flickering;
+}
 
 void CTorch::Switch()
 {
@@ -243,6 +269,7 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 	CInifile* pUserData		= K->LL_UserData(); 
 	R_ASSERT3				(pUserData,"Empty Torch user data!",torch->get_visual());
 	lanim					= LALib.FindItem(pUserData->r_string("torch_definition","color_animator"));
+	lanim_flickering		= LALib.FindItem(pUserData->r_string("torch_definition","color_animator_f"));
 	guid_bone				= K->LL_BoneID	(pUserData->r_string("torch_definition","guide_bone"));	VERIFY(guid_bone!=BI_NONE);
 
 	Fcolor clr				= pUserData->r_fcolor				("torch_definition",(b_r2)?"color_r2":"color");
@@ -412,23 +439,28 @@ void CTorch::UpdateCL()
 	}
 
 	if (!m_switched_on)					return;
+	Fcolor fclr;
 
 	// calc color animator
-	if (!lanim)							return;
-
-	int						frame;
-	// возвращает в формате BGR
-	u32 clr					= lanim->CalculateBGR(Device.fTimeGlobal,frame); 
-
-	Fcolor					fclr;
-	fclr.set				((float)color_get_B(clr),(float)color_get_G(clr),(float)color_get_R(clr),1.f);
-	fclr.mul_rgb			(fBrightness/255.f);
-	if (can_use_dynamic_lights())
+	if ((lanim_flickering && m_is_flickering) || lanim)
 	{
-		light_render->set_color	(fclr);
-		light_omni->set_color	(fclr);
+		int	frame;
+		u32 clr = 0;
+
+		if (lanim_flickering && m_is_flickering)
+			clr = lanim_flickering->CalculateBGR(Device.fTimeGlobal, frame);
+		else if (lanim)
+			clr = lanim->CalculateBGR(Device.fTimeGlobal, frame);
+
+		fclr.set		((float)color_get_B(clr), (float)color_get_G(clr), (float)color_get_R(clr), 1.f);
+		fclr.mul_rgb	(fBrightness / 255.f);
 	}
-	glow_render->set_color		(fclr);
+	else
+		fclr = m_light_color;
+
+	light_render->set_color					(fclr);
+	light_omni->set_color					(fclr);
+	glow_render->set_color					(fclr);
 }
 
 
@@ -458,10 +490,10 @@ void CTorch::net_Export			(NET_Packet& P)
 	F |= (m_bNightVisionOn ? eNightVisionActive : 0);
 	const CActor *pA = smart_cast<const CActor *>(H_Parent());
 	if (pA)
-	{
-		if (pA->attached(this))
-			F |= eAttached;
-	}
+		F |= (pA->attached(this) ? eAttached : 0);
+
+	F |= (m_is_flickering ? eFlickering : 0);
+
 	P.w_u8(F);
 //	Msg("CTorch::net_export - NV[%d]", m_bNightVisionOn);
 }
@@ -473,7 +505,8 @@ void CTorch::net_Import			(NET_Packet& P)
 	BYTE F = P.r_u8();
 	bool new_m_switched_on				= !!(F & eTorchActive);
 	bool new_m_bNightVisionOn			= !!(F & eNightVisionActive);
-
+	m_is_flickering						= !!(F & eFlickering); 	// ZergO: added
+		 
 	if (new_m_switched_on != m_switched_on)			Switch						(new_m_switched_on);
 	if (new_m_bNightVisionOn != m_bNightVisionOn)	
 	{

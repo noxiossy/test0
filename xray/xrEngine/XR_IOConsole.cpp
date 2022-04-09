@@ -40,19 +40,6 @@ text_editor::line_edit_control& CConsole::ec()
 	return m_editor->control();
 }
 
-bool CConsole::is_mark( Console_mark type )
-{
-	switch ( type )
-	{
-	case mark0:  case mark1:  case mark2:  case mark3:
-	case mark4:  case mark5:  case mark6:  case mark7:
-	case mark8:  case mark9:  case mark10: case mark11:	case mark12:
-		return true;
-		break;
-	}
-	return false;
-}
-
 u32 CConsole::get_mark_color( Console_mark type )
 {
 	u32 color = default_font_color;
@@ -77,14 +64,29 @@ u32 CConsole::get_mark_color( Console_mark type )
 	return color;
 }
 
+bool CConsole::is_mark( Console_mark type )
+{
+	switch ( type )
+	{
+	case mark0:  case mark1:  case mark2:  case mark3:
+	case mark4:  case mark5:  case mark6:  case mark7:
+	case mark8:  case mark9:  case mark10: case mark11:	case mark12:
+		return true;
+		break;
+	}
+	return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CConsole::CConsole()
+:m_hShader_back(NULL)
 {
 	m_editor = xr_new<text_editor::line_editor>( (u32)CONSOLE_BUF_SIZE );
 	m_cmd_history_max = cmd_history_max;
 	m_disable_tips = false;
 	Register_callbacks();
+	Device.seqResolutionChanged.Add(this);
 }
 
 void CConsole::Initialize()
@@ -122,6 +124,7 @@ CConsole::~CConsole()
 	xr_delete(m_hShader_back);
 	xr_delete( m_editor );
 	Destroy();
+	Device.seqResolutionChanged.Remove(this);
 }
 
 void CConsole::Destroy()
@@ -193,6 +196,12 @@ void CConsole::OutFont( LPCSTR text, float& pos_y )
 	{
 		pFont->OutI( -1.0f, pos_y, "%s", text );
 	}
+}
+
+void CConsole::OnScreenResolutionChanged()
+{
+	xr_delete(pFont);
+	xr_delete(pFont2);
 }
 
 void CConsole::OnRender()

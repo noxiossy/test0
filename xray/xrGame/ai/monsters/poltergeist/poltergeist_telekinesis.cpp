@@ -45,8 +45,10 @@ void CPolterTele::update_schedule()
 {
 	inherited::update_schedule();
 
-	if (!m_object->g_Alive() || !Actor() || !Actor()->g_Alive()) return;
-	if (Actor()->Position().distance_to(m_object->Position()) > m_pmt_distance) return;
+	curr_enemy = const_cast<CEntityAlive*>(m_object->EnemyMan.get_enemy());
+
+	if (!m_object->g_Alive() || !curr_enemy || !curr_enemy->g_Alive()) return;
+	if (curr_enemy->Position().distance_to(m_object->Position()) > m_pmt_distance) return;
 
 	switch (m_state) {
 	case eStartRaiseObjects:	
@@ -153,8 +155,10 @@ bool CPolterTele::trace_object(CObject *obj, const Fvector &target)
 	dir.normalize	();
 
 	collide::rq_result	l_rq;
-	if (Level().ObjectSpace.RayPick(trace_from, dir, range, collide::rqtBoth, l_rq, obj)) {
-		if (l_rq.O == Actor()) return true;
+	if (Level().ObjectSpace.RayPick(trace_from, dir, range, collide::rqtBoth, l_rq, obj)) 
+	{
+		if (l_rq.O == curr_enemy)
+			return true;
 	}
 
 	return false;
@@ -182,9 +186,9 @@ void CPolterTele::tele_find_objects(xr_vector<CObject*> &objects, const Fvector 
 
 		
 		Fvector center;
-		Actor()->Center(center);
+		curr_enemy->Center(center);
 		
-		if (trace_object(obj, center) || trace_object(obj, get_head_position(Actor())))
+		if (trace_object(obj, center) || trace_object(obj, get_head_position(smart_cast<CObject*>(curr_enemy))))
 			objects.push_back(obj);
 	}
 }
@@ -197,15 +201,15 @@ bool CPolterTele::tele_raise_objects()
 	tele_objects.reserve	(20);
 
 	// получить список объектов вокруг врага
-	tele_find_objects	(tele_objects, Actor()->Position());
+	tele_find_objects	(tele_objects, curr_enemy->Position());
 
 	// получить список объектов вокруг монстра
 	tele_find_objects	(tele_objects, m_object->Position());
 
 	// получить список объектов между монстром и врагом
-	float dist			= Actor()->Position().distance_to(m_object->Position());
+	float dist			= curr_enemy->Position().distance_to(m_object->Position());
 	Fvector dir;
-	dir.sub				(Actor()->Position(), m_object->Position());
+	dir.sub				(curr_enemy->Position(), m_object->Position());
 	dir.normalize		();
 
 	Fvector pos;
@@ -213,7 +217,7 @@ bool CPolterTele::tele_raise_objects()
 	tele_find_objects	(tele_objects, pos);	
 
 	// сортировать и оставить только необходимое количество объектов
-	std::sort(tele_objects.begin(),tele_objects.end(),best_object_predicate2(m_object->Position(), Actor()->Position()));
+	std::sort(tele_objects.begin(),tele_objects.end(),best_object_predicate2(m_object->Position(), curr_enemy->Position()));
 	
 	// оставить уникальные объекты
 	tele_objects.erase	(
@@ -259,7 +263,7 @@ void CPolterTele::tele_fire_objects()
 		//if (tele_object.get_state() != TS_Fire) {
 		if ((tele_object.get_state() == TS_Raise) || (tele_object.get_state() == TS_Keep))  {
 			Fvector					enemy_pos;
-			enemy_pos				= get_head_position(Actor());
+			enemy_pos				= get_head_position(smart_cast<CObject*>(curr_enemy));
 			m_object->CTelekinesis::fire_t	(tele_object.get_object(),enemy_pos, tele_object.get_object()->Position().distance_to(enemy_pos) / m_pmt_fly_velocity);
 			return;
 		}
