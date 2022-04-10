@@ -10,9 +10,17 @@
 #include "spectator.h"
 #include "Car.h"
 #include "UIGameCustom.h"
+#include "UICursor.h"
+#include "string_table.h"
 #ifdef	DEBUG
 #include "phdebug.h"
 #endif
+
+extern CUIGameCustom*	CurrentGameUI()
+{
+    return HUD().GetUI();
+}
+
 CFontManager::CFontManager()
 {
 	Device.seqDeviceReset.Add(this,REG_PRIORITY_HIGH);
@@ -373,4 +381,12 @@ void CHUDManager::net_Relcase( CObject* obj )
 #ifdef	DEBUG
 	DBG_PH_NetRelcase( obj );
 #endif
+}
+
+CDialogHolder* CurrentDialogHolder()
+{
+    if (MainMenu()->IsActive())
+        return MainMenu();
+    else
+        return HUD().GetUI();
 }

@@ -5,6 +5,7 @@
 #include "UI.h"
 
 class CHUDTarget;
+class CUIGameCustom;
 
 struct CFontManager :public pureDeviceReset			{
 							CFontManager			();
@@ -91,3 +92,8 @@ public:
 private:
 	bool					m_Renderable;
 };
+
+IC CHUDManager&			HUD()
+{
+    return *((CHUDManager*) g_hud);
+}

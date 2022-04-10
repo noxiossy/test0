@@ -7,7 +7,7 @@
 #include "ui/UIStatic.h"
 
 CUICursor::CUICursor()
-:m_static(NULL)
+:m_static(NULL),m_b_use_win_cursor(false)
 {    
 	bVisible				= false;
 	vPrevPos.set			(0.0f, 0.0f);
@@ -41,6 +41,10 @@ void CUICursor::InitInternal()
 
 	m_static->SetWndSize		(sz);
 	m_static->SetStretchTexture	(true);
+
+	u32 screen_size_x	= GetSystemMetrics( SM_CXSCREEN );
+	u32 screen_size_y	= GetSystemMetrics( SM_CYSCREEN );
+	m_b_use_win_cursor	= (screen_size_y >=Device.dwHeight && screen_size_x>=Device.dwWidth);
 }
 
 //--------------------------------------------------------------------
@@ -109,6 +113,8 @@ void CUICursor::SetUICursorPosition(const Fvector2& pos)
 	POINT		p;
 	p.x			= iFloor(vPos.x / (UI_BASE_WIDTH/(float)Device.dwWidth));
 	p.y			= iFloor(vPos.y / (UI_BASE_HEIGHT/(float)Device.dwHeight));
+    if (m_b_use_win_cursor)
+        ClientToScreen(Device.m_hWnd, (LPPOINT)&p);
 
 	SetCursorPos(p.x, p.y);
 }
