@@ -27,7 +27,6 @@ public:
 	virtual void	OnScreenResolutionChanged	();
 
 	bool			IsVisible					() {return bVisible;}
-	void			Show						();
-	void			Hide						();
-	void			Clip						(bool clip);
+	void			Show						() {bVisible = true;}
+	void			Hide						() {bVisible = false;}
 };

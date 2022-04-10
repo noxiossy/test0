@@ -5,7 +5,7 @@
 #include "UI.h"
 #include "HUDManager.h"
 #include "ui/UIStatic.h"
-#include <windows.h>
+
 
 #define C_DEFAULT	D3DCOLOR_XRGB(0xff,0xff,0xff)
 
@@ -31,36 +31,6 @@ void CUICursor::OnScreenResolutionChanged()
 {
 	xr_delete					(m_static);
 	InitInternal				();
-}
-
-void CUICursor::Clip(bool clip)
-{
-	HWND hwnd = Device.m_hWnd;
-	if (hwnd)
-	{
-		if (clip)
-		{
-			RECT clientRect;
-			::GetClientRect(hwnd, &clientRect);
-			::ClientToScreen(hwnd, (LPPOINT)&clientRect.left);
-			::ClientToScreen(hwnd, (LPPOINT)&clientRect.right);
-			::ClipCursor(&clientRect);
-		}
-		else
-			::ClipCursor(nullptr);
-	}
-}
-
-void CUICursor::Show()
-{
-	bVisible = true;
-	Clip(false);
-}
-
-void CUICursor::Hide()
-{
-	bVisible = false;
-	Clip(true);
 }
 
 void CUICursor::InitInternal()
@@ -123,16 +93,15 @@ Fvector2 CUICursor::GetCursorPositionDelta()
 	return res_delta;
 }
 
-// nitrocaster: Fix ingame cursor position in windowed mode 
 void CUICursor::UpdateCursorPosition(int _dx, int _dy)
 {
 	Fvector2	p;
 	vPrevPos = vPos;
 	if (m_b_use_win_cursor)
 	{
-		Ivector2 pti;
-		IInputReceiver::IR_GetMousePosReal(pti);
-
+		POINT		pti;
+		BOOL r		= GetCursorPos(&pti);
+		if(!r)		return;
 		p.x		= (float)pti.x;
 		p.y		= (float)pti.y;
 		vPos.x	= p.x * (UI_BASE_WIDTH / (float)Device.dwWidth);
@@ -154,9 +123,6 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
 	POINT		p;
 	p.x			= iFloor(vPos.x / (UI_BASE_WIDTH/(float)Device.dwWidth));
 	p.y			= iFloor(vPos.y / (UI_BASE_HEIGHT/(float)Device.dwHeight));
-
-	if (m_b_use_win_cursor)
-		ClientToScreen(Device.m_hWnd, (LPPOINT)&p);
 
 	SetCursorPos(p.x, p.y);
 }
