@@ -53,6 +53,7 @@ CTorch::CTorch(void)
 	m_delta_h					= 0;
 	m_is_flickering				= false;
 	m_is_broken					= false;
+	m_light_color.set			(1, 1, 1, 1);
 }
 
 CTorch::~CTorch(void) 
@@ -272,8 +273,7 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 	lanim_flickering		= LALib.FindItem(pUserData->r_string("torch_definition","color_animator_f"));
 	guid_bone				= K->LL_BoneID	(pUserData->r_string("torch_definition","guide_bone"));	VERIFY(guid_bone!=BI_NONE);
 
-	Fcolor clr				= pUserData->r_fcolor				("torch_definition",(b_r2)?"color_r2":"color");
-	fBrightness				= clr.intensity();
+	m_light_color			= pUserData->r_fcolor				("torch_definition",(b_r2)?"color_r2":"color");
 	float range				= pUserData->r_float				("torch_definition",(b_r2)?"range_r2":"range");
 	light_render->set_color	(clr);
 	light_render->set_range	(range);
@@ -439,6 +439,9 @@ void CTorch::UpdateCL()
 	}
 
 	if (!m_switched_on)					return;
+
+	fBrightness = m_light_color.intensity();
+
 	Fcolor fclr;
 
 	// calc color animator

@@ -31,6 +31,15 @@ class CPoltergeist :	public CBaseMonster ,
 
 
 public:
+	CSoundPlayer			*m_sound_player;
+
+	struct SScareDelay
+	{
+		u32 min;
+		u32 normal;
+		u32 aggressive;
+	} m_scare_delay;
+
 					CPoltergeist		();
 	virtual			~CPoltergeist		();	
 
@@ -249,6 +258,7 @@ class CPolterTele : public CPolterSpecialAbility {
 	ref_sound			m_sound_tele_hold;
 	ref_sound			m_sound_tele_throw;
 
+	CEntityAlive*		curr_enemy;
 
 	enum ETeleState {
 		eStartRaiseObjects,

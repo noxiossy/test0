@@ -31,6 +31,7 @@ protected:
 private:
 	bool			m_is_flickering;
 	bool			m_is_broken;
+	Fcolor			m_light_color;
 	inline	bool	can_use_dynamic_lights	();
 
 public:

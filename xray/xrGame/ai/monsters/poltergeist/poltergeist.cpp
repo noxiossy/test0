@@ -15,6 +15,8 @@
 #include "../control_path_builder_base.h"
 #include "../../../PhysicsShell.h"
 
+#include "sound_player.h"
+
 #define HEIGHT_CHANGE_VELOCITY	0.5f
 #define HEIGHT_CHANGE_MIN_TIME	3000
 #define HEIGHT_CHANGE_MAX_TIME	10000
@@ -25,16 +27,23 @@
 CPoltergeist::CPoltergeist()
 {
 	StateMan					= xr_new<CStateManagerPoltergeist>(this);
+	m_sound_player				= xr_new<CSoundPlayer>(this);
 	
 	invisible_vel.set			(0.1f, 0.1f);
 	
 	m_flame						= 0;
 	m_tele						= 0;
+
+	m_scare_delay.min			= 0;
+	m_scare_delay.normal		= 0;
+	m_scare_delay.aggressive	= 0;
+
 }
 
 CPoltergeist::~CPoltergeist()
 {
 	xr_delete		(StateMan);
+	xr_delete		(m_sound_player);
 	xr_delete		(m_flame);
 	xr_delete		(m_tele);
 }
@@ -108,6 +117,12 @@ void CPoltergeist::Load(LPCSTR section)
 		m_tele->load	(section);
 	}
 	
+
+	// рандомные звуки и прочее запугивание игрока
+	m_scare_delay.min		= READ_IF_EXISTS(pSettings, r_u32, section, "Delay_Scare_Min", 15000);
+	m_scare_delay.normal	= READ_IF_EXISTS(pSettings, r_u32, section, "Delay_Scare_Normal", 40000);
+	m_scare_delay.aggressive= READ_IF_EXISTS(pSettings, r_u32, section, "Delay_Scare_Aggressive", 25000);
+
 }
 
 void CPoltergeist::reload(LPCSTR section)
@@ -223,16 +238,20 @@ void CPoltergeist::net_Destroy()
 
 void CPoltergeist::Die(CObject* who)
 {
-	if (m_tele) {
-		if (state_invisible) {
+	if (state_invisible)
+	{
+		if (m_tele) 
+		{
 			setVisible(true);
 
-			if (PPhysicsShell()) {
+			if (PPhysicsShell()) 
+			{
 				Fmatrix M;
 				M.set							(XFORM());
 				M.translate_over				(m_current_position);
 				PPhysicsShell()->SetTransform	(M);
-			} else 
+			} 
+			else 
 				Position() = m_current_position;
 		}
 	}
@@ -246,7 +265,9 @@ void CPoltergeist::Die(CObject* who)
 
 void CPoltergeist::Hit(SHit* pHDS)
 {
-	ability()->on_hit(pHDS);
+	if (state_invisible)
+		ability()->on_hit(pHDS);
+
 	inherited::Hit(pHDS);
 }
 
