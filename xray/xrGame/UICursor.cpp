@@ -6,11 +6,8 @@
 #include "HUDManager.h"
 #include "ui/UIStatic.h"
 
-
-#define C_DEFAULT	D3DCOLOR_XRGB(0xff,0xff,0xff)
-
 CUICursor::CUICursor()
-:m_static(NULL),m_b_use_win_cursor(false)
+:m_static(NULL)
 {    
 	bVisible				= false;
 	vPrevPos.set			(0.0f, 0.0f);
@@ -37,28 +34,21 @@ void CUICursor::InitInternal()
 {
 	m_static					= xr_new<CUIStatic>();
 	m_static->InitTextureEx		("ui\\a_menu_cursor", "hud\\cursor");
-	Frect						rect;
-	rect.set					(0.0f,0.0f,40.0f,40.0f);
+	constexpr Frect rect		{ 0.0f, 0.0f, 40.0f, 40.0f };
 	m_static->SetOriginalRect	(rect);
-	Fvector2					sz;
-	sz.set						(rect.rb);
-	if(UI()->is_16_9_mode())
-		sz.x					/= 1.2f;
+	Fvector2 sz					{ rect.rb };
+	sz.x *= UI()->get_current_kx();
 
 	m_static->SetWndSize		(sz);
 	m_static->SetStretchTexture	(true);
-
-	u32 screen_size_x	= GetSystemMetrics( SM_CXSCREEN );
-	u32 screen_size_y	= GetSystemMetrics( SM_CYSCREEN );
-	m_b_use_win_cursor	= (screen_size_y >=Device.dwHeight && screen_size_x>=Device.dwWidth);
 }
 
 //--------------------------------------------------------------------
-u32 last_render_frame = 0;
 void CUICursor::OnRender	()
 {
 	if( !IsVisible() ) return;
 #ifdef DEBUG
+	static u32 last_render_frame = 0;
 	VERIFY(last_render_frame != Device.dwFrame);
 	last_render_frame = Device.dwFrame;
 
@@ -79,29 +69,25 @@ void CUICursor::OnRender	()
 	m_static->Draw		();
 }
 
-Fvector2 CUICursor::GetCursorPosition()
+Fvector2 CUICursor::GetCursorPosition() const
 {
 	return  vPos;
 }
 
-Fvector2 CUICursor::GetCursorPositionDelta()
+Fvector2 CUICursor::GetCursorPositionDelta() const
 {
-	Fvector2 res_delta;
-
-	res_delta.x = vPos.x - vPrevPos.x;
-	res_delta.y = vPos.y - vPrevPos.y;
-	return res_delta;
+	return Fvector2	{ vPos.x - vPrevPos.x , vPos.y - vPrevPos.y };
 }
 
-void CUICursor::UpdateCursorPosition(int _dx, int _dy)
+void CUICursor::UpdateCursorPosition(const int _dx, const int _dy)
 {
 	Fvector2	p;
 	vPrevPos = vPos;
 	if (m_b_use_win_cursor)
 	{
-		POINT		pti;
-		BOOL r		= GetCursorPos(&pti);
-		if(!r)		return;
+		Ivector2 pti;
+		IInputReceiver::IR_GetMousePosReal(pti);
+
 		p.x		= (float)pti.x;
 		p.y		= (float)pti.y;
 		vPos.x	= p.x * (UI_BASE_WIDTH / (float)Device.dwWidth);
@@ -109,7 +95,7 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
 	}
 	else
 	{
-		float sens = 1.0f;
+		constexpr float sens = 1.0f;
 		vPos.x += _dx*sens;
 		vPos.y += _dy*sens;
 	}
@@ -117,7 +103,7 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
 	clamp(vPos.y, 0.f, UI_BASE_HEIGHT);
 }
 
-void CUICursor::SetUICursorPosition(Fvector2 pos)
+void CUICursor::SetUICursorPosition(const Fvector2& pos)
 {
 	vPos		= pos;
 	POINT		p;
