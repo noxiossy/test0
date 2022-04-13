@@ -198,8 +198,6 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 			{
 			case GE_HIT_STATISTIC:
 				{
-					if (GameID() != eGameIDSingle)
-						Game().m_WeaponUsageStatistic->OnBullet_Check_Request(&HDS);
 				}break;
 			default:
 				{
@@ -272,11 +270,17 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 		demo_spectator = true;
 	} else {
 		CObject* prev_obj = Level().Objects.net_Find(E->ID);
-		R_ASSERT2(prev_obj == NULL, 
+		/*R_ASSERT2(prev_obj == NULL, 
 			make_string("previous object ID=%d is %s, hasn't been destroyed but (to destroy = %d)",
 				E->ID, prev_obj->cName().c_str(), prev_obj->getDestroy()
 			).c_str()
-		);
+		);*/
+		if (prev_obj != NULL)
+		{
+			Msg("ERROR: CGameObject:net_spawn() Object with ID already exists! ID=%d self=%s other=%s", E->ID, *(cName()), *(o->cName()));
+			return false;
+		}
+
 	}
 
 
@@ -496,49 +500,55 @@ void CGameObject::spawn_supplies()
 
 	for (u32 k = 0, j; spawn_ini()->r_line("spawn",k,&N,&V); k++) {
 		VERIFY				(xr_strlen(N));
-		j					= 1;
-		p					= 1.f;
+		if (pSettings->section_exist(N)) //Alundaio: Validate section exists
+		{
+			j					= 1;
+			p					= 1.f;
 		
-		float f_cond						= 1.0f;
-		if (V && xr_strlen(V)) {
-			int				n = _GetItemCount(V);
-			string16		temp;
-			if (n > 0)
-				j			= atoi(_GetItem(V,0,temp)); //count
+			float f_cond						= 1.0f;
+			if (V && xr_strlen(V)) {
+				int				n = _GetItemCount(V);
+				string16		temp;
+				if (n > 0)
+					j			= atoi(_GetItem(V,0,temp)); //count
 			
-			if(NULL!=strstr(V,"prob="))
-				p			=(float)atof(strstr(V,"prob=")+5);
-			if (fis_zero(p))p = 1.f;
-			if (!j)	j		= 1;
-			if(NULL!=strstr(V,"cond="))
-				f_cond		= (float)atof(strstr(V,"cond=")+5);
-			bScope			=	(NULL!=strstr(V,"scope"));
-			bSilencer		=	(NULL!=strstr(V,"silencer"));
-			bLauncher		=	(NULL!=strstr(V,"launcher"));
+				if(NULL!=strstr(V,"prob="))
+					p			=(float)atof(strstr(V,"prob=")+5);
+				if (fis_zero(p))p = 1.f;
+				if (!j)	j		= 1;
+				if(NULL!=strstr(V,"cond="))
+					f_cond		= (float)atof(strstr(V,"cond=")+5);
+				bScope			=	(NULL!=strstr(V,"scope"));
+				bSilencer		=	(NULL!=strstr(V,"silencer"));
+				bLauncher		=	(NULL!=strstr(V,"launcher"));
 
-		}
-		for (u32 i=0; i<j; ++i)
-			if (::Random.randF(1.f) < p){
-				CSE_Abstract* A=Level().spawn_item	(N,Position(),ai_location().level_vertex_id(),ID(),true);
+			}
+			for (u32 i=0; i<j; ++i)
+			{
+				if (::Random.randF(1.f) < p)
+				{
+					CSE_Abstract* A=Level().spawn_item	(N,Position(),ai_location().level_vertex_id(),ID(),true);
 
-				CSE_ALifeInventoryItem*	pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(A);
-				if(pSE_InventoryItem)
-						pSE_InventoryItem->m_fCondition = f_cond;
+					CSE_ALifeInventoryItem*	pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(A);
+					if(pSE_InventoryItem)
+							pSE_InventoryItem->m_fCondition = f_cond;
 
-				CSE_ALifeItemWeapon* W =  smart_cast<CSE_ALifeItemWeapon*>(A);
-				if (W) {
-					if (W->m_scope_status			== ALife::eAddonAttachable)
-						W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
-					if (W->m_silencer_status		== ALife::eAddonAttachable)
-						W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
-					if (W->m_grenade_launcher_status == ALife::eAddonAttachable)
-						W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
+					CSE_ALifeItemWeapon* W =  smart_cast<CSE_ALifeItemWeapon*>(A);
+					if (W) {
+						if (W->m_scope_status			== ALife::eAddonAttachable)
+							W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
+						if (W->m_silencer_status		== ALife::eAddonAttachable)
+							W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
+						if (W->m_grenade_launcher_status == ALife::eAddonAttachable)
+							W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
+					}
+
+					NET_Packet					P;
+					A->Spawn_Write				(P,TRUE);
+					Level().Send				(P,net_flags(TRUE));
+					F_entity_Destroy			(A);
 				}
-
-				NET_Packet					P;
-				A->Spawn_Write				(P,TRUE);
-				Level().Send				(P,net_flags(TRUE));
-				F_entity_Destroy			(A);
+			}
 		}
 	}
 }

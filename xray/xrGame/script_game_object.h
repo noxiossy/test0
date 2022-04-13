@@ -178,8 +178,8 @@ public:
 	_DECLARE_FUNCTION10	(GetHealth			,			float);
 	_DECLARE_FUNCTION10	(GetPsyHealth		,			float);
 	_DECLARE_FUNCTION10	(GetPower			,			float);
-	_DECLARE_FUNCTION10 (GetSatiety			,			float);
 	_DECLARE_FUNCTION10	(GetRadiation		,			float);
+    _DECLARE_FUNCTION10	(GetSatiety			,			float);
 	_DECLARE_FUNCTION10	(GetBleeding		,			float);
 	_DECLARE_FUNCTION10	(GetMorale			,			float);
 

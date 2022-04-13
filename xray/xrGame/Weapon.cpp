@@ -193,7 +193,8 @@ void CWeapon::ForceUpdateFireParticles()
 	if ( !GetHUDmode() )
 	{//update particlesXFORM real bullet direction
 
-		if (!H_Parent())		return;
+		if (!H_Parent())
+			return;
 
 		Fvector					p, d; 
 		smart_cast<CEntity*>(H_Parent())->g_fireParams	(this, p,d);
@@ -430,6 +431,9 @@ void CWeapon::Load		(LPCSTR section)
 
 	m_zoom_params.m_ReloadDof	= READ_IF_EXISTS(pSettings, r_fvector4, section, "reload_dof", Fvector4().set(-1,-1,-1,-1));
 
+    //Swartz: empty reload
+    m_zoom_params.m_ReloadEmptyDof = READ_IF_EXISTS(pSettings, r_fvector4, section, "reload_empty_dof", Fvector4().set(-1, -1, -1, -1));
+    //-Swartz
 
 	m_bHasTracers			= READ_IF_EXISTS(pSettings, r_bool, section, "tracers", true);
 	m_u8TracerColorID		= READ_IF_EXISTS(pSettings, r_u8, section, "tracers_color_ID", u8(-1));
@@ -441,6 +445,14 @@ void CWeapon::Load		(LPCSTR section)
 		m_hit_probability[i]		= READ_IF_EXISTS(pSettings,r_float,section,temp,1.f);
 	}
 
+
+	// mmccxvii: FWR code
+	//*
+	sndExplosion.create(READ_IF_EXISTS(pSettings, r_string, section, "snd_explosion", "weapon\\weapon_explosion"), st_Effect, sg_SourceType);
+	ppeExplosion = READ_IF_EXISTS(pSettings, r_string, section, "ppe_explosion", "ppe\\weapon_explosion.ppe");
+	//*
+	
+	
     m_hud_fov_add_mod = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov_addition_modifier", 0.f);
 
     m_nearwall_dist_min       = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_min", 0.5f);
@@ -1349,6 +1361,11 @@ void CWeapon::OnZoomOut()
 	ResetSubStateTime					();
 }
 
+bool CWeapon::UseScopeTexture() {
+	return (( GetAddonsState() & ALife::eForcedNotexScope ) == 0) 
+		&& m_UIScope; // только если есть текстура прицела - для простого создания коллиматоров
+};
+
 CUIWindow* CWeapon::ZoomTexture()
 {
 	if (UseScopeTexture())
@@ -1540,6 +1557,14 @@ const CInventoryItem *CWeapon::can_kill	(const xr_vector<const CGameObject*> &it
 
 bool CWeapon::ready_to_kill	() const
 {
+	//Alundaio
+	const CInventoryOwner* io = smart_cast<const CInventoryOwner*>(H_Parent());
+	if (!io)
+		return false;
+
+	if (io->inventory().ActiveItem() == NULL || io->inventory().ActiveItem()->object().ID() != ID())
+		return false; 
+	//-Alundaio
 	return					(
 		!IsMisfire() && 
 		((GetState() == eIdle) || (GetState() == eFire) || (GetState() == eFire2)) && 
@@ -1596,25 +1621,25 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 	//clamp(idx, u8(0), u8(1));
 	clamp(idx, 0ui8, 1ui8);
 
-	float fStrafeMaxTime = hi->m_measures.m_strafe_offset[2][idx].y; 
+	float fStrafeMaxTime = hi->m_measures.m_strafe_offset[2][idx].y; // ????. ????? ? ????????, ?? ??????? ?? ?????????? ?? ???????????? ?????????
 	if (fStrafeMaxTime <= EPS)
 		fStrafeMaxTime = 0.01f;
 
-    float fStepPerUpd = Device.fTimeDelta / fStrafeMaxTime;
+	float fStepPerUpd = Device.fTimeDelta / fStrafeMaxTime; // ???????? ????????? ??????? ????????
 
 	u32 iMovingState = pActor->MovingState();
 	if ((iMovingState & mcLStrafe) != 0)
-	{
-        float fVal = (m_fLR_MovingFactor > 0.f ? fStepPerUpd * 3 : fStepPerUpd);
+	{ // ???????? ?????
+		float fVal = (m_fLR_MovingFactor > 0.f ? fStepPerUpd * 3 : fStepPerUpd);
 		m_fLR_MovingFactor -= fVal;
 	}
 	else if ((iMovingState & mcRStrafe) != 0)
-	{ 
-        float fVal = (m_fLR_MovingFactor < 0.f ? fStepPerUpd * 3 : fStepPerUpd);
+	{ // ???????? ??????
+		float fVal = (m_fLR_MovingFactor < 0.f ? fStepPerUpd * 3 : fStepPerUpd);
 		m_fLR_MovingFactor += fVal;
 	}
 	else
-	{
+	{ // ????????? ? ????? ?????? ???????????
 		if (m_fLR_MovingFactor < 0.0f)
 		{
 			m_fLR_MovingFactor += fStepPerUpd;
@@ -1627,8 +1652,9 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 		}
 	}
 
-	clamp(m_fLR_MovingFactor, -1.0f, 1.0f); 
+	clamp(m_fLR_MovingFactor, -1.0f, 1.0f); // ?????? ??????? ?????? ?? ?????? ????????? ??? ??????
 
+	// ?????????? ?????? ?????? ??? ??????????? ?????? ? ????
 	for (int _idx = 0; _idx <= 1; _idx++)
 	{
         bool bEnabled = (hi->m_measures.m_strafe_offset[2][_idx].x != 0.0f);
@@ -1637,20 +1663,22 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 
 		Fvector curr_offs, curr_rot;
 
+		// ???????? ??????? ???? ? ???????
         curr_offs = hi->m_measures.m_strafe_offset[0][_idx]; // pos
-		curr_offs.mul(m_fLR_MovingFactor);                   
+		curr_offs.mul(m_fLR_MovingFactor);                   // ???????? ?? ?????? ???????
 
+		// ??????? ???? ? ???????
         curr_rot = hi->m_measures.m_strafe_offset[1][_idx]; // rot
-		curr_rot.mul(-PI / 180.f);                          
-		curr_rot.mul(m_fLR_MovingFactor);                   
+		curr_rot.mul(-PI / 180.f);                          // ??????????? ???? ? ???????
+		curr_rot.mul(m_fLR_MovingFactor);                   // ???????? ?? ?????? ???????
 
 		if (_idx == 0)
-		{ 
+		{ // ?? ?????
             curr_offs.mul(1.f - m_zoom_params.m_fZoomRotationFactor);
             curr_rot.mul(1.f - m_zoom_params.m_fZoomRotationFactor);
         }
         else
-        { 
+        { // ?? ????? ????
             curr_offs.mul(m_zoom_params.m_fZoomRotationFactor);
             curr_rot.mul(m_zoom_params.m_fZoomRotationFactor);
 		}
@@ -1803,8 +1831,14 @@ BOOL CWeapon::ParentMayHaveAimBullet	()
 
 BOOL CWeapon::ParentIsActor	()
 {
-	CObject* O=H_Parent();
-	CEntityAlive* EA=smart_cast<CEntityAlive*>(O);
+	CObject* O			= H_Parent();
+	if (!O)
+		return FALSE;
+
+	CEntityAlive* EA	= smart_cast<CEntityAlive*>(O);
+	if (!EA)
+		return FALSE;
+
 	return EA->cast_actor()!=0;
 }
 
@@ -1840,15 +1874,27 @@ void CWeapon::OnStateSwitch	(u32 S)
 	inherited::OnStateSwitch(S);
 	m_dwAmmoCurrentCalcFrame = 0;
 
-	if(GetState()==eReload)
-	{
-		if(H_Parent()==Level().CurrentEntity() && !fsimilar(m_zoom_params.m_ReloadDof.w,-1.0f))
-		{
-			CActor* current_actor	= smart_cast<CActor*>(H_Parent());
-			if (current_actor)
-				current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(m_zoom_params.m_ReloadDof) );
-		}
-	}
+    if (GetState() == eReload)
+    {
+        if (iAmmoElapsed == 0) //Swartz: re-written to use reload empty DOF
+        {
+            if (H_Parent() == Level().CurrentEntity() && !fsimilar(m_zoom_params.m_ReloadEmptyDof.w, -1.0f))
+            {
+                CActor* current_actor = smart_cast<CActor*>(H_Parent());
+                if (current_actor)
+                    current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(m_zoom_params.m_ReloadEmptyDof));
+            }
+        }
+        else
+        {
+            if (H_Parent() == Level().CurrentEntity() && !fsimilar(m_zoom_params.m_ReloadDof.w, -1.0f))
+            {
+                CActor* current_actor = smart_cast<CActor*>(H_Parent());
+                if (current_actor)
+                    current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(m_zoom_params.m_ReloadDof));
+            }
+        }
+    }
 }
 
 void CWeapon::OnAnimationEnd(u32 state) 

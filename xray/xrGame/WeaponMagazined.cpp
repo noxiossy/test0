@@ -69,9 +69,26 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	m_sounds.LoadSound(section,"snd_shoot", "sndShot"		, m_eSoundShot		);
 	m_sounds.LoadSound(section,"snd_empty", "sndEmptyClick"	, m_eSoundEmptyClick	);
 	m_sounds.LoadSound(section,"snd_reload", "sndReload"		, m_eSoundReload		);
-	
-	m_sSndShotCurrent = "sndShot";
-		
+
+	// mmccxvii: FWR code
+	//*
+	if (WeaponSoundExist(section, "snd_fire_modes"))
+	{
+		m_sounds.LoadSound(section, "snd_fire_modes", "sndFireModes", m_eSoundEmptyClick);
+	}
+
+	if (WeaponSoundExist(section, "snd_reload_empty"))
+	{
+		m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", m_eSoundReloadEmpty);
+	}
+
+	if (WeaponSoundExist(section, "snd_reload_misfire"))
+	{
+		m_sounds.LoadSound(section, "snd_reload_misfire", "sndReloadMisfire", m_eSoundReloadMisfire);
+	}
+	//*
+    m_sSndShotCurrent = IsSilencerAttached() ? "sndSilencerShot" : "sndShot";
+
 	//звуки и партиклы глушителя, еслит такой есть
 	if ( m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent )
 	{
@@ -152,9 +169,9 @@ void CWeaponMagazined::FireEnd()
 {
 	inherited::FireEnd();
 
-	CActor	*actor = smart_cast<CActor*>(H_Parent());
+	/*CActor	*actor = smart_cast<CActor*>(H_Parent());
 	if(!iAmmoElapsed && actor && GetState()!=eReload) 
-		Reload();
+		Reload();*/  LR_DEVS CHECK
 }
 
 void CWeaponMagazined::Reload() 
@@ -262,8 +279,11 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 
 		if(l_it == l_ammo.end()) l_ammo[*l_cartridge.m_ammoSect] = 1;
 		m_magazine.pop_back(); 
-		--iAmmoElapsed;
-	}
+		if (iAmmoElapsed > 0)
+		{
+			--iAmmoElapsed;
+		}
+    }
 
 	VERIFY((u32)iAmmoElapsed == m_magazine.size());
 	
@@ -273,12 +293,15 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 	xr_map<LPCSTR, u16>::iterator l_it;
 	for(l_it = l_ammo.begin(); l_ammo.end() != l_it; ++l_it) 
 	{
-		CWeaponAmmo *l_pA = smart_cast<CWeaponAmmo*>(m_pInventory->GetAny(l_it->first));
-		if(l_pA) 
+		if(m_pInventory)
 		{
-			u16 l_free = l_pA->m_boxSize - l_pA->m_boxCurr;
-			l_pA->m_boxCurr = l_pA->m_boxCurr + (l_free < l_it->second ? l_free : l_it->second);
-			l_it->second = l_it->second - (l_free < l_it->second ? l_free : l_it->second);
+			CWeaponAmmo *l_pA = smart_cast<CWeaponAmmo*>(m_pInventory->GetAny(l_it->first));
+			if(l_pA) 
+			{
+				u16 l_free = l_pA->m_boxSize - l_pA->m_boxCurr;
+				l_pA->m_boxCurr = l_pA->m_boxCurr + (l_free < l_it->second ? l_free : l_it->second);
+				l_it->second = l_it->second - (l_free < l_it->second ? l_free : l_it->second);
+			}
 		}
 		if(l_it->second && !unlimited_ammo()) SpawnAmmo(l_it->second, l_it->first);
 	}
@@ -289,8 +312,20 @@ void CWeaponMagazined::ReloadMagazine()
 	m_dwAmmoCurrentCalcFrame = 0;	
 
 	//устранить осечку при перезарядке
-	if(IsMisfire())	bMisfire = false;
-	
+	if (IsMisfire())
+	{
+		bMisfire = false;
+
+		// mmccxvii: FWR code
+		//**
+		if (iAmmoElapsed > 0)
+		{
+			--iAmmoElapsed;
+		}
+		return;
+		//*
+	}
+
 	if (!m_bLockType) {
 		m_ammoName	= NULL;
 		m_pAmmo		= NULL;
@@ -449,6 +484,24 @@ void CWeaponMagazined::UpdateSounds	()
 //. nah	m_sounds.SetPosition("sndShot", P);
 	m_sounds.SetPosition("sndReload", P);
 //. nah	m_sounds.SetPosition("sndEmptyClick", P);
+
+	// mmccxvii: FWR code
+	//*
+	if (m_sounds.FindSoundItem("sndFireModes", false))
+	{
+		m_sounds.SetPosition("sndFireModes", P);
+	}
+
+	if (m_sounds.FindSoundItem("sndReloadEmpty", false))
+	{
+		m_sounds.SetPosition("sndReloadEmpty", P);
+	}
+
+	if (m_sounds.FindSoundItem("sndReloadMisfire", false))
+	{
+		m_sounds.SetPosition("sndReloadMisfire", P);
+	}
+	//*
 }
 
 void CWeaponMagazined::state_Fire(float dt)
@@ -456,38 +509,38 @@ void CWeaponMagazined::state_Fire(float dt)
 	if(iAmmoElapsed > 0)
 	{
 		VERIFY(fOneShotTime>0.f);
-
-		Fvector					p1, d; 
-		p1.set(get_LastFP());
-		d.set(get_LastFD());
-
-		if (!H_Parent()) return;
-		if (smart_cast<CMPPlayersBag*>(H_Parent()) != NULL)
+		
+        if (!H_Parent())
 		{
-			Msg("! WARNING: state_Fire of object [%d][%s] while parent is CMPPlayerBag...", ID(), cNameSect().c_str());
+			StopShooting();
 			return;
 		}
 
 		CInventoryOwner* io		= smart_cast<CInventoryOwner*>(H_Parent());
-		if(NULL == io->inventory().ActiveItem())
-		{
-				Log("current_state", GetState() );
-				Log("next_state", GetNextState());
-				Log("item_sect", cNameSect().c_str());
-				Log("H_Parent", H_Parent()->cNameSect().c_str());
+        if (!io->inventory().ActiveItem())
+        {
+			StopShooting();
+			return; //Alundaio: This is not supposed to happen but it does. GSC was aware but why no return here? Known to cause crash on game load if npc immediatly enters combat.
 		}
 
 		CEntity* E = smart_cast<CEntity*>(H_Parent());
-		E->g_fireParams	(this, p1,d);
+        if (!E->g_stateFire())
+		{
+            StopShooting();
+			return;
+		}
 
-		if( !E->g_stateFire() )
-			StopShooting();
-
+		Fvector p1, d;
+        p1.set(get_LastFP());
+        d.set(get_LastFD());
+		
+        
+        E->g_fireParams(this, p1, d);
 		if (m_iShotNum == 0)
 		{
 			m_vStartPos = p1;
 			m_vStartDir = d;
-		};
+        }
 		
 		VERIFY(!m_magazine.empty());
 
@@ -497,12 +550,6 @@ void CWeaponMagazined::state_Fire(float dt)
 				(m_iQueueSize<0 || m_iShotNum<m_iQueueSize)
 			   )
 		{
-			if( CheckForMisfire() )
-			{
-				StopShooting();
-				return;
-			}
-
 			m_bFireSingleShot		= false;
 
 			fShotTimeCounter		+=	fOneShotTime;
@@ -515,8 +562,14 @@ void CWeaponMagazined::state_Fire(float dt)
 				FireTrace		(p1,d);
 			else
 				FireTrace		(m_vStartPos, m_vStartDir);
-		}
-	
+
+			if (CheckForMisfire())
+			{
+				StopShooting();
+				return;
+			}
+        }
+
 		if(m_iShotNum == m_iQueueSize)
 			m_bStopedAfterQueueFired = true;
 
@@ -622,13 +675,16 @@ void CWeaponMagazined::switch2_Idle	()
 void CWeaponMagazined::switch2_Fire	()
 {
 	CInventoryOwner* io		= smart_cast<CInventoryOwner*>(H_Parent());
+	if (!io)
+		return;
+
 	CInventoryItem* ii		= smart_cast<CInventoryItem*>(this);
-#ifdef DEBUG
-	VERIFY2					(io,make_string("no inventory owner, item %s",*cName()));
-
 	if (ii != io->inventory().ActiveItem())
-		Msg					("! not an active item, item %s, owner %s, active item %s",*cName(),*H_Parent()->cName(),io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");
-
+	{
+		Msg("WARNING: Not an active item, item %s, owner %s, active item %s", *cName(), *H_Parent()->cName(), io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");	
+		return;
+	}
+#ifdef DEBUG
 	if ( !(io && (ii == io->inventory().ActiveItem())) ) 
 	{
 		CAI_Stalker			*stalker = smart_cast<CAI_Stalker*>(H_Parent());
@@ -638,9 +694,6 @@ void CWeaponMagazined::switch2_Fire	()
 			stalker->planner().show_target_world_state	();
 		}
 	}
-#else
-	if (!io)
-		return;
 #endif // DEBUG
 
 //
@@ -666,14 +719,14 @@ void CWeaponMagazined::switch2_Empty()
 {
 	OnZoomOut();
 	
-	if(!TryReload())
-	{
+	//if(!TryReload())
+	//{
 		OnEmptyClick();
-	}
+	/*}
 	else
 	{
 		inherited::FireEnd();
-	}
+	}*/
 }
 void CWeaponMagazined::PlayReloadSound()
 {
@@ -1006,7 +1059,9 @@ void CWeaponMagazined::PlayAnimHide()
 
 void CWeaponMagazined::PlayAnimReload()
 {
-	VERIFY(GetState()==eReload);
+	if (GetState() != eReload)
+		return;
+
 	PlayHUDMotion("anm_reload", TRUE, this, GetState());
 }
 
@@ -1017,7 +1072,7 @@ void CWeaponMagazined::PlayAnimAim()
 
 void CWeaponMagazined::PlayAnimIdle()
 {
-	VERIFY(GetState()==eIdle);
+	if(GetState()!=eIdle)	return;
 	if(IsZoomed())
 	{
 		PlayAnimAim();

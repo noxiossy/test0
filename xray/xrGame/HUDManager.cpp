@@ -12,6 +12,7 @@
 #include "UIGameCustom.h"
 #include "UICursor.h"
 #include "string_table.h"
+#include "Level.h"
 #ifdef	DEBUG
 #include "phdebug.h"
 #endif
@@ -377,4 +378,12 @@ void CHUDManager::net_Relcase( CObject* obj )
 #ifdef	DEBUG
 	DBG_PH_NetRelcase( obj );
 #endif
+}
+
+CDialogHolder* CurrentDialogHolder()
+{
+    if (MainMenu()->IsActive())
+        return MainMenu();
+    else
+        return HUD().GetUI();
 }
