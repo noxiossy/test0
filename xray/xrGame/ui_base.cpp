@@ -151,8 +151,7 @@ void ui_core::PushScissor(const Frect& r_tgt, bool overlapped)
 	if(UI()->m_currentPointType==IUIRender::pttLIT)
 		return;
 
-//	return;
-	Frect r_top			= ScreenRect();
+	Frect r_top			= {0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT};
 	Frect result		= r_tgt;
 	if (!m_Scissors.empty()&&!overlapped){
 		r_top			= m_Scissors.top();
@@ -255,7 +254,21 @@ void ui_core::RenderFont()
 
 bool ui_core::is_16_9_mode()
 {
-	return (Device.dwWidth)/float(Device.dwHeight) > (UI_BASE_WIDTH/UI_BASE_HEIGHT +0.01f);
+	return (float(Device.dwWidth)/float(Device.dwHeight)) > (UI_BASE_WIDTH/UI_BASE_HEIGHT +0.01f);
+}
+
+bool ui_core::is_widescreen()
+{
+	return (float(Device.dwWidth)/float(Device.dwHeight)) > (UI_BASE_WIDTH/UI_BASE_HEIGHT +0.01f);
+}
+
+float ui_core::get_current_kx()
+{
+	float h = float(Device.dwHeight);
+	float w = float(Device.dwWidth);
+
+	float res = (h / w) / (UI_BASE_HEIGHT / UI_BASE_WIDTH);
+	return res;
 }
 
 shared_str	ui_core::get_xml_name(LPCSTR fn)
@@ -285,13 +298,4 @@ shared_str	ui_core::get_xml_name(LPCSTR fn)
 #endif // #ifdef DEBUG
 	}
 	return str;
-}
-
-float ui_core::get_current_kx()
-{
-	float h = float(Device.dwHeight);
-	float w = float(Device.dwWidth);
-
-	float res = (h / w) / (UI_BASE_HEIGHT / UI_BASE_WIDTH);
-	return res;
 }

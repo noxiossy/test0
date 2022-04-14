@@ -172,12 +172,12 @@ void CUIDialogWnd::Update(){
 	CUIWindow::Update();
 }
 
-//CDialogHolder* CurrentDialogHolder();
+CDialogHolder* CurrentDialogHolder();
 
 void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 {
-	//if(!IsShown())
-		//CurrentDialogHolder()->StartDialog(this,bDoHideIndicators);
+	if(!IsShown())
+		CurrentDialogHolder()->StartDialog(this,bDoHideIndicators);
 }
 void CUIDialogWnd::HideDialog()
 {

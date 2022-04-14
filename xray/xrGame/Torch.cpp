@@ -240,8 +240,15 @@ void CTorch::Switch	(bool light_on)
 
 	if (*light_trace_bone) 
 	{
-		IKinematics* pVisual				= smart_cast<IKinematics*>(Visual()); VERIFY(pVisual);
+		IKinematics* pVisual				= smart_cast<IKinematics*>(Visual());
+
+		if (!pVisual)
+			return;
+
 		u16 bi								= pVisual->LL_BoneID(light_trace_bone);
+
+		if (bi == BI_NONE)
+			return;
 
 		pVisual->LL_SetBoneVisible			(bi,	light_on,	TRUE);
 		pVisual->CalculateBones				(TRUE);
@@ -513,10 +520,13 @@ void CTorch::net_Import			(NET_Packet& P)
 	{
 //		Msg("CTorch::net_Import - NV[%d]", new_m_bNightVisionOn);
 
-		SwitchNightVision			(new_m_bNightVisionOn);
+		const CActor *pA = smart_cast<const CActor *>(H_Parent());
+		if (pA)
+		{
+			SwitchNightVision			(new_m_bNightVisionOn);
+		}
 	}
 }
-
 bool  CTorch::can_be_attached		() const
 {
 //	if( !inherited::can_be_attached() ) return false;

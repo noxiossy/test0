@@ -73,6 +73,13 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
 	CEntityAlive* EA			= smart_cast<CEntityAlive*>(Level().CurrentEntity());
 	if (!EA || !EA->g_Alive() )	return false;
 
+	CActor *pActor = smart_cast<CActor*>(pInvOwner);
+	if( !pActor ) 
+		return false;
+
+	if( !pActor->g_Alive() )	
+		return false;
+
 	switch ( get_binded_action(dik) )
 	{
 	case kACTIVE_JOBS:
@@ -156,6 +163,9 @@ void  CUIGameSP::StartUpgrade(CInventoryOwner* pActorInv, CInventoryOwner* pMech
 
 void CUIGameSP::StartTalk(bool disable_break)
 {
+	RemoveCustomStatic		("main_task");
+	RemoveCustomStatic		("secondary_task");
+
 	TalkMenu->b_disable_break = disable_break;
 	m_game->StartStopMenu(TalkMenu, true);
 }
