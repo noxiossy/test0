@@ -90,7 +90,8 @@ void	CResourceManager::ED_UpdateBlender	(LPCSTR Name, IBlender* data)
 //////////////////////////////////////////////////////////////////////
 void	CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 {
-	if (0==names) 		names 	= "$null";
+	if (0==names || 0==names[0])
+ 		names 	= "$null";
 
 	dest.clear();
 	char*	P			= (char*) names;
@@ -367,6 +368,7 @@ void	CResourceManager::_DumpMemoryUsage		()
 	}
 
 	// dump
+	if (Core.ParamFlags.test(Core.lr_fulllog))
 	{
 		xr_multimap<u32,std::pair<u32,shared_str> >::iterator I = mtex.begin	();
 		xr_multimap<u32,std::pair<u32,shared_str> >::iterator E = mtex.end		();

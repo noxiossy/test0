@@ -56,7 +56,8 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
 			STextureParams::ttTerrain	== tp.type ||
 			STextureParams::ttNormalMap	== tp.type	)
 		{
-		texture_desc& desc		 = m_texture_details[fn];
+			texture_desc&	desc	= m_texture_details[fn];
+			cl_dt_scaler*&	dts		= m_detail_scalers[fn];
 
 			if( tp.detail_name.size() &&
 				tp.flags.is_any(STextureParams::flDiffuseDetail|STextureParams::flBumpDetail) )
@@ -66,7 +67,11 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
 
 				desc.m_assoc				= xr_new<texture_assoc>();
 				desc.m_assoc->detail_name	= tp.detail_name;
-				desc.m_assoc->cs			= xr_new<cl_dt_scaler>(tp.detail_scale);
+				if (dts)
+					dts->scale = tp.detail_scale;
+				else
+					/*desc.m_assoc->cs*/dts	= xr_new<cl_dt_scaler>(tp.detail_scale);
+
 				desc.m_assoc->usage			= 0;
 				
 				if( tp.flags.is(STextureParams::flDiffuseDetail) )
@@ -122,6 +127,17 @@ void CTextureDescrMngr::UnLoad()
 		xr_delete(I->second.m_spec);
 	}
 	m_texture_details.clear	();
+}
+
+CTextureDescrMngr::~CTextureDescrMngr()
+{
+	auto I = m_detail_scalers.begin();
+	auto E = m_detail_scalers.end();
+
+	for(;I!=E;++I)
+		xr_delete(I->second);
+
+	m_detail_scalers.clear	();
 }
 
 shared_str CTextureDescrMngr::GetBumpName(const shared_str& tex_name) const
@@ -184,9 +200,10 @@ BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res
 	{
 		if(I->second.m_assoc)
 		{
-                        texture_assoc* TA = I->second.m_assoc;
+            texture_assoc* TA = I->second.m_assoc;
 			res	= TA->detail_name.c_str();
-			CS	= TA->cs;
+			auto It2 = m_detail_scalers.find(tex_name);
+			CS	= It2==m_detail_scalers.end()?0:It2->second;//TA->cs;
 			return TRUE;
 		}
 	}
