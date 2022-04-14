@@ -133,7 +133,16 @@ public:
 			void	OnNextFireMode		();
 			void	OnPrevFireMode		();
 			bool	HasFireModes		() { return m_bHasDifferentFireModes; };
-	virtual	int		GetCurrentFireMode	() { return m_aFireModes[m_iCurFireMode]; };	
+
+    virtual	int		GetCurrentFireMode()
+    {
+        //AVO: fixed crash due to original GSC assumption that CWeaponMagazined will always have firemodes specified in configs.
+        //return m_aFireModes[m_iCurFireMode];
+        if (HasFireModes())
+            return m_aFireModes[m_iCurFireMode];
+        else
+            return 1;
+    };
 
 	virtual void	save				(NET_Packet &output_packet);
 	virtual void	load				(IReader &input_packet);

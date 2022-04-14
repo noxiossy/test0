@@ -34,6 +34,7 @@ public:
 							CWeapon				();
 	virtual					~CWeapon			();
 
+	bool			bScopeIsHasTexture;
 	// Generic
 	virtual void			Load				(LPCSTR section);
 
@@ -207,7 +208,7 @@ protected:
 		
 		Fvector			m_ZoomDof;
 		Fvector4		m_ReloadDof;
-
+        Fvector4		m_ReloadEmptyDof; //Swartz: reload when empty mag. DOF
 	} m_zoom_params;
 	
 	CUIWindow*				m_UIScope;

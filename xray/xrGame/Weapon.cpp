@@ -72,6 +72,7 @@ CWeapon::CWeapon()
 	m_set_next_ammoType_on_reload = u32(-1);
 	m_crosshair_inertion	= 0.f;
 	
+	bScopeIsHasTexture = false;
 	m_nearwall_last_hud_fov = psHUD_FOV_def;
 }
 
@@ -448,8 +449,8 @@ void CWeapon::Load		(LPCSTR section)
 
 	// mmccxvii: FWR code
 	//*
-	sndExplosion.create(READ_IF_EXISTS(pSettings, r_string, section, "snd_explosion", "weapon\\weapon_explosion"), st_Effect, sg_SourceType);
-	ppeExplosion = READ_IF_EXISTS(pSettings, r_string, section, "ppe_explosion", "ppe\\weapon_explosion.ppe");
+	//sndExplosion.create(READ_IF_EXISTS(pSettings, r_string, section, "snd_explosion", "weapon\\weapon_explosion"), st_Effect, sg_SourceType);
+	//ppeExplosion = READ_IF_EXISTS(pSettings, r_string, section, "ppe_explosion", "ppe\\weapon_explosion.ppe");
 	//*
 	
 	
@@ -1361,10 +1362,10 @@ void CWeapon::OnZoomOut()
 	ResetSubStateTime					();
 }
 
-bool CWeapon::UseScopeTexture() {
+/*bool CWeapon::UseScopeTexture() {
 	return (( GetAddonsState() & ALife::eForcedNotexScope ) == 0) 
 		&& m_UIScope; // только если есть текстура прицела - для простого создания коллиматоров
-};
+};*/
 
 CUIWindow* CWeapon::ZoomTexture()
 {
