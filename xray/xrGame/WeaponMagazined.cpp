@@ -58,6 +58,22 @@ void CWeaponMagazined::net_Destroy()
 	inherited::net_Destroy();
 }
 
+//AVO: for custom added sounds check if sound exists
+bool CWeaponMagazined::WeaponSoundExist(LPCSTR section, LPCSTR sound_name)
+{
+    LPCSTR str;
+    bool sec_exist = process_if_exists_set(section, sound_name, &CInifile::r_string, str, true);
+    if (sec_exist)
+        return true;
+    else
+    {
+#ifdef DEBUG
+        Msg("~ [WARNING] ------ Sound [%s] does not exist in [%s]", sound_name, section);
+#endif
+        return false;
+    }
+}
+//-AVO
 
 void CWeaponMagazined::Load	(LPCSTR section)
 {
@@ -171,7 +187,7 @@ void CWeaponMagazined::FireEnd()
 
 	/*CActor	*actor = smart_cast<CActor*>(H_Parent());
 	if(!iAmmoElapsed && actor && GetState()!=eReload) 
-		Reload();*/  LR_DEVS CHECK
+		Reload();*/  //LR_DEVS CHECK
 }
 
 void CWeaponMagazined::Reload() 
@@ -188,7 +204,7 @@ bool CWeaponMagazined::TryReload()
 {
 	if(m_pInventory) 
 	{
-		if(IsGameTypeSingle() && ParentIsActor())
+        if (ParentIsActor())
 		{
 			int	AC					= GetSuitableAmmoTotal();
 			Actor()->callback(GameObject::eWeaponNoAmmoAvailable)(lua_game_object(), AC);

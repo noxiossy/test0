@@ -277,7 +277,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 		);*/
 		if (prev_obj != NULL)
 		{
-			Msg("ERROR: CGameObject:net_spawn() Object with ID already exists! ID=%d self=%s other=%s", E->ID, *(cName()), *(o->cName()));
+			Msg("ERROR: CGameObject:net_spawn() Object with ID already exists! ID=%d self=%s other=%s", E->ID, *(cName()), *(prev_obj->cName()));
 			return false;
 		}
 
