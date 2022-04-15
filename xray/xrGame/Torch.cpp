@@ -207,6 +207,8 @@ bool CTorch::Broken(bool fatal) const
 void CTorch::Switch()
 {
 	if (OnClient()) return;
+	if (!m_switched_on && m_is_broken) return;
+
 	bool bActive			= !m_switched_on;
 	Switch					(bActive);
 }
@@ -358,10 +360,18 @@ void CTorch::UpdateCL()
 			M.c.y	+= H_Parent()->Radius	()*2.f/3.f;
 		}
 
-		if (actor) 
+		if (actor && actor->g_Alive())
 		{
-			m_prev_hp.x		= angle_inertion_var(m_prev_hp.x,-actor->cam_FirstEye()->yaw,TORCH_INERTION_SPEED_MIN,TORCH_INERTION_SPEED_MAX,TORCH_INERTION_CLAMP,Device.fTimeDelta);
-			m_prev_hp.y		= angle_inertion_var(m_prev_hp.y,-actor->cam_FirstEye()->pitch,TORCH_INERTION_SPEED_MIN,TORCH_INERTION_SPEED_MAX,TORCH_INERTION_CLAMP,Device.fTimeDelta);
+			if (actor->active_cam() == eacLookAt)
+			{
+				m_prev_hp.x		= angle_inertion_var(m_prev_hp.x,-actor->cam_Active()->yaw,TORCH_INERTION_SPEED_MIN,TORCH_INERTION_SPEED_MAX,TORCH_INERTION_CLAMP,Device.fTimeDelta);
+				m_prev_hp.y		= angle_inertion_var(m_prev_hp.y,-actor->cam_Active()->pitch,TORCH_INERTION_SPEED_MIN,TORCH_INERTION_SPEED_MAX,TORCH_INERTION_CLAMP,Device.fTimeDelta);
+			}
+			else
+			{
+				m_prev_hp.x		= angle_inertion_var(m_prev_hp.x,-actor->cam_FirstEye()->yaw,TORCH_INERTION_SPEED_MIN,TORCH_INERTION_SPEED_MAX,TORCH_INERTION_CLAMP,Device.fTimeDelta);
+				m_prev_hp.y		= angle_inertion_var(m_prev_hp.y,-actor->cam_FirstEye()->pitch,TORCH_INERTION_SPEED_MIN,TORCH_INERTION_SPEED_MAX,TORCH_INERTION_CLAMP,Device.fTimeDelta);
+			}
 
 			Fvector			dir,right,up;	
 			dir.setHP		(m_prev_hp.x+m_delta_h,m_prev_hp.y);

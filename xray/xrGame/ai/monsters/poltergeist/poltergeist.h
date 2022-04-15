@@ -10,6 +10,13 @@ class CPoltergeisMovementManager;
 class CPolterSpecialAbility;
 
 //////////////////////////////////////////////////////////////////////////
+enum EPolterSounds
+{
+	eSndDeath,
+	eSndDeathHidden,
+	eSndHit,
+	eSndHitHidden,
+};
 
 class CPoltergeist :	public CBaseMonster ,
 						public CTelekinesis,
@@ -22,6 +29,8 @@ class CPoltergeist :	public CBaseMonster ,
 
 	float					m_height;
 	bool					m_disable_hide;
+
+	ref_sound				m_strange_sound;
 
 	SMotionVel				invisible_vel;
 
@@ -42,6 +51,10 @@ public:
 
 					CPoltergeist		();
 	virtual			~CPoltergeist		();	
+
+	// Poltergeist ability
+			void	PhysicalImpulse		(const Fvector &position);
+			void	StrangeSounds		(const Fvector &position);
 
 	virtual void	Load				(LPCSTR section);
 	virtual void	reload				(LPCSTR section);
@@ -69,13 +82,6 @@ public:
 	
 	
 	IC		bool	is_hidden			() {return state_invisible;}
-
-	
-	// Poltergeist ability
-			void	PhysicalImpulse		(const Fvector &position);
-			void	StrangeSounds		(const Fvector &position);
-			
-			ref_sound m_strange_sound;
 	
 	// Movement
 			Fvector m_current_position;		// Позиция на ноде
@@ -119,6 +125,7 @@ class CPolterSpecialAbility {
 	CParticlesObject	*m_particles_object;
 	CParticlesObject	*m_particles_object_electro;
 
+	LPCSTR				m_particles_show;
 	LPCSTR				m_particles_hidden;
 	LPCSTR				m_particles_damage;
 	LPCSTR				m_particles_death;

@@ -4,7 +4,7 @@
 #include "../../../level.h"
 #include "../../../material_manager.h"
 #include "../../../level_debug.h"
-
+#include "sound_player.h"
 
 CPolterSpecialAbility::CPolterSpecialAbility(CPoltergeist *polter)
 {
@@ -19,10 +19,12 @@ CPolterSpecialAbility::~CPolterSpecialAbility()
 {
 	CParticlesObject::Destroy	(m_particles_object);
 	CParticlesObject::Destroy	(m_particles_object_electro);
+	m_sound_base.destroy		();
 }
 
 void CPolterSpecialAbility::load(LPCSTR section)
 {
+	m_particles_show			= pSettings->r_string(section,"Particles_Show");
 	m_particles_hidden					= pSettings->r_string(section,"Particles_Hidden");
 	m_particles_damage					= pSettings->r_string(section,"Particles_Damage");
 	m_particles_death					= pSettings->r_string(section,"Particles_Death");
@@ -52,6 +54,8 @@ void CPolterSpecialAbility::on_hide()
 
 void CPolterSpecialAbility::on_show()
 {
+	m_object->PlayParticles(m_particles_show, m_object->Position(), Fvector().set(0.0f, 1.0f, 0.0f), TRUE, FALSE);
+
 	if (m_particles_object)			CParticlesObject::Destroy(m_particles_object);
 	if (m_particles_object_electro) CParticlesObject::Destroy(m_particles_object_electro);
 }
@@ -67,10 +71,12 @@ void CPolterSpecialAbility::on_die()
 	Fvector particles_position	= m_object->m_current_position;
 	particles_position.y		+= m_object->target_height;
 
+	m_object->m_sound_player->play	(EPolterSounds::eSndDeathHidden);
 	m_object->PlayParticles			(m_particles_death, particles_position, Fvector().set(0.0f,1.0f,0.0f), TRUE, FALSE);
 
 	CParticlesObject::Destroy		(m_particles_object_electro);
 	CParticlesObject::Destroy		(m_particles_object);
+	m_sound_base.destroy			();
 }
 
 void CPolterSpecialAbility::on_hit(SHit* pHDS)
@@ -86,6 +92,7 @@ void CPolterSpecialAbility::on_hit(SHit* pHDS)
 			m_bone.transform_tiny	(start_pos);
 			m_object->XFORM().transform_tiny	(start_pos);
 
+			m_object->m_sound_player->play(EPolterSounds::eSndHitHidden);
 			m_object->PlayParticles(m_particles_damage, start_pos, Fvector().set(0.f,1.f,0.f));
 		}
 	} 

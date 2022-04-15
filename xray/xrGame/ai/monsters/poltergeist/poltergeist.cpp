@@ -117,6 +117,14 @@ void CPoltergeist::Load(LPCSTR section)
 		m_tele->load	(section);
 	}
 	
+	// ZergO: уникальные звуки в зависимости от состояния
+	const int count = DEFAULT_SAMPLE_COUNT;
+	LPCSTR bone = "bip01_head";
+
+	m_sound_player->add("Sound_Death",		  count, SOUND_TYPE_MONSTER_DYING,		MonsterSound::eCriticalPriority,	u32(MonsterSound::eCaptureAllChannels),	EPolterSounds::eSndDeath, bone);
+	m_sound_player->add("Sound_Hidden_Death", count, SOUND_TYPE_MONSTER_DYING,		MonsterSound::eCriticalPriority,	u32(MonsterSound::eCaptureAllChannels),	EPolterSounds::eSndDeathHidden, bone);
+	m_sound_player->add("Sound_Hit",		  count, SOUND_TYPE_MONSTER_INJURING,	MonsterSound::eHighPriority,		u32(MonsterSound::eCaptureAllChannels),	EPolterSounds::eSndHit, bone);
+	m_sound_player->add("Sound_Hidden_Hit",	  count, SOUND_TYPE_MONSTER_INJURING,	MonsterSound::eHighPriority,		u32(MonsterSound::eCaptureAllChannels),	EPolterSounds::eSndHitHidden, bone);
 
 	// рандомные звуки и прочее запугивание игрока
 	m_scare_delay.min		= READ_IF_EXISTS(pSettings, r_u32, section, "Delay_Scare_Min", 15000);
@@ -255,6 +263,8 @@ void CPoltergeist::Die(CObject* who)
 				Position() = m_current_position;
 		}
 	}
+	else
+		m_sound_player->play(EPolterSounds::eSndDeath);
 
 	inherited::Die				(who);
 	Energy::disable				();
@@ -265,12 +275,15 @@ void CPoltergeist::Die(CObject* who)
 
 void CPoltergeist::Hit(SHit* pHDS)
 {
+	// ZergO: пули пролетаеют сквозь него, когда полтергейст в состоянии энергии
 	if (state_invisible)
 		ability()->on_hit(pHDS);
-
-	inherited::Hit(pHDS);
+	else
+	{
+		m_sound_player->play(EPolterSounds::eSndHit);
+		inherited::Hit(pHDS);
+	}
 }
-
 
 
 void CPoltergeist::UpdateHeight()
