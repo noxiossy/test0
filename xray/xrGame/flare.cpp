@@ -95,16 +95,16 @@ void CFlare::OnAnimationEnd(u32 state)
 
 void CFlare::SwitchOn()
 {
-	static int lt				= 1; //IRender_Light::POINT
-	static bool ls				= true;
+	LPCSTR sect = cNameSect().c_str();
+
 	light_render				= ::Render->light_create();
-	light_render->set_type		( (IRender_Light::LT)lt);
-	light_render->set_shadow	(ls);
-	light_lanim					= LALib.FindItem("flare_lanim_showing");
+	light_render->set_type		(IRender_Light::POINT);
+	light_render->set_shadow	(true);
+	light_lanim					= LALib.FindItem(pSettings->r_string(sect, "flare_lanim_showing"));
 
 	light_render->set_active	(true);
 
-	m_pFlareParticles			= CParticlesObject::Create(pSettings->r_string(cNameSect(), "working_particles"), FALSE);
+	m_pFlareParticles			= CParticlesObject::Create(pSettings->r_string(sect, "working_particles"), FALSE);
 	m_pFlareParticles->Play		(true);
 
 }
@@ -130,12 +130,12 @@ void CFlare::UpdateCL()
 	if( light_render /* && HudItemData()*/ )
 	{
 		float _c 				= CurrStateTime()/1000.0f;
-		if(fsimilar(_c,m_work_time_sec)||_c>m_work_time_sec)
+		if (fsimilar(_c, m_work_time_sec) || (_c > m_work_time_sec))
 		{
 			SwitchOff			();
 			return				;
 		}
-		if(_c+2.0f > m_work_time_sec) //2sec
+		if ((_c + 2.0f) > m_work_time_sec) //2sec
 		{
 			DropFlare			();
 		}
@@ -151,8 +151,6 @@ void CFlare::UpdateCL()
 		
 		fclr.set				((float)color_get_B(clr),(float)color_get_G(clr),(float)color_get_R(clr),1.f);
 		fclr.mul_rgb			(fBrightness/255.f);
-		
-		fclr.set				(1,1,1,1);
 		
 		light_render->set_color	(fclr);
 

@@ -179,9 +179,7 @@ void CCustomZone::Load(LPCSTR section)
 		m_dwBlowoutParticlesTime = pSettings->r_u32(section,"blowout_particles_time");
 		if (s32(m_dwBlowoutParticlesTime)>m_StateTime[eZoneStateBlowout])	{
 			m_dwBlowoutParticlesTime=m_StateTime[eZoneStateBlowout];
-#ifndef MASTER_GOLD
 			Msg("! ERROR: invalid 'blowout_particles_time' in '%s'",section);
-#endif // #ifndef MASTER_GOLD
 		}
 	}
 	else
@@ -192,9 +190,7 @@ void CCustomZone::Load(LPCSTR section)
 		m_dwBlowoutLightTime = pSettings->r_u32(section,"blowout_light_time");
 		if (s32(m_dwBlowoutLightTime)>m_StateTime[eZoneStateBlowout])	{
 			m_dwBlowoutLightTime=m_StateTime[eZoneStateBlowout];
-#ifndef MASTER_GOLD
 			Msg("! ERROR: invalid 'blowout_light_time' in '%s'",section);
-#endif // #ifndef MASTER_GOLD
 		}
 	}
 	else
@@ -205,9 +201,7 @@ void CCustomZone::Load(LPCSTR section)
 		m_dwBlowoutSoundTime = pSettings->r_u32(section,"blowout_sound_time");
 		if (s32(m_dwBlowoutSoundTime)>m_StateTime[eZoneStateBlowout])	{
 			m_dwBlowoutSoundTime=m_StateTime[eZoneStateBlowout];
-#ifndef MASTER_GOLD
 			Msg("! ERROR: invalid 'blowout_sound_time' in '%s'",section);
-#endif // #ifndef MASTER_GOLD
 		}
 	}
 	else
@@ -217,9 +211,7 @@ void CCustomZone::Load(LPCSTR section)
 		m_dwBlowoutExplosionTime = pSettings->r_u32(section,"blowout_explosion_time"); 
 		if (s32(m_dwBlowoutExplosionTime)>m_StateTime[eZoneStateBlowout])	{
 			m_dwBlowoutExplosionTime=m_StateTime[eZoneStateBlowout];
-#ifndef MASTER_GOLD
 			Msg("! ERROR: invalid 'blowout_explosion_time' in '%s'",section);
-#endif // #ifndef MASTER_GOLD
 		}
 	}
 	else
@@ -235,9 +227,7 @@ void CCustomZone::Load(LPCSTR section)
 
 		if((s32)m_dwBlowoutWindTimeEnd < m_StateTime[eZoneStateBlowout]){
 			m_dwBlowoutWindTimeEnd =u32( m_StateTime[eZoneStateBlowout]-1);
-#ifndef MASTER_GOLD
 			Msg("! ERROR: invalid 'blowout_wind_time_end' in '%s'",section);
-#endif // #ifndef MASTER_GOLD
 		}
 
 		
@@ -250,9 +240,10 @@ void CCustomZone::Load(LPCSTR section)
 		sscanf(pSettings->r_string(section,"light_color"), "%f,%f,%f", &m_LightColor.r, &m_LightColor.g, &m_LightColor.b);
 		m_fLightRange			= pSettings->r_float(section,"light_range");
 		m_fLightTime			= pSettings->r_float(section,"light_time");
-		m_fLightTimeLeft		= 0;
+		m_fLightTimeLeft		= 0.f;
 
 		m_fLightHeight		= pSettings->r_float(section,"light_height");
+		m_LightTexture		= READ_IF_EXISTS(pSettings, r_string, section, "light_texture", "");
 	}
 
 	//загрузить параметры idle подсветки
@@ -266,6 +257,10 @@ void CCustomZone::Load(LPCSTR section)
 		m_zone_flags.set(eIdleLightVolumetric,pSettings->r_bool (section, "idle_light_volumetric") );
 		m_zone_flags.set(eIdleLightShadow,pSettings->r_bool (section, "idle_light_shadow") );
 		m_zone_flags.set(eIdleLightR1,pSettings->r_bool (section, "idle_light_r1") );
+		m_fIdleLightRangeRandMin = READ_IF_EXISTS(pSettings, r_float, section, "idle_light_range_rand_min", -0.25f);
+		m_fIdleLightRangeRandMax = READ_IF_EXISTS(pSettings, r_float, section, "idle_light_range_rand_max", 0.25f);
+
+		m_IdleLightTexture		 = READ_IF_EXISTS(pSettings, r_string, section, "idle_light_texture", "");
 	}
 
 	m_ef_anomaly_type			= pSettings->r_u32(section,"ef_anomaly_type");
@@ -307,6 +302,8 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 	{
 		m_pIdleLight = ::Render->light_create();
 		m_pIdleLight->set_shadow(!!m_zone_flags.test(eIdleLightShadow));
+		if (xr_strlen(m_IdleLightTexture))
+			m_pIdleLight->set_texture(m_IdleLightTexture);
 
 		if(m_zone_flags.test(eIdleLightVolumetric))
 		{
@@ -321,6 +318,8 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 	{
 		m_pLight = ::Render->light_create();
 		m_pLight->set_shadow(true);
+		if (xr_strlen(m_LightTexture))
+			m_pLight->set_texture(m_LightTexture);
 	}else
 		m_pLight = NULL;
 
@@ -703,7 +702,7 @@ void CCustomZone::UpdateIdleLight	()
 	Fcolor					fclr;
 	fclr.set				((float)color_get_B(clr)/255.f,(float)color_get_G(clr)/255.f,(float)color_get_R(clr)/255.f,1.f);
 	
-	float range = m_fIdleLightRange + 0.25f*::Random.randF(-1.f,1.f);
+	float range = m_fIdleLightRange + ::Random.randF(m_fIdleLightRangeRandMin, m_fIdleLightRangeRandMax);
 	m_pIdleLight->set_range	(range);
 	m_pIdleLight->set_color	(fclr);
 
@@ -955,7 +954,7 @@ void CCustomZone::StartBlowoutLight		()
 {
 	if(!m_pLight || m_fLightTime<=0.f) return;
 	
-	m_fLightTimeLeft = (float)Device.dwTimeGlobal + m_fLightTime*1000.0f;
+	m_fLightTimeLeft = m_fLightTime;
 
 	m_pLight->set_color(m_LightColor.r, m_LightColor.g, m_LightColor.b);
 	m_pLight->set_range(m_fLightRange);
@@ -975,14 +974,21 @@ void  CCustomZone::StopBlowoutLight		()
 
 void CCustomZone::UpdateBlowoutLight	()
 {
-	if(m_fLightTimeLeft > (float)Device.dwTimeGlobal)
+	if(m_fLightTimeLeft>0)
 	{
-		float time_k	= m_fLightTimeLeft - (float)Device.dwTimeGlobal;
+		m_fLightTimeLeft -= Device.fTimeDelta;
+		// Исправление не отключения света после выключения аномалии
+		if (m_fDistanceToCurEntity > 29.f)
+		{
+			if (m_fLightTime <= 1.f)
+				m_fLightTimeLeft = m_fLightTimeLeft / 1.45f;
+			else
+				m_fLightTimeLeft = m_fLightTimeLeft / 1.15f;
+		}
 
-//		m_fLightTimeLeft -= Device.fTimeDelta;
-		clamp(time_k, 0.0f, m_fLightTime*1000.0f);
+		clamp(m_fLightTimeLeft,0.0f,m_fLightTime);
 
-		float scale		= time_k/(m_fLightTime*1000.0f);
+		float scale		= m_fLightTimeLeft/m_fLightTime;
 		scale			= powf(scale+EPS_L, 0.15f);
 		float r			= m_fLightRange*scale;
 		VERIFY(_valid(r));

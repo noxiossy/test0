@@ -870,24 +870,12 @@ void CActor::UpdateCL	()
 			float fire_disp_full = pWeapon->GetFireDispersion(true);
 			m_fdisp_controller.SetDispertion(fire_disp_full);
 			
-			fire_disp_full = m_fdisp_controller.GetCurrentDispertion();
-
-			HUD().SetCrosshairDisp(fire_disp_full, 0.02f);
-			HUD().ShowCrosshair(pWeapon->use_crosshair());
+			HUD().ShowCrosshair(false);
 #ifdef DEBUG
 			HUD().SetFirstBulletCrosshairDisp(pWeapon->GetFirstBulletDisp());
 #endif
 			
-			BOOL B = ! ((mstate_real & mcLookout) && !IsGameTypeSingle());
-
-			psHUD_Flags.set( HUD_WEAPON_RT, B );
-
-			B = B && pWeapon->show_crosshair();
-
-			psHUD_Flags.set( HUD_CROSSHAIR_RT2, B );
-			
-
-			
+			psHUD_Flags.set( HUD_CROSSHAIR_RT2, pWeapon->show_crosshair() );
 			psHUD_Flags.set( HUD_DRAW_RT,		pWeapon->show_indicators() );
 		}
 

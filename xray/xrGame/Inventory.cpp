@@ -25,8 +25,8 @@
 using namespace InventoryUtilities;
 
 // what to block
-u32	INV_STATE_LADDER		= (1<<RIFLE_SLOT | 1<<APPARATUS_SLOT);
-u32	INV_STATE_CAR			= INV_STATE_LADDER;
+u32	INV_STATE_LADDER		= INV_STATE_BLOCK_ALL;
+u32	INV_STATE_CAR			= INV_STATE_BLOCK_ALL;
 u32	INV_STATE_BLOCK_ALL		= 0xffffffff;
 u32	INV_STATE_INV_WND		= INV_STATE_BLOCK_ALL;
 u32	INV_STATE_BUY_MENU		= INV_STATE_BLOCK_ALL;
@@ -948,7 +948,7 @@ void CInventory::UpdateDropTasks()
 
 void CInventory::UpdateDropItem(PIItem pIItem)
 {
-	if( pIItem->GetDropManual() )
+	if (pIItem && pIItem->GetDropManual())
 	{
 		pIItem->SetDropManual(FALSE);
 		pIItem->DenyTrade();
@@ -1055,7 +1055,7 @@ PIItem CInventory::item(CLASS_ID cls_id) const
 	for(TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it) 
 	{
 		PIItem pIItem = *it;
-		if(pIItem->object().CLS_ID == cls_id && 
+		if (pIItem && pIItem->object().CLS_ID == cls_id &&
 			pIItem->Useful()) 
 			return pIItem;
 	}
@@ -1100,7 +1100,7 @@ u32		CInventory::dwfGetGrenadeCount(LPCSTR caSection, bool SearchAll)
 	for(TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it) 
 	{
 		PIItem	l_pIItem = *l_it;
-		if (l_pIItem->object().CLS_ID == CLSID_GRENADE_F1 || l_pIItem->object().CLS_ID == CLSID_GRENADE_RGD5)
+		if (l_pIItem && l_pIItem->object().CLS_ID == CLSID_GRENADE_F1 || l_pIItem->object().CLS_ID == CLSID_GRENADE_RGD5)
 			++l_dwCount;
 	}
 
@@ -1113,7 +1113,7 @@ bool CInventory::bfCheckForObject(ALife::_OBJECT_ID tObjectID)
 	for(TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it) 
 	{
 		PIItem	l_pIItem = *l_it;
-		if (l_pIItem->object().ID() == tObjectID)
+		if (l_pIItem && l_pIItem->object().ID() == tObjectID)
 			return(true);
 	}
 	return		(false);
@@ -1125,7 +1125,7 @@ CInventoryItem *CInventory::get_object_by_id(ALife::_OBJECT_ID tObjectID)
 	for(TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it) 
 	{
 		PIItem	l_pIItem = *l_it;
-		if (l_pIItem->object().ID() == tObjectID)
+		if (l_pIItem && l_pIItem->object().ID() == tObjectID)
 			return	(l_pIItem);
 	}
 	return		(0);
