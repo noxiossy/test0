@@ -79,6 +79,7 @@ protected:
 
 	CGameFont*		pFont = nullptr;
 	CGameFont*		pFont2 = nullptr;
+	
 	FactoryPtr<IUIShader>* m_hShader_back = nullptr;
 
 	POINT			m_mouse_pos;

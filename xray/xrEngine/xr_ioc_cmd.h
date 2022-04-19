@@ -265,7 +265,7 @@ public
 	void	Execute	(LPCSTR args) override
 	{
 		Fvector v;
-		if (3!=sscanf(args,"%f,%f,%f",&v.x,&v.y,&v.z))	{ InvalidSyntax(); return; }
+		if ((3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z)) && (3 != sscanf(args, "(%f, %f, %f)", &v.x, &v.y, &v.z)) ) { InvalidSyntax(); return; }
 		if (v.x<min.x || v.y<min.y || v.z<min.z)		{ InvalidSyntax(); return; }
 		if (v.x>max.x || v.y>max.y || v.z>max.z)		{ InvalidSyntax(); return; }
 		value->set(v);

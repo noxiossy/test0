@@ -95,6 +95,8 @@ public:
 			bool				get_dik_name				(int dik, LPSTR dest, int dest_sz);
 
 			void				feedback					(u16 s1, u16 s2, float time);
+
+			char				DikToChar					(int dik);
 };
 
 extern ENGINE_API CInput *		pInput;

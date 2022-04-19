@@ -9,14 +9,6 @@
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
 
-IConsole_Command* CConsole::GetCommand(LPCSTR cmd) const
-{
-	vecCMD_CIT it = Commands.find(cmd);
-	if (it == Commands.end())
-		return NULL;
-	else
-		return it->second;
-}
 
 bool CConsole::GetBool( LPCSTR cmd )
 {
@@ -49,6 +41,16 @@ float CConsole::GetFloat( LPCSTR cmd, float& min, float& max )
 	}
 	return 0.0f;
 }
+
+IConsole_Command* CConsole::GetCommand(LPCSTR cmd) const
+{
+	vecCMD_CIT it = Commands.find(cmd);
+	if (it == Commands.end())
+		return NULL;
+	else
+		return it->second;
+}
+
 
 int CConsole::GetInteger( LPCSTR cmd, int& min, int& max )
 {

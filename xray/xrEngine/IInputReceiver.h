@@ -1,9 +1,3 @@
-// IInputReceiver.h: interface for the IInputReceiver class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#ifndef IINPUTRECEIVERH
-#define IINPUTRECEIVERH
 #pragma once
 
 class ENGINE_API	IInputReceiver
@@ -38,5 +32,3 @@ public:
 ENGINE_API extern float			psMouseSens;
 ENGINE_API extern float			psMouseSensScale;
 ENGINE_API extern Flags32		psMouseInvert;
-
-#endif
