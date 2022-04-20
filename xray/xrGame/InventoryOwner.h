@@ -116,6 +116,8 @@ protected:
 	bool				m_bAllowInvUpgrade;
 
 	u32					m_tmp_active_slot_num;
+	
+	bool				m_play_show_hide_reload_sounds;
 	//////////////////////////////////////////////////////////////////////////
 	// сюжетная информация
 public:
@@ -148,7 +150,9 @@ public:
 
 	virtual CCustomOutfit*			GetOutfit()	const {return NULL;};
 
-	//////////////////////////////////////////////////////////////////////////
+	bool CanPlayShHdRldSounds				() const {return m_play_show_hide_reload_sounds;};
+	void SetPlayShHdRldSounds				(bool play) {m_play_show_hide_reload_sounds = play;};
+//////////////////////////////////////////////////////////////////////////
 	//игровые характеристики персонажа
 public:
 	CCharacterInfo&						CharacterInfo		() const {VERIFY(m_pCharacterInfo); return *m_pCharacterInfo;}
