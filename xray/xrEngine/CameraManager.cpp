@@ -313,7 +313,6 @@ void CCameraManager::UpdatePPEffectors()
 	int		_count	= 0;
 	if(m_EffectorsPP.size()) 
 	{
-		bool b = false;
 		pp_affected = pp_identity;
 		for(int i = m_EffectorsPP.size()-1; i >= 0; --i) 
 		{
@@ -322,17 +321,9 @@ void CCameraManager::UpdatePPEffectors()
 			if(eff->Valid() && eff->Process(l_PPInf))
 			{
 				++_count;
-				if(!b)
-				{
-					pp_affected.add		(l_PPInf);
-					pp_affected.sub		(pp_identity);
-					pp_affected.validate("in cycle");
-				}
-				if(!eff->bOverlap)
-				{
-					b				= true;
-					pp_affected		= l_PPInf;
-				}
+				pp_affected.add		(l_PPInf);
+				pp_affected.sub		(pp_identity);
+				pp_affected.validate("in cycle");
 			}else 
 				RemovePPEffector	(eff->Type());
 		}
