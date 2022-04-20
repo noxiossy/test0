@@ -30,6 +30,7 @@ protected:
 	ESoundTypes		m_eSoundReload;
     ESoundTypes		m_eSoundReloadEmpty;
     ESoundTypes		m_eSoundReloadMisfire;
+	bool			m_sounds_enabled;
 	// General
 	//кадр момента пересчета UpdateSounds
 	u32				dwUpdateSounds_Frame;

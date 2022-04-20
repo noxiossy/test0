@@ -34,11 +34,12 @@ float CWeapon::GetFireDispersion	(float cartridge_k)
 	float fire_disp = fireDispersionBase * cur_silencer_koef.fire_dispersion * cartridge_k * GetConditionDispersionFactor();
 	
 	//вычислить дисперсию, вносимую самим стрелком
-	const CInventoryOwner* pOwner	=	smart_cast<const CInventoryOwner*>(H_Parent());
-	VERIFY (pOwner);
-
-	float parent_disp = pOwner->GetWeaponAccuracy();
-	fire_disp += parent_disp;
+	if(H_Parent())
+	{
+		const CInventoryOwner* pOwner	=	smart_cast<const CInventoryOwner*>(H_Parent());
+		float parent_disp				= pOwner->GetWeaponAccuracy();
+		fire_disp						+= parent_disp;
+	}
 
 	return fire_disp;
 }

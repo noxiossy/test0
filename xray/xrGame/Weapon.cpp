@@ -101,12 +101,8 @@ void CWeapon::UpdateXForm	()
 	// Get access to entity and its visual
 	CEntityAlive*			E = smart_cast<CEntityAlive*>(H_Parent());
 	
-	if (!E) {
-		if (!IsGameTypeSingle())
-			UpdatePosition	(H_Parent()->XFORM());
-
-		return;
-	}
+    if (!E)
+       return;
 
 	const CInventoryOwner	*parent = smart_cast<const CInventoryOwner*>(E);
 	if (parent && parent->use_simplified_visual())
@@ -535,7 +531,7 @@ void CWeapon::net_Destroy	()
 BOOL CWeapon::IsUpdating()
 {	
 	bool bIsActiveItem = m_pInventory && m_pInventory->ActiveItem()==this;
-	return bIsActiveItem || bWorking || IsPending() || getVisible();
+	return bIsActiveItem || bWorking;// || IsPending() || getVisible();
 }
 
 void CWeapon::net_Export(NET_Packet& P)
@@ -730,16 +726,11 @@ void CWeapon::OnActiveItem ()
 void CWeapon::OnHiddenItem ()
 {
 	m_dwAmmoCurrentCalcFrame = 0;
-//. Hide
-	if(IsGameTypeSingle())
-		SwitchState(eHiding);
-	else
-		SwitchState(eHidden);
+
+	SwitchState(eHiding);
+
 	OnZoomOut();
-//-
 	inherited::OnHiddenItem		();
-//.	SetState					(eHidden);
-//.	SetNextState				(eHidden);
 
 	m_set_next_ammoType_on_reload = u32(-1);
 }
@@ -786,10 +777,7 @@ void CWeapon::UpdateCL		()
 	UpdateFlameParticles	();
 	UpdateFlameParticles2	();
 
-	if(!IsGameTypeSingle())
-		make_Interpolation		();
-	
-	if( (GetNextState()==GetState()) && IsGameTypeSingle() && H_Parent()==Level().CurrentEntity())
+    if ((GetNextState() == GetState()) && H_Parent() == Level().CurrentEntity())
 	{
 		CActor* pActor	= smart_cast<CActor*>(H_Parent());
 		if(pActor && !pActor->AnyMove() && this==pActor->inventory().ActiveItem())
@@ -945,7 +933,7 @@ bool CWeapon::SwitchAmmoType( u32 flags )
 	do 
 	{
 		l_newType = (l_newType+1) % m_ammoTypes.size();
-		b1 = l_newType != m_ammoType;
+		b1 = (l_newType != m_ammoType);
 		b2 = unlimited_ammo() ? false : ( !m_pInventory->GetAny( *m_ammoTypes[l_newType] ) );						
 	} while( b1 && b2 );
 
@@ -1489,15 +1477,7 @@ int		g_iWeaponRemove = 1;
 
 bool CWeapon::NeedToDestroyObject()	const
 {
-	if (GameID() == eGameIDSingle) return false;
-	if (Remote()) return false;
-	if (H_Parent()) return false;
-	if (g_iWeaponRemove == -1) return false;
-	if (g_iWeaponRemove == 0) return true;
-	if (TimePassedAfterIndependant() > m_dwWeaponRemoveTime)
-		return true;
-
-	return false;
+    return false;
 }
 
 ALife::_TIME_ID	 CWeapon::TimePassedAfterIndependant()	const
@@ -1622,25 +1602,25 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 	//clamp(idx, u8(0), u8(1));
 	clamp(idx, 0ui8, 1ui8);
 
-	float fStrafeMaxTime = hi->m_measures.m_strafe_offset[2][idx].y; // ????. ????? ? ????????, ?? ??????? ?? ?????????? ?? ???????????? ?????????
+	float fStrafeMaxTime = hi->m_measures.m_strafe_offset[2][idx].y; // Макс. время в секундах, за которое мы наклонимся из центрального положения
 	if (fStrafeMaxTime <= EPS)
 		fStrafeMaxTime = 0.01f;
 
-	float fStepPerUpd = Device.fTimeDelta / fStrafeMaxTime; // ???????? ????????? ??????? ????????
+	float fStepPerUpd = Device.fTimeDelta / fStrafeMaxTime; // Величина изменение фактора поворота
 
 	u32 iMovingState = pActor->MovingState();
 	if ((iMovingState & mcLStrafe) != 0)
-	{ // ???????? ?????
+	{ // Движемся влево
 		float fVal = (m_fLR_MovingFactor > 0.f ? fStepPerUpd * 3 : fStepPerUpd);
 		m_fLR_MovingFactor -= fVal;
 	}
 	else if ((iMovingState & mcRStrafe) != 0)
-	{ // ???????? ??????
+	{ // Движемся вправо
 		float fVal = (m_fLR_MovingFactor < 0.f ? fStepPerUpd * 3 : fStepPerUpd);
 		m_fLR_MovingFactor += fVal;
 	}
 	else
-	{ // ????????? ? ????? ?????? ???????????
+	{ // Двигаемся в любом другом направлении
 		if (m_fLR_MovingFactor < 0.0f)
 		{
 			m_fLR_MovingFactor += fStepPerUpd;
@@ -1653,9 +1633,9 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 		}
 	}
 
-	clamp(m_fLR_MovingFactor, -1.0f, 1.0f); // ?????? ??????? ?????? ?? ?????? ????????? ??? ??????
+	clamp(m_fLR_MovingFactor, -1.0f, 1.0f); // Фактор боковой ходьбы не должен превышать эти лимиты
 
-	// ?????????? ?????? ?????? ??? ??????????? ?????? ? ????
+	// Производим наклон ствола для нормального режима и аима
 	for (int _idx = 0; _idx <= 1; _idx++)
 	{
         bool bEnabled = (hi->m_measures.m_strafe_offset[2][_idx].x != 0.0f);
@@ -1664,22 +1644,22 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 
 		Fvector curr_offs, curr_rot;
 
-		// ???????? ??????? ???? ? ???????
+		// Смещение позиции худа в стрейфе
         curr_offs = hi->m_measures.m_strafe_offset[0][_idx]; // pos
-		curr_offs.mul(m_fLR_MovingFactor);                   // ???????? ?? ?????? ???????
+		curr_offs.mul(m_fLR_MovingFactor);                   // Умножаем на фактор стрейфа
 
-		// ??????? ???? ? ???????
+		// Поворот худа в стрейфе
         curr_rot = hi->m_measures.m_strafe_offset[1][_idx]; // rot
-		curr_rot.mul(-PI / 180.f);                          // ??????????? ???? ? ???????
-		curr_rot.mul(m_fLR_MovingFactor);                   // ???????? ?? ?????? ???????
+		curr_rot.mul(-PI / 180.f);                          // Преобразуем углы в радианы
+		curr_rot.mul(m_fLR_MovingFactor);                   // Умножаем на фактор стрейфа
 
 		if (_idx == 0)
-		{ // ?? ?????
+		{ // От бедра
             curr_offs.mul(1.f - m_zoom_params.m_fZoomRotationFactor);
             curr_rot.mul(1.f - m_zoom_params.m_fZoomRotationFactor);
         }
         else
-        { // ?? ????? ????
+        { // Во время аима
             curr_offs.mul(m_zoom_params.m_fZoomRotationFactor);
             curr_rot.mul(m_zoom_params.m_fZoomRotationFactor);
 		}
@@ -1772,9 +1752,6 @@ bool CWeapon::unlimited_ammo()
 		return psActorFlags.test(AF_UNLIMITEDAMMO) && 
 				m_DefaultCartridge.m_flags.test(CCartridge::cfCanBeUnlimited); 
 
-	return ((GameID() != eGameIDArtefactHunt) && 
-			(GameID() != eGameIDCaptureTheArtefact) &&
-			m_DefaultCartridge.m_flags.test(CCartridge::cfCanBeUnlimited)); 
 			
 };
 

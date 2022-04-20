@@ -2697,9 +2697,6 @@
     <ClInclude Include="item_manager.h">
       <Filter>AI\AComponents\MemoryManager\clsuterized_data_managers\ItemManager</Filter>
     </ClInclude>
-    <ClInclude Include="item_manager_inline.h">
-      <Filter>AI\AComponents\MemoryManager\clsuterized_data_managers\ItemManager</Filter>
-    </ClInclude>
     <ClInclude Include="danger_manager.h">
       <Filter>AI\AComponents\MemoryManager\clsuterized_data_managers\DangerManager</Filter>
     </ClInclude>
@@ -4585,9 +4582,6 @@
       <Filter>AI\AMonsters\humans\stalker\DecisionMaker\actions\combat</Filter>
     </ClInclude>
     <ClInclude Include="stalker_combat_actions.h">
-      <Filter>AI\AMonsters\humans\stalker\DecisionMaker\actions\combat\actions</Filter>
-    </ClInclude>
-    <ClInclude Include="stalker_combat_actions_inline.h">
       <Filter>AI\AMonsters\humans\stalker\DecisionMaker\actions\combat\actions</Filter>
     </ClInclude>
     <ClInclude Include="stalker_combat_action_base.h">

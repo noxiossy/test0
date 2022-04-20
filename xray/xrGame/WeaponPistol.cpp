@@ -74,7 +74,6 @@ void CWeaponPistol::PlayAnimIdle()
 {
 	if (TryPlayAnimIdle()) return;
 
-	VERIFY(GetState()==eIdle);
 	if(iAmmoElapsed==0)
 	{
 		PlayHUDMotion("anm_idle_empty", TRUE, NULL, GetState());

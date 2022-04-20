@@ -137,7 +137,7 @@ void	CInventoryItem::Hit					(SHit* pHDS)
 	if( !m_flags.test(FUsingCondition) ) return;
 
 	float hit_power = pHDS->damage();
-	hit_power *= m_HitTypeK[pHDS->hit_type];
+	hit_power *= GetHitImmunity(pHDS->hit_type);
 
 	ChangeCondition(-hit_power);
 }

@@ -409,13 +409,9 @@ void CLevel::ProcessGameEvents		()
 				}break;
 			case M_STATISTIC_UPDATE:
 				{
-					if (GameID() != eGameIDSingle)
-						Game().m_WeaponUsageStatistic->OnUpdateRequest(&P);
 				}break;
 			case M_FILE_TRANSFER:
 				{
-					if (m_file_transfer)			//in case of net_Stop
-						m_file_transfer->on_message(&P);
 				}break;
 			case M_GAMEMESSAGE:
 				{
@@ -428,8 +424,6 @@ void CLevel::ProcessGameEvents		()
 			}			
 		}
 	}
-	if (OnServer() && GameID()!= eGameIDSingle)
-		Game().m_WeaponUsageStatistic->Send_Check_Respond();
 }
 
 #ifdef DEBUG_MEMORY_MANAGER
@@ -488,8 +482,7 @@ void CLevel::OnFrame	()
 	Fvector	temp_vector;
 	m_feel_deny.feel_touch_update		(temp_vector, 0.f);
 
-	if (GameID()!=eGameIDSingle)		psDeviceFlags.set(rsDisableObjectsAsCrows,true);
-	else								psDeviceFlags.set(rsDisableObjectsAsCrows,false);
+    psDeviceFlags.set(rsDisableObjectsAsCrows, false);
 
 	// commit events from bullet manager from prev-frame
 	Device.Statistic->TEST0.Begin		();
@@ -499,14 +492,6 @@ void CLevel::OnFrame	()
 	// Client receive
 	if (net_isDisconnected())	
 	{
-		if (OnClient() && GameID() != eGameIDSingle)
-		{
-#ifdef DEBUG
-			Msg("--- I'm disconnected, so clear all objects...");
-#endif // #ifdef DEBUG
-			ClearAllObjects();
-		}
-
 		Engine.Event.Defer				("kernel:disconnect");
 		return;
 	} else {
@@ -529,7 +514,7 @@ void CLevel::OnFrame	()
 		else								
 			MapManager().Update		();
 
-		if( IsGameTypeSingle() && Device.dwPrecacheFrame==0 )
+        if (Device.dwPrecacheFrame == 0)
 		{
 			if (g_mt_config.test(mtMap)) 
 				Device.seqParallel.push_back	(fastdelegate::FastDelegate0<>(m_game_task_manager,&CGameTaskManager::UpdateTasks));
@@ -739,14 +724,6 @@ void CLevel::OnRender()
 			CTeamBaseZone	*team_base_zone = smart_cast<CTeamBaseZone*>(_O);
 			if (team_base_zone)
 				team_base_zone->OnRender();
-			
-			if (GameID() != eGameIDSingle)
-			{
-				CInventoryItem* pIItem = smart_cast<CInventoryItem*>(_O);
-				if (pIItem) pIItem->OnRender();
-			}
-
-			
 			if (dbg_net_Draw_Flags.test(dbg_draw_skeleton)) //draw skeleton
 			{
 				CGameObject* pGO = smart_cast<CGameObject*>	(_O);
@@ -978,9 +955,8 @@ bool		CLevel::InterpolationDisabled	()
 
 void 		CLevel::PhisStepsCallback		( u32 Time0, u32 Time1 )
 {
-	if (!Level().game)				return;
-	if (GameID() == eGameIDSingle)	return;
-};
+	return;
+}
 
 void				CLevel::SetNumCrSteps		( u32 NumSteps )
 {
@@ -1012,8 +988,7 @@ ALife::_TIME_ID CLevel::GetEnvironmentGameTime()
 
 u8 CLevel::GetDayTime() 
 { 
-	u32 dummy32;
-	u32 hours;
+    u32 dummy32, hours;
 	GetGameDateTime(dummy32, dummy32, dummy32, hours, dummy32, dummy32, dummy32);
 	VERIFY	(hours<256);
 	return	u8(hours); 

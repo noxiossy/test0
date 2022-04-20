@@ -114,8 +114,6 @@ BOOL CInventoryOwner::net_Spawn		(CSE_Abstract* DC)
 	if(!pThis) return FALSE;
 	CSE_Abstract* E	= (CSE_Abstract*)(DC);
 
-	if ( IsGameTypeSingle() )
-	{
 		CSE_ALifeTraderAbstract* pTrader = NULL;
 		if(E) pTrader = smart_cast<CSE_ALifeTraderAbstract*>(E);
 		if(!pTrader) return FALSE;
@@ -137,14 +135,6 @@ BOOL CInventoryOwner::net_Spawn		(CSE_Abstract* DC)
 			dialog_manager->SetDefaultStartDialog(CharacterInfo().StartDialog());
 		}
 		m_game_name			= pTrader->m_character_name;
-	}
-	else
-	{
-		CharacterInfo().m_SpecificCharacter.Load					("mp_actor");
-		CharacterInfo().InitSpecificCharacter						("mp_actor");
-		CharacterInfo().m_SpecificCharacter.data()->m_sGameName = (E->name_replace()[0]) ? E->name_replace() : *pThis->cName();
-		m_game_name												= (E->name_replace()[0]) ? E->name_replace() : *pThis->cName();
-	}
 	
 
 	if(!pThis->Local())  return TRUE;
@@ -178,7 +168,7 @@ void	CInventoryOwner::load	(IReader &input_packet)
 	u8 active_slot = input_packet.r_u8();
 	if(active_slot == u8(-1))
 		inventory().SetActiveSlot(NO_ACTIVE_SLOT);
-	else
+	//else
 		//inventory().Activate_deffered(active_slot, Device.dwFrame);
 
 	m_tmp_active_slot_num		 = active_slot;
@@ -199,9 +189,7 @@ void CInventoryOwner::UpdateInventoryOwner(u32 deltaT)
 	if ( IsTrading() )
 	{
 		//если мы умерли, то нет "trade"
-		CEntityAlive* pOurEntityAlive = smart_cast<CEntityAlive*>(this);
-		R_ASSERT(pOurEntityAlive);
-		if ( !pOurEntityAlive->g_Alive() )
+		if ( !is_alive() )
 		{
 			StopTrading();
 		}
@@ -217,9 +205,7 @@ void CInventoryOwner::UpdateInventoryOwner(u32 deltaT)
 		}
 
 		//если мы умерли, то тоже не говорить
-		CEntityAlive* pOurEntityAlive = smart_cast<CEntityAlive*>(this);
-		R_ASSERT(pOurEntityAlive);
-		if ( !pOurEntityAlive->g_Alive() )
+		if ( !is_alive() )
 		{
 			StopTalk();
 		}
@@ -250,16 +236,13 @@ bool CInventoryOwner::OfferTalk(CInventoryOwner* talk_partner)
 	if(!IsTalkEnabled()) return false;
 
 	//проверить отношение к собеседнику
-	CEntityAlive* pOurEntityAlive = smart_cast<CEntityAlive*>(this);
-	R_ASSERT(pOurEntityAlive);
-
 	CEntityAlive* pPartnerEntityAlive = smart_cast<CEntityAlive*>(talk_partner);
 	R_ASSERT(pPartnerEntityAlive);
 	
 //	ALife::ERelationType relation = RELATION_REGISTRY().GetRelationType(this, talk_partner);
 //	if(relation == ALife::eRelationTypeEnemy) return false;
 
-	if(!pOurEntityAlive->g_Alive() || !pPartnerEntityAlive->g_Alive()) return false;
+	if(!is_alive() || !pPartnerEntityAlive->g_Alive()) return false;
 
 	StartTalk(talk_partner);
 
@@ -373,7 +356,7 @@ void CInventoryOwner::spawn_supplies		()
 	if (use_bolts())
 		Level().spawn_item					("bolt",game_object->Position(),game_object->ai_location().level_vertex_id(),game_object->ID());
 
-	if (!ai().get_alife() && IsGameTypeSingle() ) 
+    if (!ai().get_alife())
 	{
 		CSE_Abstract						*abstract = Level().spawn_item("device_pda",game_object->Position(),game_object->ai_location().level_vertex_id(),game_object->ID(),true);
 		CSE_ALifeItemPDA					*pda = smart_cast<CSE_ALifeItemPDA*>(abstract);
@@ -616,3 +599,11 @@ bool CInventoryOwner::use_throw_randomness		()
 {
 	return						(true);
 }
+
+bool CInventoryOwner::is_alive()
+{
+	CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(this);
+	R_ASSERT( pEntityAlive );
+	return (!!pEntityAlive->g_Alive());
+}
+

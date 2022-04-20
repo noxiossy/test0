@@ -101,6 +101,8 @@ public:
 	LPCSTR				IconName		() const;
 	u32					get_money		() const				{return m_money;}
 	void				set_money		(u32 amount, bool bSendEvent);
+	bool				is_alive		();
+
 protected:
 	u32					m_money;
 	// торговля

@@ -8,6 +8,7 @@
 #include "silencer.h"
 #include "GrenadeLauncher.h"
 #include "inventory.h"
+#include "InventoryOwner.h"
 #include "xrserver_objects_alife_items.h"
 #include "ActorEffector.h"
 #include "EffectorZoomInertion.h"
@@ -18,6 +19,8 @@
 #include "MPPlayersBag.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UIStatic.h"
+#include "game_object_space.h"
+#include "HudSound.h"
 
 CUIXml*				pWpnScopeXml = NULL;
 
@@ -37,6 +40,7 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
 	m_eSoundShot				= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
 	m_eSoundEmptyClick			= ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
 	m_eSoundReload				= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+	m_sounds_enabled			= true;
 	
 	m_sSndShotCurrent			= NULL;
 	m_sSilencerFlameParticles	= m_sSilencerSmokeParticles = NULL;
@@ -422,6 +426,7 @@ void CWeaponMagazined::ReloadMagazine()
 void CWeaponMagazined::OnStateSwitch	(u32 S)
 {
 	inherited::OnStateSwitch(S);
+	CInventoryOwner* owner = smart_cast<CInventoryOwner*>(this->H_Parent());
 	switch (S)
 	{
 	case eIdle:
@@ -438,12 +443,18 @@ void CWeaponMagazined::OnStateSwitch	(u32 S)
 		switch2_Empty	();
 		break;
 	case eReload:
+		if(owner)
+			m_sounds_enabled = owner->CanPlayShHdRldSounds();
 		switch2_Reload	();
 		break;
 	case eShowing:
+		if(owner)
+			m_sounds_enabled = owner->CanPlayShHdRldSounds();
 		switch2_Showing	();
 		break;
 	case eHiding:
+		if(owner)
+			m_sounds_enabled = owner->CanPlayShHdRldSounds();
 		switch2_Hiding	();
 		break;
 	case eHidden:
@@ -744,9 +755,24 @@ void CWeaponMagazined::switch2_Empty()
 		inherited::FireEnd();
 	}*/
 }
+
 void CWeaponMagazined::PlayReloadSound()
 {
-	PlaySound	("sndReload",get_LastFP());
+	if (m_sounds_enabled)
+	{
+		LPCSTR CurrentSound = "sndReload";
+
+		if (bMisfire && m_sounds.FindSoundItem("sndReloadMisfire", false))
+		{
+			CurrentSound = "sndReloadMisfire";
+		}
+		else if (iAmmoElapsed == 0 && m_sounds.FindSoundItem("sndReloadEmpty", false))
+		{
+			CurrentSound = "sndReloadEmpty";
+		}
+
+		PlaySound(CurrentSound, get_LastFP());
+	}
 }
 
 void CWeaponMagazined::switch2_Reload()
@@ -757,12 +783,14 @@ void CWeaponMagazined::switch2_Reload()
 	PlayAnimReload		();
 	SetPending			(TRUE);
 }
+
 void CWeaponMagazined::switch2_Hiding()
 {
 	OnZoomOut();
 	CWeapon::FireEnd();
 	
-	PlaySound			("sndHide",get_LastFP());
+	if(m_sounds_enabled)
+		PlaySound			("sndHide",get_LastFP());
 
 	PlayAnimHide		();
 	SetPending			(TRUE);
@@ -781,7 +809,9 @@ void CWeaponMagazined::switch2_Hidden()
 }
 void CWeaponMagazined::switch2_Showing()
 {
-	PlaySound			("sndShow",get_LastFP());
+
+	if(m_sounds_enabled)
+		PlaySound			("sndShow",get_LastFP());
 
 	SetPending			(TRUE);
 	PlayAnimShow		();
@@ -932,9 +962,13 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
 	}
 	else if(m_eSilencerStatus == ALife::eAddonAttachable &&
-			0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonSilencer) &&
 			(m_sSilencerName == item_section_name))
 	{
+		if ((m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0)
+		{
+			Msg("ERROR: silencer addon already detached.");
+			return true;
+		}
 		m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonSilencer;
 
 		UpdateAddonsVisibility();
@@ -942,9 +976,13 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
 	}
 	else if(m_eGrenadeLauncherStatus == ALife::eAddonAttachable &&
-			0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
 			(m_sGrenadeLauncherName == item_section_name))
 	{
+		if ((m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) == 0)
+		{
+			Msg("ERROR: grenade launcher addon already detached.");
+			return true;
+		}
 		m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
 		UpdateAddonsVisibility();
@@ -1006,7 +1044,7 @@ void CWeaponMagazined::InitAddons()
 		}
 	}
 
-	if ( IsSilencerAttached() && SilencerAttachable() )
+	if ( IsSilencerAttached()/* && SilencerAttachable() */)
 	{		
 		m_sFlameParticlesCurrent	= m_sSilencerFlameParticles;
 		m_sSmokeParticlesCurrent	= m_sSilencerSmokeParticles;
@@ -1078,7 +1116,18 @@ void CWeaponMagazined::PlayAnimReload()
 	if (GetState() != eReload)
 		return;
 
-	PlayHUDMotion("anm_reload", TRUE, this, GetState());
+	LPCSTR CurrentAnimation = "anm_reload";
+
+	if (bMisfire && IsHUDAnimationExist("anm_reload_misfire"))
+	{
+		CurrentAnimation = "anm_reload_misfire";
+	}
+	else if (iAmmoElapsed == 0 && IsHUDAnimationExist("anm_reload_empty"))
+	{
+		CurrentAnimation = "anm_reload_empty";
+	}
+
+	PlayHUDMotion(CurrentAnimation, TRUE, this, GetState());
 }
 
 void CWeaponMagazined::PlayAnimAim()
@@ -1317,7 +1366,7 @@ bool CWeaponMagazined::install_upgrade_impl( LPCSTR section, bool test )
 	//snd_shoot2     = weapons\ak74u_shot_2 ??
 	//snd_shoot3     = weapons\ak74u_shot_3 ??
 
-	if ( m_eSilencerStatus == ALife::eAddonAttachable )
+	if ( m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent )
 	{
 		result |= process_if_exists_set( section, "silencer_flame_particles", &CInifile::r_string, m_sSilencerFlameParticles, test );
 		result |= process_if_exists_set( section, "silencer_smoke_particles", &CInifile::r_string, m_sSilencerSmokeParticles, test );

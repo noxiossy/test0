@@ -59,6 +59,9 @@ public:
 	virtual void			render_hud_mode		();
 	virtual bool			need_renderable		();
 
+	bool					IsReload			()	const		{	return GetState() == eReload;}
+	bool					IsFire				()	const		{	return GetState() == eFire;}
+
 	virtual void			render_item_ui		();
 	virtual bool			render_item_ui_query();
 

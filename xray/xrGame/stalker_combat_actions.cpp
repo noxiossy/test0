@@ -204,9 +204,6 @@ void CStalkerActionRetreatFromEnemy::execute		()
 	if (!object().memory().enemy().selected())
 		return;
 
-	if (!object().memory().enemy().selected())
-		return;
-
 	object().movement().set_movement_type			(eMovementTypeRun);
 	object().movement().set_path_type				(MovementManager::ePathTypeLevelPath);
 	object().movement().set_detail_path_type		(DetailPathManager::eDetailPathTypeSmooth);
@@ -478,7 +475,12 @@ void CStalkerActionTakeCover::execute		()
 
 	inherited::execute					();
 
-	CMemoryInfo							mem_object = object().memory().memory(object().memory().enemy().selected());
+	//Alundaio: verify enemy
+	const CEntityAlive *enemy = object().memory().enemy().selected();
+	if (!enemy)
+		return;
+
+	CMemoryInfo	mem_object = object().memory().memory(enemy);
 
 	if (!mem_object.m_object)
 		return;
@@ -598,7 +600,11 @@ void CStalkerActionLookOut::execute		()
 
 	inherited::execute					();
 	
-	CMemoryInfo							mem_object = object().memory().memory(object().memory().enemy().selected());
+	const CEntityAlive *enemy = object().memory().enemy().selected();
+	if (!enemy)
+		return;
+
+	CMemoryInfo	mem_object = object().memory().memory(enemy);
 
 	if (!mem_object.m_object)
 		return;
@@ -679,7 +685,12 @@ void CStalkerActionHoldPosition::execute		()
 
 	inherited::execute					();
 	
-	CMemoryInfo							mem_object = object().memory().memory(object().memory().enemy().selected());
+	//Alundaio: Cleaned up
+	const CEntityAlive *enemy = object().memory().enemy().selected();
+	if (!enemy)
+		return;
+
+	CMemoryInfo	mem_object = object().memory().memory(enemy);
 
 	if (!mem_object.m_object)
 		return;
@@ -778,7 +789,11 @@ void CStalkerActionDetourEnemy::execute			()
 
 	inherited::execute					();
 
-	CMemoryInfo							mem_object = object().memory().memory(object().memory().enemy().selected());
+	const CEntityAlive *enemy = object().memory().enemy().selected();
+	if (!enemy)
+		return;
+
+	CMemoryInfo	mem_object = object().memory().memory(enemy);
 
 	if (!mem_object.m_object)
 		return;
@@ -1079,7 +1094,12 @@ void CStalkerActionKillEnemyIfPlayerOnThePath::execute			()
 #endif // TEST_MENTAL_STATE
 
 	inherited::execute					();
-	
+
+	//Alundaio: Sanity
+	if (!object().memory().enemy().selected())
+		return;
+	//Alundaio: END
+
 	object().sight().setup				(CSightAction(object().memory().enemy().selected(),true,true));
 
 	fire								();

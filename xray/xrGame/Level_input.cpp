@@ -121,7 +121,7 @@ void CLevel::IR_OnKeyboardPress	(int key)
 			if (Device.editor())	return;
 		#endif // INGAME_EDITOR
 
-		if (!g_block_pause && (IsGameTypeSingle() || IsDemoPlay()))
+        if (!g_block_pause)
 			Device.Pause(!Device.Paused(), TRUE, TRUE, "li_pause_key");
 		return;
 	}
@@ -176,12 +176,12 @@ void CLevel::IR_OnKeyboardPress	(int key)
 
 	if ( game && Game().IR_OnKeyboardPress(key) )	return;
 
-	if(_curr == kQUICK_SAVE && IsGameTypeSingle())
+    if (_curr == kQUICK_SAVE)
 	{
 		Console->Execute			("save");
 		return;
 	}
-	if(_curr == kQUICK_LOAD && IsGameTypeSingle())
+    if (_curr == kQUICK_LOAD)
 	{
 #ifdef DEBUG
 		FS.get_path					("$game_config$")->m_Flags.set(FS_Path::flNeedRescan, TRUE);
@@ -201,7 +201,6 @@ void CLevel::IR_OnKeyboardPress	(int key)
 #ifndef MASTER_GOLD
 	switch (key) {
 	case DIK_F7: {
-		if (GameID() != eGameIDSingle) return;
 		FS.get_path					("$game_config$")->m_Flags.set(FS_Path::flNeedRescan, TRUE);
 		FS.get_path					("$game_scripts$")->m_Flags.set(FS_Path::flNeedRescan, TRUE);
 		FS.rescan_pathes			();
@@ -228,11 +227,6 @@ void CLevel::IR_OnKeyboardPress	(int key)
 	}
 	case DIK_NUMPAD5: 
 		{
-			if (GameID()!=eGameIDSingle) 
-			{
-				Msg("For this game type Demo Record is disabled.");
-///				return;
-			};
 			if(!pInput->iGetAsyncKeyState(DIK_LSHIFT))
 			{
 				Console->Hide	();
@@ -278,7 +272,6 @@ void CLevel::IR_OnKeyboardPress	(int key)
 		return;
 	}
 	case DIK_BACK:
-		if (GameID() == eGameIDSingle)
 			DRender->NextSceneMode();
 			//HW.Caps.SceneMode			= (HW.Caps.SceneMode+1)%3;
 		return;
@@ -360,9 +353,6 @@ void CLevel::IR_OnKeyboardPress	(int key)
 	}
 
 	case MOUSE_1: {
-		if (GameID() != eGameIDSingle)
-			break;
-
 		if (pInput->iGetAsyncKeyState(DIK_LALT)) {
 			if (smart_cast<CActor*>(CurrentEntity()))
 				try_change_current_entity	();

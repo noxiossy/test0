@@ -180,8 +180,6 @@ void CHUDTarget::Render()
 			CEntityAlive*	pCurEnt = smart_cast<CEntityAlive*>	(Level().CurrentEntity());
 			PIItem			l_pI	= smart_cast<PIItem>		(PP.RQ.O);
 
-			if (IsGameTypeSingle())
-			{
 				CInventoryOwner* our_inv_owner		= smart_cast<CInventoryOwner*>(pCurEnt);
 				if (E && E->g_Alive() && !E->cast_base_monster())
 				{
@@ -194,17 +192,25 @@ void CHUDTarget::Render()
 						case ALife::eRelationTypeEnemy:
 							C = C_ON_ENEMY; break;
 						case ALife::eRelationTypeNeutral:
-							C = C_ON_NEUTRAL; break;
+							C = C_ON_NEUTRAL;
+							if (fuzzyShowInfo>0.5f)
+							{
+								CStringTable	strtbl		;
+								F->SetColor	(subst_alpha(C,u8(iFloor(255.f*(fuzzyShowInfo-0.5f)*2.f))));
+								F->OutNext	("%s", *strtbl.translate(others_inv_owner->Name()) );
+								//F->OutNext	("%s", *strtbl.translate(others_inv_owner->CharacterInfo().Community().id()) );
+							}
+							break;
 						case ALife::eRelationTypeFriend:
-							C = C_ON_FRIEND; break;
-						}
-
-						if (fuzzyShowInfo>0.5f)
-						{
-							CStringTable	strtbl		;
-							F->SetColor	(subst_alpha(C,u8(iFloor(255.f*(fuzzyShowInfo-0.5f)*2.f))));
-							F->OutNext	("%s", *strtbl.translate(others_inv_owner->Name()) );
-							F->OutNext	("%s", *strtbl.translate(others_inv_owner->CharacterInfo().Community().id()) );
+							C = C_ON_FRIEND; 
+							if (fuzzyShowInfo>0.5f)
+							{
+								CStringTable	strtbl		;
+								F->SetColor	(subst_alpha(C,u8(iFloor(255.f*(fuzzyShowInfo-0.5f)*2.f))));
+								F->OutNext	("%s", *strtbl.translate(others_inv_owner->Name()) );
+								//F->OutNext	("%s", *strtbl.translate(others_inv_owner->CharacterInfo().Community().id()) );
+							}
+							break;
 						}
 					}
 
@@ -220,37 +226,6 @@ void CHUDTarget::Render()
 						}
 						fuzzyShowInfo += SHOW_INFO_SPEED*Device.fTimeDelta;
 					}
-			}
-			else
-			{
-				if (E && (E->GetfHealth()>0))
-				{
-					if (pCurEnt && GameID() == eGameIDSingle)
-					{
-						if (PP.RQ.range >= recon_mindist() && PP.RQ.range <= recon_maxdist())
-						{
-							float ddist = (PP.RQ.range - recon_mindist())/(recon_maxdist() - recon_mindist());
-							float dspeed = recon_minspeed() + (recon_maxspeed() - recon_minspeed())*ddist;
-							fuzzyShowInfo += Device.fTimeDelta/dspeed;
-						}else{
-							if (PP.RQ.range < recon_mindist()) 
-								fuzzyShowInfo += recon_minspeed()*Device.fTimeDelta;
-							else 
-								fuzzyShowInfo = 0;
-						};
-
-						if (fuzzyShowInfo>0.5f)
-						{
-							clamp(fuzzyShowInfo,0.f,1.f);
-							int alpha_C = iFloor(255.f*(fuzzyShowInfo-0.5f)*2.f);
-							u8 alpha_b	= u8(alpha_C & 0x00ff);
-							F->SetColor	(subst_alpha(C,alpha_b));
-							F->OutNext	("%s",*PP.RQ.O->cName());
-						}
-					}
-				};
-			};
-
 		}else{
 			fuzzyShowInfo -= HIDE_INFO_SPEED*Device.fTimeDelta;
 		}

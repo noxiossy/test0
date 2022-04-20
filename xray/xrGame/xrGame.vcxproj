@@ -1154,7 +1154,6 @@
     <ClInclude Include="inventory_upgrade_root.h" />
     <ClInclude Include="inventory_upgrade_root_inline.h" />
     <ClInclude Include="item_manager.h" />
-    <ClInclude Include="item_manager_inline.h" />
     <ClInclude Include="key_binding_registrator.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Level_Bullet_Manager.h" />
@@ -1570,7 +1569,6 @@
     <ClInclude Include="stalker_anomaly_planner.h" />
     <ClInclude Include="stalker_base_action.h" />
     <ClInclude Include="stalker_combat_actions.h" />
-    <ClInclude Include="stalker_combat_actions_inline.h" />
     <ClInclude Include="stalker_combat_action_base.h" />
     <ClInclude Include="stalker_combat_planner.h" />
     <ClInclude Include="stalker_danger_by_sound_actions.h" />

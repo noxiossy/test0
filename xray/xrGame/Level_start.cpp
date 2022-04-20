@@ -22,9 +22,7 @@ BOOL CLevel::net_Start	( LPCSTR op_server, LPCSTR op_client )
 
 	pApp->LoadBegin				();
 
-	string64	player_name;
-	GetPlayerName_FromRegistry( player_name, sizeof(player_name) );
-
+	string64	player_name = "xraylr";
 	if ( xr_strlen(player_name) == 0 )
 	{
 		strcpy_s( player_name, xr_strlen(Core.UserName) ? Core.UserName : Core.CompName );
@@ -180,16 +178,6 @@ bool CLevel::net_start3				()
 			m_caClientOptions = tmp;
 		};
 	};
-	//setting players GameSpy CDKey if it comes from command line
-	if (strstr(m_caClientOptions.c_str(), "/cdkey="))
-	{
-		string64 CDKey;
-		const char* start = strstr(m_caClientOptions.c_str(),"/cdkey=") +xr_strlen("/cdkey=");
-		sscanf			(start, "%[^/]",CDKey);
-		string128 cmd;
-		sprintf_s(cmd, "cdkey %s", _strupr(CDKey));
-		Console->Execute			(cmd);
-	}
 	return true;
 }
 
@@ -242,19 +230,11 @@ bool CLevel::net_start6				()
 		}
 	}else{
 		Msg				("! Failed to start client. Check the connection or level existance.");
-
-		if (m_connect_server_err==xrServer::ErrBELoad)
-		{
-			DEL_INSTANCE	(g_pGameLevel);
-			Console->Execute("main_menu on");
-		}
-		else
+		
 		if (m_connect_server_err==xrServer::ErrConnect&&!psNET_direct_connect) 
 		{
 			DEL_INSTANCE	(g_pGameLevel);
 			Console->Execute("main_menu on");
-
-			MainMenu()->SwitchToMultiplayerMenu();
 		}
 		else
 		if (!map_data.m_map_loaded && map_data.m_name.size() && m_bConnectResult)	//if (map_data.m_name == "") - level not loaded, see CLevel::net_start_client3
@@ -271,9 +251,6 @@ bool CLevel::net_start6				()
 
 			DEL_INSTANCE	(g_pGameLevel);
 			Console->Execute("main_menu on");
-
-			MainMenu()->SwitchToMultiplayerMenu();
-			MainMenu()->Show_DownloadMPMap(dialog_string, download_url);
 		}
 		else
 		if (map_data.IsInvalidClientChecksum())
@@ -291,8 +268,6 @@ bool CLevel::net_start6				()
 			g_pGameLevel->net_Stop();
 			DEL_INSTANCE	(g_pGameLevel);
 			Console->Execute("main_menu on");
-			MainMenu()->SwitchToMultiplayerMenu();
-			MainMenu()->Show_DownloadMPMap(dialog_string, download_url);
 		}
 		else 
 		{
