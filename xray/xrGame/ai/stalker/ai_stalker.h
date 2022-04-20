@@ -335,6 +335,8 @@ private:
 	xr_vector<CTradeItem>				m_temp_items;
 	u32									m_total_money;
 	bool								m_sell_info_actuality;
+public:
+			bool						can_take						(CInventoryItem const * item);
 
 protected:
 			u32							fill_items						(CInventory &inventory, CGameObject *old_owner, ALife::_OBJECT_ID new_owner_id);
@@ -353,7 +355,6 @@ protected:
 			void						update_sell_info				();
 			bool						tradable_item					(CInventoryItem *inventory_item, const u16 &current_owner_id);
 			bool						can_sell						(CInventoryItem* item);
-			bool						can_take						(CInventoryItem const * item);
 
 			bool						non_conflicted					(const CInventoryItem *item, const CWeapon *new_weapon) const;
 			bool						enough_ammo						(const CWeapon *new_weapon) const;
@@ -410,7 +411,8 @@ public:
 	IC		Fvector						weapon_shot_effector_direction	(const Fvector &current) const;
 	virtual void						UpdateCamera					();
 	virtual	bool						can_attach						(const CInventoryItem *inventory_item) const;
-	virtual	bool						use_simplified_visual			() const {return (already_dead());};
+	// because we don't want to use this feature for stalkers
+	virtual	bool						use_simplified_visual			() const {return false; } //(already_dead());};
 #ifdef DEBUG
 			void						debug_planner					(const script_planner *planner);
 #endif
