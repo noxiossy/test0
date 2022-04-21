@@ -15,6 +15,7 @@
 #include "client_spawn_manager.h"
 #include "../xrEngine/igame_persistent.h"
 #include "game_cl_base.h"
+#include "UIGameCustom.h"
 #include "ui/UIDialogWnd.h"
 #include "date_time.h"
 #include "ai_space.h"
@@ -31,7 +32,11 @@
 #include "phworld.h"
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
+#include "UI/UIGameTutorial.h"
+#include "string_table.h"
+#include "ui/UIInventoryUtilities.h"
 #include "../xrEngine/Environment.h"
+#include "restriction_space.h"
 
 using namespace luabind;
 
@@ -117,22 +122,31 @@ bool set_weather_fx	(LPCSTR weather_name)
 #endif // #ifdef INGAME_EDITOR
 }
 
+bool start_weather_fx_from_time	(LPCSTR weather_name, float time)
+{
+#ifdef INGAME_EDITOR
+	if (!Device.editor())
+#endif // #ifdef INGAME_EDITOR
+		return		(g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time));
+	
+#ifdef INGAME_EDITOR
+	return			(false);
+#endif // #ifdef INGAME_EDITOR
+}
+
 bool is_wfx_playing	()
 {
 	return			(g_pGamePersistent->Environment().IsWFXPlaying());
 }
 
-void change_game_time(u32 days, u32 hours, u32 mins)
+float get_wfx_time	()
 {
-	game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
-	if (tpGame && ai().get_alife())
-	{
-		u32 value = days * 86400 + hours * 3600 + mins * 60;
-		float fValue = static_cast<float> (value);
-		value *= 1000;//msec		
-		g_pGamePersistent->Environment().ChangeGameTime(fValue);
-		tpGame->alife().time_manager().change_game_time(value);
-	}
+	return			(g_pGamePersistent->Environment().wfx_time);
+}
+
+void stop_weather_fx()
+{
+	g_pGamePersistent->Environment().StopWFX();
 }
 
 void set_time_factor(float time_factor)
@@ -183,6 +197,19 @@ u32 get_time_minutes()
 	u32 year = 0, month = 0, day = 0, hours = 0, mins = 0, secs = 0, milisecs = 0;
 	split_time((g_pGameLevel && Level().game) ? Level().GetGameTime() : ai().alife().time_manager().game_time(), year, month, day, hours, mins, secs, milisecs);
 	return			mins;
+}
+
+void change_game_time(u32 days, u32 hours, u32 mins)
+{
+	game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
+	if(tpGame && ai().get_alife())
+	{
+		u32 value		= days*86400+hours*3600+mins*60;
+		float fValue	= static_cast<float> (value);
+		value			*= 1000;//msec		
+		g_pGamePersistent->Environment().ChangeGameTime(fValue);
+		tpGame->alife().time_manager().change_game_time(value);
+	}
 }
 
 float high_cover_in_direction(u32 level_vertex_id, const Fvector &direction)
@@ -236,6 +263,11 @@ Fvector vertex_position(u32 level_vertex_id)
 		return Fvector{};
 	}
 	return			(ai().level_graph().vertex_position(level_vertex_id));
+}
+
+bool valid_vertex(u32 level_vertex_id)
+{
+	return ai().level_graph().valid_vertex_id(level_vertex_id);
 }
 
 void map_add_object_spot(u16 id, LPCSTR spot_type, LPCSTR text)
@@ -670,6 +702,40 @@ u32 render_get_dx_level()
 {
 	return ::Render->get_dx_level();
 }
+
+CUISequencer* g_tutorial = NULL;
+CUISequencer* g_tutorial2 = NULL;
+
+void start_tutorial(LPCSTR name)
+{
+	if(g_tutorial){
+		VERIFY				(!g_tutorial2);
+		g_tutorial2			= g_tutorial;
+	};
+
+	g_tutorial							= xr_new<CUISequencer>();
+	g_tutorial->Start					(name);
+	if(g_tutorial2)
+		g_tutorial->m_pStoredInputReceiver = g_tutorial2->m_pStoredInputReceiver;
+
+}
+
+void stop_tutorial()
+{
+	if(g_tutorial)
+		g_tutorial->Stop();	
+}
+
+LPCSTR translate_string(LPCSTR str)
+{
+	return *CStringTable().translate(str);
+}
+
+bool has_active_tutotial()
+{
+	return (g_tutorial!=NULL);
+}
+
 #pragma optimize("s",on)
 void CLevel::script_register(lua_State *L)
 {
@@ -693,10 +759,14 @@ void CLevel::script_register(lua_State *L)
 		def("get_weather",						get_weather),
 		def("set_weather",						set_weather),
 		def("set_weather_fx",					set_weather_fx),
+		def("start_weather_fx_from_time",		start_weather_fx_from_time),
 		def("is_wfx_playing",					is_wfx_playing),
+		def("get_wfx_time",						get_wfx_time),
+		def("stop_weather_fx",					stop_weather_fx),
 
 		def("environment",						environment),
 		
+		def("valid_vertex",						&valid_vertex),
 		def("set_time_factor",					set_time_factor),
 		def("get_time_factor",					get_time_factor),
 
@@ -706,7 +776,7 @@ void CLevel::script_register(lua_State *L)
 		def("get_time_days",					get_time_days),
 		def("get_time_hours",					get_time_hours),
 		def("get_time_minutes",					get_time_minutes),
-		def("change_game_time", 				change_game_time),
+		def("change_game_time",					change_game_time),
 
 		def("high_cover_in_direction",			high_cover_in_direction),
 		def("low_cover_in_direction",			low_cover_in_direction),
@@ -796,5 +866,13 @@ void CLevel::script_register(lua_State *L)
 		
 		def("community_relation",				&g_get_community_relation),
 		def("set_community_relation",			&g_set_community_relation)
+	];
+	module(L,"game")
+	[
+		def("start_tutorial",		&start_tutorial),
+		def("stop_tutorial",		&stop_tutorial),
+		def("has_active_tutorial",	&has_active_tutotial),
+		def("translate_string",		&translate_string)
+
 	];
 }
