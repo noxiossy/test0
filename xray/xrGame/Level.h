@@ -1,9 +1,3 @@
-// Level.h: interface for the CLevel class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_LEVEL_H__38F63863_DB0C_494B_AFAB_C495876EC671__INCLUDED_)
-#define AFX_LEVEL_H__38F63863_DB0C_494B_AFAB_C495876EC671__INCLUDED_
 #pragma once
 
 #include "../xrEngine/igame_level.h"
@@ -338,7 +332,6 @@ public:
 
 protected:
 //	CFogOfWarMngr*		m_pFogOfWarMngr;
-protected:	
 	CMapManager *			m_map_manager;
 	CGameTaskManager*		m_game_task_manager;
 
@@ -434,7 +427,7 @@ IC CPHCommander & CLevel::ph_commander_scripts()
 //by Mad Max 
 IC bool		OnServer()			{ return Level().IsServer();}
 IC bool		OnClient()			{ return Level().IsClient();}
-IC bool		IsGameTypeSingle()	{ return (g_pGamePersistent->GameType() == eGameIDSingle);};
+IC bool		IsGameTypeSingle()	{ return true;};
 
 class  CPHWorld;
 extern CPHWorld*				ph_world;
@@ -450,5 +443,3 @@ public:
 					CZoneList();
 	virtual			~CZoneList();
 }; // class CZoneList
-
-#endif // !defined(AFX_LEVEL_H__38F63863_DB0C_494B_AFAB_C495876EC671__INCLUDED_)

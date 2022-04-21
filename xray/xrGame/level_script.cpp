@@ -32,8 +32,6 @@
 #include "phworld.h"
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
-#include "UI/UIGameTutorial.h"
-#include "string_table.h"
 #include "ui/UIInventoryUtilities.h"
 #include "../xrEngine/Environment.h"
 #include "restriction_space.h"
@@ -703,39 +701,6 @@ u32 render_get_dx_level()
 	return ::Render->get_dx_level();
 }
 
-CUISequencer* g_tutorial = NULL;
-CUISequencer* g_tutorial2 = NULL;
-
-void start_tutorial(LPCSTR name)
-{
-	if(g_tutorial){
-		VERIFY				(!g_tutorial2);
-		g_tutorial2			= g_tutorial;
-	};
-
-	g_tutorial							= xr_new<CUISequencer>();
-	g_tutorial->Start					(name);
-	if(g_tutorial2)
-		g_tutorial->m_pStoredInputReceiver = g_tutorial2->m_pStoredInputReceiver;
-
-}
-
-void stop_tutorial()
-{
-	if(g_tutorial)
-		g_tutorial->Stop();	
-}
-
-LPCSTR translate_string(LPCSTR str)
-{
-	return *CStringTable().translate(str);
-}
-
-bool has_active_tutotial()
-{
-	return (g_tutorial!=NULL);
-}
-
 #pragma optimize("s",on)
 void CLevel::script_register(lua_State *L)
 {
@@ -866,13 +831,5 @@ void CLevel::script_register(lua_State *L)
 		
 		def("community_relation",				&g_get_community_relation),
 		def("set_community_relation",			&g_set_community_relation)
-	];
-	module(L,"game")
-	[
-		def("start_tutorial",		&start_tutorial),
-		def("stop_tutorial",		&stop_tutorial),
-		def("has_active_tutorial",	&has_active_tutotial),
-		def("translate_string",		&translate_string)
-
 	];
 }
