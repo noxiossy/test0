@@ -17,12 +17,6 @@
 
 #include "sound_player.h"
 
-#define HEIGHT_CHANGE_VELOCITY	0.5f
-#define HEIGHT_CHANGE_MIN_TIME	3000
-#define HEIGHT_CHANGE_MAX_TIME	10000
-#define HEIGHT_MIN				0.4f
-#define HEIGHT_MAX				2.0f
-
 
 CPoltergeist::CPoltergeist()
 {
@@ -106,6 +100,12 @@ void CPoltergeist::Load(LPCSTR section)
 
 	READ_IF_EXISTS(pSettings,r_u32,section,"PsyAura_Fake_Delay", 8000);
 	READ_IF_EXISTS(pSettings,r_float,section,"PsyAura_Fake_MaxAddDist", 90.f);
+
+	m_height_change_velocity = READ_IF_EXISTS(pSettings,r_float,section,"Height_Change_Velocity", 0.5f);
+	m_height_change_min_time = READ_IF_EXISTS(pSettings,r_u32,section,"Height_Change_Min_Time", 3000);
+	m_height_change_max_time = READ_IF_EXISTS(pSettings,r_u32,section,"Height_Change_Max_Time", 10000);
+	m_height_min			 = READ_IF_EXISTS(pSettings,r_float,section,"Height_Min", 0.4f);
+	m_height_max			 = READ_IF_EXISTS(pSettings,r_float,section,"Height_Max", 2.f);
 
 	LPCSTR polter_type = pSettings->r_string(section,"type");
 	
@@ -199,7 +199,8 @@ void CPoltergeist::Show()
 void CPoltergeist::UpdateCL()
 {
 	inherited::UpdateCL();
-	def_lerp(m_height, target_height, HEIGHT_CHANGE_VELOCITY, client_update_fdelta());
+
+	def_lerp(m_height, target_height, m_height_change_velocity, client_update_fdelta());
 	
 	ability()->update_frame	();
 }
@@ -293,8 +294,8 @@ void CPoltergeist::UpdateHeight()
 	u32 cur_time = Device.dwTimeGlobal;
 	
 	if (time_height_updated < cur_time)	{
-		time_height_updated = cur_time + Random.randI(HEIGHT_CHANGE_MIN_TIME,HEIGHT_CHANGE_MAX_TIME);
-		target_height		= Random.randF(HEIGHT_MIN, HEIGHT_MAX);		
+		time_height_updated = cur_time + Random.randI(m_height_change_min_time,m_height_change_max_time);
+		target_height		= Random.randF(m_height_min, m_height_max);		
 	}
 }
 

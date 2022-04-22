@@ -101,6 +101,12 @@ private:
 			void	Hide					();
 			void	Show					();
 
+			float	m_height_change_velocity;
+			u32		m_height_change_min_time;
+			u32		m_height_change_max_time;
+			float	m_height_min;
+			float	m_height_max;
+			
 
 public:
 #ifdef DEBUG

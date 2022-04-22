@@ -15,7 +15,12 @@
 #include "../../../detail_path_manager.h"
 #include "../../../CharacterPhysicsSupport.h"
 #include "../control_path_builder_base.h"
+#include "../../../Inventory.h"
+#include "../../../ActorCondition.h"
+#include "../../../xr_level_controller.h"
+#include "../../../weapon.h"
 
+#include "../../../../xrCore/_vector3d_ext.h"
 
 CPseudoGigant::CPseudoGigant()
 {
@@ -247,7 +252,13 @@ void CPseudoGigant::on_threaten_execute()
 	Level().ObjectSpace.GetNearest	(m_nearest,Position(), 15.f, NULL); 
 	for (u32 i=0;i<m_nearest.size();i++) {
 		CPhysicsShellHolder  *obj = smart_cast<CPhysicsShellHolder *>(m_nearest[i]);
-		if (!obj || !obj->m_pPhysicsShell) continue;
+		//https://github.com/OGSR/OGSR-Engine/commit/298dff12851da90e8696360241573bab0864b698
+		if (
+			!obj || !obj->m_pPhysicsShell ||
+			(obj->spawn_ini() && obj->spawn_ini()->section_exist("ph_heavy")) ||
+			(pSettings->line_exist(obj->cNameSect().c_str(), "ph_heavy") && pSettings->r_bool(obj->cNameSect().c_str(), "ph_heavy")) ||
+			(pSettings->line_exist(obj->cNameSect().c_str(), "quest_item") && pSettings->r_bool(obj->cNameSect().c_str(), "quest_item"))
+			) continue;
 
 		Fvector dir;
 		Fvector pos;
@@ -287,7 +298,25 @@ void CPseudoGigant::on_threaten_execute()
 	}
 
 	Actor()->lock_accel_for	(m_time_kick_actor_slow_down);
-	
+
+	// Выбить из рук оружие - cari0us
+	CWeapon* const active_weapon	= smart_cast<CWeapon*>(Actor()->inventory().ActiveItem());
+
+	if ( active_weapon )
+	{
+		Fvector dir			= Actor()->Direction();
+		if ( dir.y < 0.f )
+		{
+			dir.y			= -dir.y;
+		}
+		active_weapon->SetActivationSpeedOverride ( normalize(dir) * 8 );
+
+		if ( !Actor()->inventory().Action((u16)kDROP, CMD_STOP) )
+		{
+			Actor()->g_PerformDrop		();
+		}
+	}
+
 	// Нанести хит
 	NET_Packet	l_P;
 	SHit		HS;
