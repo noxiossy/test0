@@ -11,6 +11,7 @@
 extern BOOL					LogExecCB		= TRUE;
 static string_path			logFName		= "engine.log";
 static string_path			log_file_name	= "engine.log";
+static string_path			log_file_name_backup	= "engine_bkp.log";
 static BOOL 				no_log			= TRUE;
 #ifdef PROFILE_CRITICAL_SECTIONS
 	static xrCriticalSection	logCS(MUTEX_PROFILE_ID(log));
@@ -180,14 +181,14 @@ void InitLog()
 
 void CreateLog			(BOOL nl)
 {
-    no_log				= nl;/*
-	strconcat			(sizeof(log_file_name),log_file_name,Core.ApplicationName,"_",Core.UserName,".log");*/
+    no_log				= nl;
+	//strconcat			(sizeof(log_file_name),log_file_name,Core.ApplicationName,"_",Core.UserName,".log");
 	if (FS.path_exist("$logs$"))
 		FS.update_path	(logFName,"$logs$",log_file_name);
 	if (!no_log){
 		//Alun: Backup existing log
-		xr_string backup_logFName = EFS.ChangeFileExt(logFName,".bkp");
-		FS.file_rename(logFName, backup_logFName.c_str(), true);
+		//xr_string backup_logFName = EFS.ChangeFileExt(logFName,".bkp");
+		FS.file_rename(logFName, log_file_name_backup, true);
 		//-Alun
         IWriter *f		= FS.w_open	(logFName);
         if (f==NULL){
