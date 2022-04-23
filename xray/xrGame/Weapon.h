@@ -254,7 +254,7 @@ public:
 		if (pA && pA->active_cam() == eacLookAt)
 			return false;
 
-		return (m_bHideCrosshairInZoom || ZoomTexture());
+		return (m_zoom_params.m_bHideCrosshairInZoom || ZoomTexture());
 	}
 	
 	IC float				GetZoomFactor		() const		{return m_zoom_params.m_fCurrentZoomFactor;}
@@ -267,7 +267,6 @@ public:
     float m_nearwall_last_hud_fov;
     float m_nearwall_target_hud_fov;
     float m_nearwall_speed_mod;
-	float m_nearwall_last_hud_fov;
 
 	bool m_nearwall_on;
 

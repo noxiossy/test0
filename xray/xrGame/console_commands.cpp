@@ -453,7 +453,7 @@ public:
 			return;
 		}
 
-		string_path				S,S1;
+		string_path				S,S1,BS,BS1;
 		S[0]					= 0;
 //.		sscanf					(args ,"%s",S);
 		strcpy_s					(S,args);
@@ -467,10 +467,21 @@ public:
 			
 			if (CSavedGameWrapper::saved_game_exist(S)) 
 			{
-				string256 backup_quicsave_name = "quicksave_2";
-				FS.file_rename(S, backup_quicsave_name, true);
+				strconcat		(sizeof(BS),BS,"quicksave","_","2.sav");
+				strconcat		(sizeof(BS1),BS1,"quicksave","_","2.dds");
+	
+				strcat			(S,".sav");
+				FS.update_path	(BS,"$game_saves$",S);
+				FS.file_rename	(S, BS, true);
+				
+				strcat			(S,".dds");
+				FS.update_path	(BS1,"$game_saves$",S);
+				FS.file_rename	(S, BS1, true);
+				//FS.file_rename(S,BS,true);
+				//string256 backup_quicsave_name = "quicksave_2.sav";
+				//xr_string backup_quicsave_name = EFS.ChangeFileExt(logFName,"_bkp.sav");
 				//strconcat		(sizeof(S),S,Core.UserName,"_","quicksave_2");
-				Msg				("Creating backup quicksave - %s",S);
+				Msg				("Creating backup quicksave - %s",BS);
 
 			}
 			NET_Packet			net_packet;
