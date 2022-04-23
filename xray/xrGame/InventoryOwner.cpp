@@ -43,6 +43,7 @@ CInventoryOwner::CInventoryOwner			()
 	m_need_osoznanie_mode		= FALSE;
 
 	m_play_show_hide_reload_sounds	= true;
+	m_tmp_next_item_slot		= NO_ACTIVE_SLOT;
 }
 
 DLL_Pure *CInventoryOwner::_construct		()
@@ -327,6 +328,11 @@ void CInventoryOwner::OnItemTake			(CInventoryItem *inventory_item)
 			inventory().Activate(m_tmp_active_slot_num);
 			m_tmp_active_slot_num	= NO_ACTIVE_SLOT;
 		}
+        if ( m_tmp_next_item_slot != NO_ACTIVE_SLOT ) 
+		{
+			inventory().Slot( inventory_item, true );
+			m_tmp_next_item_slot = NO_ACTIVE_SLOT;
+		}
 	}
 }
 
@@ -607,5 +613,10 @@ bool CInventoryOwner::is_alive()
 	CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(this);
 	R_ASSERT( pEntityAlive );
 	return (!!pEntityAlive->g_Alive());
+}
+
+void CInventoryOwner::SetNextItemSlot( u32 slot ) 
+{
+	m_tmp_next_item_slot = slot;
 }
 

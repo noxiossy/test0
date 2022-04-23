@@ -530,12 +530,16 @@ bool CWeaponMagazinedWGrenade::Detach(LPCSTR item_section_name, bool b_spawn_ite
 	   0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
 	   !xr_strcmp(*m_sGrenadeLauncherName, item_section_name))
 	{
-		m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
-		if(m_bGrenadeMode)
+		// https://github.com/revolucas/CoC-Xray/pull/5/commits/9ca73da34a58ceb48713b1c67608198c6af26db2
+		// Now we need to unload GL's magazine
+		if (!m_bGrenadeMode)
 		{
-			UnloadMagazine();
 			PerformSwitchGL();
 		}
+		UnloadMagazine();
+		PerformSwitchGL();
+
+		m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
 		UpdateAddonsVisibility();
 
@@ -909,4 +913,8 @@ void CWeaponMagazinedWGrenade::net_Spawn_install_upgrades	( Upgrades_type saved_
 {
 	// do not delete this
 	// this is intended behaviour
+}
+
+float CWeaponMagazinedWGrenade::Weight() const {
+  return inherited::Weight() + GetMagazineWeight( m_magazine2 );
 }

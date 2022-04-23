@@ -28,6 +28,7 @@ class CCartridge : public IAnticheatDumpable
 public:
 	CCartridge();
 	void Load(LPCSTR section, u8 LocalAmmoType);
+	float Weight() const;
 
 	shared_str	m_ammoSect;
 	enum{
@@ -66,7 +67,8 @@ public:
 	virtual void					renderable_Render	();
 
 	virtual bool					Useful				() const;
-	virtual float					Weight				();
+	virtual float					Weight				() const;
+	virtual	u32						Cost				() const;
 
 	bool							Get					(CCartridge &cartridge);
 

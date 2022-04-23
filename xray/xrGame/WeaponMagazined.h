@@ -167,6 +167,7 @@ protected:
 
 	virtual	int		ShotsFired			() { return m_iShotNum; }
 	virtual float	GetWeaponDeterioration	();
+	bool			ScopeRespawn		( PIItem );
 
 public:
     //AVO: for custom added sounds check if sound exists
