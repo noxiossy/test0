@@ -158,7 +158,7 @@ public:
 	ALife::EWeaponAddonStatus	get_ScopeStatus				() const { return m_eScopeStatus; }
 	ALife::EWeaponAddonStatus	get_SilencerStatus			() const { return m_eSilencerStatus; }
 
-	virtual bool UseScopeTexture() {return true;};
+	virtual bool UseScopeTexture();
 
 	//обновление видимости для косточек аддонов
 			void UpdateAddonsVisibility();
@@ -189,10 +189,10 @@ public:
 	shared_str		m_sSilencerName;
 	shared_str		m_sGrenadeLauncherName;
 
-	shared_str m_sWpn_scope_bone;
+	std::vector<shared_str> m_sWpn_scope_bones;
 	shared_str m_sWpn_silencer_bone;
 	shared_str m_sWpn_launcher_bone;
-	shared_str m_sHud_wpn_scope_bone;
+	std::vector<shared_str> m_sHud_wpn_scope_bones;
 	shared_str m_sHud_wpn_silencer_bone;
 	shared_str m_sHud_wpn_launcher_bone;
 
