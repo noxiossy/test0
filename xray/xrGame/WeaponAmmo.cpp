@@ -59,25 +59,8 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
 	m_InvShortName			= CStringTable().translate( pSettings->r_string(section, "inv_name_short"));
 }
 
-float CCartridge::Weight() const
-{
-	auto s = m_ammoSect.c_str();
-	float res = 0;
-	if ( s )
-	{		
-		float box = pSettings->r_float(s, "box_size");
-		if (box > 0)
-		{
-			float w = pSettings->r_float(s, "inv_weight");
-			res = w / box;
-		}			
-	}
-	return res;
-}
-
 CWeaponAmmo::CWeaponAmmo(void) 
 {
-	m_weight				= .2f;
 }
 
 CWeaponAmmo::~CWeaponAmmo(void)
@@ -224,22 +207,11 @@ CInventoryItem *CWeaponAmmo::can_make_killing	(const CInventory *inventory) cons
 	return					(0);
 }
 
-float CWeaponAmmo::Weight() const
-{	
-	if (m_boxSize > 0)
-	{
-		float res = inherited::Weight();
-		res *= (float)m_boxCurr / (float)m_boxSize;
-		return res;
-	}
-	return 0;	
-}
-
-u32 CWeaponAmmo::Cost() const
+float CWeaponAmmo::Weight()
 {
-	u32 res = inherited::Cost();
+	float res = inherited::Weight();
 
-	res = iFloor(res*(float)m_boxCurr/(float)m_boxSize+0.5f);
+	res *= (float)m_boxCurr/(float)m_boxSize;
 
 	return res;
 }

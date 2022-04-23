@@ -914,7 +914,3 @@ void CWeaponMagazinedWGrenade::net_Spawn_install_upgrades	( Upgrades_type saved_
 	// do not delete this
 	// this is intended behaviour
 }
-
-float CWeaponMagazinedWGrenade::Weight() const {
-  return inherited::Weight() + GetMagazineWeight( m_magazine2 );
-}

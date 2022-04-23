@@ -81,7 +81,6 @@ public:
 	virtual void			setup_physic_shell	();
 
 	virtual void			SwitchState			(u32 S);
-	virtual bool			Activate			( bool = false );
 
 	virtual void			OnActiveItem		();
 	virtual void			OnHiddenItem		();
@@ -278,8 +277,7 @@ public:
 
 	virtual	u8				GetCurrentHudOffsetIdx ();
 
-	virtual float			Weight				() const;		
-	virtual u32				Cost				() const;
+	virtual float				Weight			();		
 
 public:
     virtual EHandDependence		HandDependence		()	const		{	return eHandDependence;}

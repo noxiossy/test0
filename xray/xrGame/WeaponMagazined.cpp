@@ -1435,8 +1435,12 @@ bool CWeaponMagazined::ScopeRespawn( PIItem pIItem ) {
 
       auto io = smart_cast<CInventoryOwner*>( H_Parent() );
       auto ii = smart_cast<CInventoryItem*>( this );
-      if ( io->inventory().InSlot( ii ) )
-        io->SetNextItemSlot( ii->GetSlot() );
+	  if (io) {
+		  if (io->inventory().InSlot(ii))
+			  io->SetNextItemSlot(ii->GetSlot());
+		  else
+			  io->SetNextItemSlot(0);
+	  }
 
       DestroyObject();
       sobj2->Spawn_Write( P, TRUE );
