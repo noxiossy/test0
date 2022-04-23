@@ -475,7 +475,7 @@ public:
 				{
 					strconcat		(sizeof(S),S,/*Core.UserName,"_","quicksave_1");
 					Msg				("Creating backup quicksave - %s",S);
-				}*/
+				}
 			}*/
 			NET_Packet			net_packet;
 			net_packet.w_begin	(M_SAVE_GAME);
