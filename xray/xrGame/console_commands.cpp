@@ -463,19 +463,20 @@ public:
 		timer.Start				();
 #endif
 		if (!xr_strlen(S)){
-			strconcat			(sizeof(S),S,/*Core.UserName,"_",*/"quicksave_1");
+			strconcat			(sizeof(S),S,"quicksave","_","1");/*
+			
 			if (CSavedGameWrapper::saved_game_exist(S)) 
 			{
 				xr_string backup_quicsave_name = "quicksave_2";
 				FS.file_rename(S, backup_quicsave_name.c_str(), true);
-				//strconcat		(sizeof(S),S,/*Core.UserName,"_",*/"quicksave_2");
+				//strconcat		(sizeof(S),S,Core.UserName,"_","quicksave_2");
 				Msg				("Creating backup quicksave - %s",S);
 				/*if (CSavedGameWrapper::saved_game_exist(S)) 
 				{
 					strconcat		(sizeof(S),S,/*Core.UserName,"_","quicksave_1");
 					Msg				("Creating backup quicksave - %s",S);
 				}*/
-			}
+			}*/
 			NET_Packet			net_packet;
 			net_packet.w_begin	(M_SAVE_GAME);
 			net_packet.w_stringZ(S);
