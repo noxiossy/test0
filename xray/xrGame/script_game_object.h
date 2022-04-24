@@ -14,6 +14,10 @@
 #include "xr_time.h"
 #include "character_info_defs.h"
 
+#include "gameobject.h"
+#include "ai_space.h"
+#include "script_engine.h"
+
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;
@@ -686,6 +690,9 @@ public:
 
 			void				take_items_enabled						(bool value);
 			bool				take_items_enabled						() const;
+
+			// alpet: visual functions for CWeapon descedants 
+			_DECLARE_FUNCTION10 (alife_object			,			CSE_ALifeDynamicObject*);
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
