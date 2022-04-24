@@ -22,6 +22,7 @@
 #include "ui/UIStatic.h"
 #include "game_object_space.h"
 #include "HudSound.h"
+#include "script_game_object.h"
 
 CUIXml*				pWpnScopeXml = NULL;
 

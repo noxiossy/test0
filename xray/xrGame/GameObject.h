@@ -2,8 +2,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)
-#define AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_
 #pragma once
 
 #include "../xrEngine/xr_object.h"
@@ -288,6 +286,7 @@ public:
 
 	virtual	void			On_B_NotCurrentEntity () {};
 
+	CSE_ALifeDynamicObject* alife_object() const; // alpet: ?????????? ????????? ????????? ??? ????? ???????
 	// for moving objects
 private:
 			u32				new_level_vertex_id	() const;
@@ -309,5 +308,3 @@ public:
 
 	virtual void			on_matrix_change	(const Fmatrix &previous);
 };
-
-#endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)
