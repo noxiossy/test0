@@ -23,6 +23,9 @@
 #include "clsid_game.h"
 #include "ui/UIWindow.h"
 #include "WeaponMagazinedWGrenade.h"
+#include "game_object_space.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
 
 #define WEAPON_REMOVE_TIME		60000
 #define ROTATION_TIME			0.25f
@@ -633,6 +636,21 @@ BOOL CWeapon::IsUpdating()
 {	
 	bool bIsActiveItem = m_pInventory && m_pInventory->ActiveItem()==this;
 	return bIsActiveItem || bWorking;// || IsPending() || getVisible();
+}
+
+void CWeapon::net_Export( CSE_Abstract* E ) {
+  inherited::net_Export( E );
+
+  CSE_ALifeInventoryItem *itm = smart_cast<CSE_ALifeInventoryItem*>( E );
+  itm->m_fCondition = m_fCondition;
+
+  /*CSE_ALifeItemWeapon* wpn = smart_cast<CSE_ALifeItemWeapon*>( E );
+  wpn->wpn_flags = IsUpdating() ? 1 : 0;
+  wpn->a_elapsed = u16( iAmmoElapsed );
+  wpn->m_addon_flags.flags = m_flagsAddOnState;
+  wpn->ammo_type = (u8)m_ammoType;
+  wpn->wpn_state = (u8)GetState();
+  wpn->m_bZoom   = (u8)IsZoomed();*/
 }
 
 void CWeapon::net_Export(NET_Packet& P)
