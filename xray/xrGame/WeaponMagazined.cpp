@@ -1265,12 +1265,6 @@ void CWeaponMagazined::load(IReader &input_packet)
 	load_data		(m_iCurFireMode, input_packet);
 }
 
-void CWeaponMagazined::net_Export( CSE_Abstract* E ) {
-  inherited::net_Export( E );
-  CSE_ALifeItemWeaponMagazined* wpn = smart_cast<CSE_ALifeItemWeaponMagazined*>( E );
-  wpn->m_u8CurFireMode = u8( m_iCurFireMode&0x00ff );
-}
-
 void CWeaponMagazined::net_Export	(NET_Packet& P)
 {
 	inherited::net_Export (P);

@@ -80,7 +80,6 @@ public:
 
 	virtual	void	UpdateCL		();
 	virtual void	net_Destroy		();
-	virtual void	net_Export		( CSE_Abstract* E );
 	virtual void	net_Export		(NET_Packet& P);
 	virtual void	net_Import		(NET_Packet& P);
 
@@ -125,7 +124,6 @@ protected:
 	bool			m_bHasDifferentFireModes;
 	xr_vector<s8>	m_aFireModes;
 	int				m_iCurFireMode;
-	string16		m_sCurFireMode;
 	int				m_iPrefferedFireMode;
 
 	//переменная блокирует использование
