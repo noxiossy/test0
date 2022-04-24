@@ -23,7 +23,8 @@ struct HUD_SOUND_ITEM
 										const CObject* parent,
 										bool hud_mode,
 										bool looped = false,
-										u8 index=u8(-1));
+										u8 index=u8(-1)
+										bool overlap = false);
 
 	static void		StopSound		(	HUD_SOUND_ITEM& snd);
 
@@ -66,7 +67,8 @@ public:
 													const CObject* parent,
 													bool hud_mode,
 													bool looped = false,
-													u8 index=u8(-1));
+													u8 index=u8(-1)
+													bool overlap = false);
 
 	void						StopSound		(	LPCSTR alias);
 

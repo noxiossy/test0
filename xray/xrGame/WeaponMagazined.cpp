@@ -652,7 +652,7 @@ void CWeaponMagazined::SetDefaults	()
 void CWeaponMagazined::OnShot()
 {
 	// Sound
-	PlaySound					(m_sSndShotCurrent.c_str(), get_LastFP());
+	PlaySound					(m_sSndShotCurrent.c_str(), get_LastFP(), true);
 
 	// Camera	
 	AddShotEffector				();
@@ -1417,7 +1417,7 @@ bool CWeaponMagazined::ScopeRespawn( PIItem pIItem ) {
     LPCSTR S = pSettings->r_string( cNameSect(), scope_respawn.c_str() );
     if ( xr_strcmp( cName().c_str(), S ) != 0 ) {
       CSE_Abstract* _abstract = Level().spawn_item( S, Position(), ai_location().level_vertex_id(), H_Parent()->ID(), true );
-      CSE_ALifeDynamicObject* sobj1 = alife_object();
+      auto sobj1 = alife_object();
       CSE_ALifeDynamicObject* sobj2 = smart_cast<CSE_ALifeDynamicObject*>( _abstract );
 
       NET_Packet P;
