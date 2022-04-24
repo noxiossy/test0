@@ -11,6 +11,7 @@
 #include "script_binder.h"
 #include "Hit.h"
 #include "game_object_space.h"
+#include "script_callback_ex.h"
 
 class CPhysicsShell;
 class CSE_Abstract;
@@ -285,6 +286,8 @@ public:
 	virtual	LPCSTR			visual_name			(CSE_Abstract *server_entity);
 
 	virtual	void			On_B_NotCurrentEntity () {};
+
+	CSE_ALifeDynamicObject* alife_object() const; // alpet: возвращает серверный экземпляр для этого объекта
 
 	// for moving objects
 private:
