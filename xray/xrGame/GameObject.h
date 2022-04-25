@@ -306,4 +306,9 @@ public:
 	}
 
 	virtual void			on_matrix_change	(const Fmatrix &previous);
+public:
+	CSE_ALifeDynamicObject* alife_object		() const;				// alpet: возвращает серверный экземпляр для этого объекта
+	virtual void			UpdateXFORM			(const Fmatrix &upd);	// alpet: для обновления позиции и направления
+	virtual void			ChangePosition		(const Fvector &pos);
+
 };

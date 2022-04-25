@@ -116,9 +116,6 @@ protected:
 	bool				m_bAllowInvUpgrade;
 
 	u32					m_tmp_active_slot_num;
-	
-	bool				m_play_show_hide_reload_sounds;
-	u32					m_tmp_next_item_slot;
 	//////////////////////////////////////////////////////////////////////////
 	// сюжетная информация
 public:
@@ -232,8 +229,6 @@ public:
 	virtual	float				missile_throw_force		(); 
 	virtual	bool				use_throw_randomness	();
 	virtual bool				NeedOsoznanieMode		() {return m_need_osoznanie_mode!=FALSE;}
-
-	void						SetNextItemSlot			( u32 );
 };
 
 #include "inventory_owner_inline.h"

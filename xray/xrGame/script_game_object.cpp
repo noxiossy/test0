@@ -536,3 +536,10 @@ void CScriptGameObject::invulnerable		(bool invulnerable)
 
 	monster->invulnerable	(invulnerable);
 }
+
+//////////////////////////////////////////////////////////////////
+CSE_ALifeDynamicObject* CScriptGameObject::alife_object() const
+{
+	return object().alife_object();
+}
+

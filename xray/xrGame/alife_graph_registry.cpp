@@ -151,7 +151,8 @@ void CALifeGraphRegistry::add	(CSE_ALifeDynamicObject *object, GameGraph::_GRAPH
 		Msg						("[LSS] adding object [%s][%d] to graph point %d",object->name_replace(),object->ID,game_vertex_id);
 	}
 #endif
-	if (!object->m_bOnline && object->used_ai_locations() && ai().game_graph().valid_vertex_id(game_vertex_id) /**&& object->interactive()/**/) {
+	if (!object->m_bOnline && object->used_ai_locations() /**&& object->interactive()/**/) {
+		VERIFY					(ai().game_graph().valid_vertex_id(game_vertex_id));
 		m_objects[game_vertex_id].objects().add(object->ID,object);
 		object->m_tGraphID		= game_vertex_id;
 	}
@@ -167,8 +168,7 @@ void CALifeGraphRegistry::add	(CSE_ALifeDynamicObject *object, GameGraph::_GRAPH
 
 void CALifeGraphRegistry::remove	(CSE_ALifeDynamicObject *object, GameGraph::_GRAPH_ID game_vertex_id, bool update)
 {
-	bool vertex_valid = ai().game_graph().valid_vertex_id( game_vertex_id );
-	if ( object->used_ai_locations() && vertex_valid /**&& object->interactive()/**/ ) {
+	if (object->used_ai_locations() /**&& object->interactive()/**/) {
 	#ifdef DEBUG
 		if (psAI_Flags.test(aiALife)) {
 			Msg					("[LSS] removing object [%s][%d] from graph point %d",object->name_replace(),object->ID,game_vertex_id);
@@ -176,11 +176,7 @@ void CALifeGraphRegistry::remove	(CSE_ALifeDynamicObject *object, GameGraph::_GR
 	#endif
 		m_objects[game_vertex_id].objects().remove(object->ID);
 	}	
-	if ( update && m_level ) {
-	  if ( vertex_valid )
-	    level().remove( object, ai().game_graph().vertex( game_vertex_id )->level_id() != level().level_id() );
-	  else
-	    level().remove( object, true );
-	}
+	if (update && m_level)
+		level().remove			(object,ai().game_graph().vertex(game_vertex_id)->level_id() != level().level_id());
 }
 

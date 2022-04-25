@@ -687,6 +687,9 @@ public:
 			void				take_items_enabled						(bool value);
 			bool				take_items_enabled						() const;
 
+
+			CSE_ALifeDynamicObject* alife_object						() const; // alpet: возвращает серверный экземпляр для этого объекта
+
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 add_to_type_list(CScriptGameObject)
