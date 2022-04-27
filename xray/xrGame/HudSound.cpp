@@ -81,12 +81,14 @@ void HUD_SOUND_ITEM::PlaySound(	HUD_SOUND_ITEM&		hud_snd,
 								const CObject*	parent,
 								bool			b_hud_mode,
 								bool			looped,
-								u8 index)
+								u8 index,
+								bool overlap)
 {
 	if (hud_snd.sounds.empty())	return;
 
-	hud_snd.m_activeSnd			= NULL;
-	StopSound					(hud_snd);
+	//hud_snd.m_activeSnd			= NULL;
+	if ( !overlap )
+	  StopSound( hud_snd );
 
 	u32 flags = b_hud_mode?sm_2D:0;
 	if(looped)
@@ -96,14 +98,23 @@ void HUD_SOUND_ITEM::PlaySound(	HUD_SOUND_ITEM&		hud_snd,
 		index = (u8)Random.randI(hud_snd.sounds.size());
 
 	hud_snd.m_activeSnd = &hud_snd.sounds[ index ];
-	
 
+	Fvector pos  = ( flags & sm_2D ) ? Fvector().set( 0, 0, 0 ) : position;
+	float   vol  = hud_snd.m_activeSnd->volume;
+	
+	if ( overlap ) 
+	{
+	hud_snd.m_activeSnd->snd.play_no_feedback	(const_cast<CObject*>(parent), flags, hud_snd.m_activeSnd->delay, &pos, &vol );
+	}
+	else 
+	{
 	hud_snd.m_activeSnd->snd.play_at_pos(	const_cast<CObject*>(parent),
-											flags&sm_2D?Fvector().set(0,0,0):position,
+											pos,
 											flags,
 											hud_snd.m_activeSnd->delay);
 
-	hud_snd.m_activeSnd->snd.set_volume		(hud_snd.m_activeSnd->volume * b_hud_mode?psHUDSoundVolume:1.0f);
+	hud_snd.m_activeSnd->snd.set_volume		(vol * (b_hud_mode?psHUDSoundVolume:1.0f));
+	}
 }
 
 void HUD_SOUND_ITEM::StopSound(HUD_SOUND_ITEM& hud_snd)

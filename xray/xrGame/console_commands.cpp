@@ -186,13 +186,6 @@ public:
 	virtual void Execute(LPCSTR args) {
 		CCC_Token::Execute(args);
 		if (g_pGameLevel && Level().game){
-//#ifndef	DEBUG
-			if (GameID() != eGameIDSingle){
-				Msg("For this game type difficulty level is disabled.");
-				return;
-			};
-//#endif
-
 			game_cl_Single* game		= smart_cast<game_cl_Single*>(Level().game); VERIFY(game);
 			game->OnDifficultyChanged	();
 		}
@@ -259,7 +252,7 @@ class CCC_ALifeSwitchDistance : public IConsole_Command {
 public:
 	CCC_ALifeSwitchDistance(LPCSTR N) : IConsole_Command(N)  { };
 	virtual void Execute(LPCSTR args) {
-		if ((GameID() == eGameIDSingle)  &&ai().get_alife()) {
+		if (ai().get_alife()) {
 			float id1 = 0.0f;
 			sscanf(args ,"%f",&id1);
 			if (id1 < 2.0f)
@@ -280,7 +273,7 @@ class CCC_ALifeProcessTime : public IConsole_Command {
 public:
 	CCC_ALifeProcessTime(LPCSTR N) : IConsole_Command(N)  { };
 	virtual void Execute(LPCSTR args) {
-		if ((GameID() == eGameIDSingle)  &&ai().get_alife()) {
+		if (ai().get_alife()) {
 			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
 			VERIFY			(tpGame);
 			int id1 = 0;
@@ -300,7 +293,7 @@ class CCC_ALifeObjectsPerUpdate : public IConsole_Command {
 public:
 	CCC_ALifeObjectsPerUpdate(LPCSTR N) : IConsole_Command(N)  { };
 	virtual void Execute(LPCSTR args) {
-		if ((GameID() == eGameIDSingle)  &&ai().get_alife()) {
+		if (ai().get_alife()) {
 			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
 			VERIFY			(tpGame);
 			int id1 = 0;
@@ -316,7 +309,7 @@ class CCC_ALifeSwitchFactor : public IConsole_Command {
 public:
 	CCC_ALifeSwitchFactor(LPCSTR N) : IConsole_Command(N)  { };
 	virtual void Execute(LPCSTR args) {
-		if ((GameID() == eGameIDSingle)  &&ai().get_alife()) {
+		if (ai().get_alife()) {
 			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
 			VERIFY			(tpGame);
 			float id1 = 0;
@@ -341,13 +334,7 @@ public:
 			Msg("Demo Record is disabled when level is not loaded.");
 			return;
 		}
-		#ifndef	DEBUG
-		if (GameID() != eGameIDSingle) 
-		{
-			Msg("For this game type Demo Record is disabled.");
-			return;
-		};
-		#endif
+
 		Console->Hide	();
 		if (MainMenu()->IsActive()) MainMenu()->Activate(false); // close main menu if it is open
 		string_path		fn_; 
@@ -389,13 +376,6 @@ public:
 	  IConsole_Command(N) 
 	  { bEmptyArgsHandled = TRUE; };
 	  virtual void Execute(LPCSTR args) {
-		#ifndef	DEBUG
-		if (GameID() != eGameIDSingle) 
-		{
-			Msg("For this game type Demo Play is disabled.");
-			return;
-		};
-		#endif
 		  if (0==g_pGameLevel)
 		  {
 			  Msg	("! There are no level(s) started");
@@ -443,17 +423,13 @@ public:
 			return;
 		}
 #endif
-		if(!IsGameTypeSingle()){
-			Msg("for single-mode only");
-			return;
-		}
 		if(!g_actor || !Actor()->g_Alive())
 		{
 			Msg("cannot make saved game because actor is dead :(");
 			return;
 		}
 
-		string_path				S,S1,BS,BS1;
+		string_path				S,S1;
 		S[0]					= 0;
 //.		sscanf					(args ,"%s",S);
 		strcpy_s					(S,args);
@@ -463,27 +439,7 @@ public:
 		timer.Start				();
 #endif
 		if (!xr_strlen(S)){
-			strconcat			(sizeof(S),S,"quicksave","_","1");
-			
-			if (CSavedGameWrapper::saved_game_exist(S)) 
-			{
-				strconcat		(sizeof(BS),BS,"quicksave","_","2.sav");
-				strconcat		(sizeof(BS1),BS1,"quicksave","_","2.dds");
-	
-				strcat			(S,".sav");
-				FS.update_path	(BS,"$game_saves$",S);
-				FS.file_rename	(S, BS, true);
-				
-				strcat			(S,".dds");
-				FS.update_path	(BS1,"$game_saves$",S);
-				FS.file_rename	(S, BS1, true);
-				//FS.file_rename(S,BS,true);
-				//string256 backup_quicsave_name = "quicksave_2.sav";
-				//xr_string backup_quicsave_name = EFS.ChangeFileExt(logFName,"_bkp.sav");
-				//strconcat		(sizeof(S),S,Core.UserName,"_","quicksave_2");
-				Msg				("Creating backup quicksave - %s",BS);
-
-			}
+			strconcat			(sizeof(S),S,Core.UserName,"_","quicksave");
 			NET_Packet			net_packet;
 			net_packet.w_begin	(M_SAVE_GAME);
 			net_packet.w_stringZ(S);
@@ -1003,13 +959,6 @@ public:
 	  virtual void	Execute	(LPCSTR args)
 	  {
 		  if(!ph_world)	return;
-#ifndef DEBUG
-		  if (g_pGameLevel && Level().game && GameID() != eGameIDSingle)
-		  {
-			  Msg("Command is not available in Multiplayer");
-			  return;
-		  }
-#endif
 		  ph_world->SetGravity(float(atof(args)));
 	  }
 	  virtual void	Status	(TStatus& S)

@@ -48,9 +48,9 @@ void CHudItem::Load(LPCSTR section)
 }
 
 
-void CHudItem::PlaySound(LPCSTR alias, const Fvector& position)
+void CHudItem::PlaySound(LPCSTR alias, const Fvector& position, bool overlap )
 {
-	m_sounds.PlaySound	(alias, position, object().H_Root(), !!GetHUDmode());
+	m_sounds.PlaySound	(alias, position, object().H_Root(), !!GetHUDmode(), false, overlap );
 }
 
 void CHudItem::renderable_Render()

@@ -652,7 +652,7 @@ void CWeaponMagazined::SetDefaults	()
 void CWeaponMagazined::OnShot()
 {
 	// Sound
-	PlaySound					(m_sSndShotCurrent.c_str(), get_LastFP());
+	PlaySound					(m_sSndShotCurrent.c_str(), get_LastFP(), true);
 
 	// Camera	
 	AddShotEffector				();
