@@ -339,7 +339,7 @@ attachable_hud_item::~attachable_hud_item()
 {
 	IRenderVisual* v			= m_model->dcast_RenderVisual();
 	::Render->model_Delete		(v);
-	m_model						= NULL;
+	m_model						= nullptr;
 }
 
 void attachable_hud_item::load(const shared_str& sect_name)
@@ -773,6 +773,9 @@ void player_hud::detach_item_idx(u16 idx)
 		for(u32 bidx=0; bidx<bc; ++bidx)
 		{
 			CBlend* BR			= m_model->LL_PartBlend(part_idR, bidx);
+			if (!BR)
+				continue;
+
 			MotionID M			= BR->motionID;
 
 			u16 pc					= m_model->partitions().count();
@@ -780,10 +783,13 @@ void player_hud::detach_item_idx(u16 idx)
 			{
 				if(pid!=part_idR)
 				{
-					CBlend* B			= m_model->PlayCycle(pid, M, TRUE);
-					u16 bop				= B->bone_or_part;
-					*B					= *BR;
-					B->bone_or_part		= bop;
+					CBlend* B			= m_model->PlayCycle(pid, M, TRUE);  // this can destroy BR calling UpdateTracks !
+					if (BR->blend_state() != CBlend::eFREE_SLOT)
+					{
+						u16 bop = B->bone_or_part;
+						*B = *BR;
+						B->bone_or_part = bop;
+					}
 				}
 			}
 		}
