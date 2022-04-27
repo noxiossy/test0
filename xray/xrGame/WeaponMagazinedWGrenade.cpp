@@ -144,7 +144,7 @@ void CWeaponMagazinedWGrenade::OnShot		()
 	if(m_bGrenadeMode)
 	{
 		PlayAnimShoot		();
-		PlaySound			("sndShotG", get_LastFP2(), true);
+		PlaySound			("sndShotG", get_LastFP2());
 		AddShotEffector		();
 		StartFlameParticles2();
 	} 
