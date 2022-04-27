@@ -783,13 +783,10 @@ void player_hud::detach_item_idx(u16 idx)
 			{
 				if(pid!=part_idR)
 				{
-					CBlend* B			= m_model->PlayCycle(pid, M, TRUE);  // this can destroy BR calling UpdateTracks !
-					if (BR->blend_state() != CBlend::eFREE_SLOT)
-					{
-						u16 bop = B->bone_or_part;
-						*B = *BR;
-						B->bone_or_part = bop;
-					}
+					CBlend* B			= m_model->PlayCycle(pid, M, TRUE);
+					u16 bop				= B->bone_or_part;
+					*B					= *BR;
+					B->bone_or_part		= bop;
 				}
 			}
 		}
