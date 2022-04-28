@@ -7179,6 +7179,9 @@
     <ClInclude Include="ui\UIDragDropListEx.h">
       <Filter>UI\UIWindows\DragDrop2</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIDragDropReferenceList.h">
+      <Filter>UI\UIWindows\DragDrop2</Filter>
+    </ClInclude>
     <ClInclude Include="ui\UILabel.h">
       <Filter>UI\UIWindows\Label</Filter>
     </ClInclude>
@@ -10741,6 +10744,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIDragDropListEx.cpp">
       <Filter>UI\UIWindows\DragDrop2</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIDragDropReferenceList.cpp">
+      <Filter>UI\UIWindows\DragDro2p</Filter>
     </ClCompile>
     <ClCompile Include="ui\UILabel.cpp">
       <Filter>UI\UIWindows\Label</Filter>

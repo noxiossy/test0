@@ -4,6 +4,7 @@
 #include "xrUIXmlParser.h"
 #include "UICharacterInfo.h"
 #include "UIDragDropListEx.h"
+#include "UIDragDropReferenceList.h"
 #include "UIActorStateInfo.h"
 #include "UIItemInfo.h"
 #include "UIFrameLineWnd.h"

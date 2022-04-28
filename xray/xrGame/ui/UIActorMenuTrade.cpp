@@ -2,6 +2,7 @@
 #include "UIActorMenu.h"
 #include "UI3tButton.h"
 #include "UIDragDropListEx.h"
+#include "UIDragDropReferenceList.h"
 #include "UICharacterInfo.h"
 #include "UIFrameLineWnd.h"
 #include "UICellItem.h"

@@ -23,6 +23,7 @@
 #include "UICharacterInfo.h"
 #include "UIItemInfo.h"
 #include "UIDragDropListEx.h"
+#include "UIDragDropReferenceList.h"
 #include "UIInventoryUpgradeWnd.h"
 #include "UI3tButton.h"
 #include "UIMessageBoxEx.h"

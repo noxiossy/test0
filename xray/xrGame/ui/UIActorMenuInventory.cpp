@@ -7,6 +7,7 @@
 #include "../Level.h"
 #include "UICellItemFactory.h"
 #include "UIDragDropListEx.h"
+#include "UIDragDropReferenceList.h"
 #include "UICellCustomItems.h"
 #include "UIItemInfo.h"
 #include "UIFrameLineWnd.h"

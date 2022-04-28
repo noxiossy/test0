@@ -5,6 +5,7 @@
 #include "UIInvUpgradeInfo.h"
 
 #include "UIDragDropListEx.h"
+#include "UIDragDropReferenceList.h"
 #include "UICharacterInfo.h"
 
 #include "../inventory_item.h"

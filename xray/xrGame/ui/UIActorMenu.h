@@ -7,6 +7,7 @@
 
 class CUICharacterInfo;
 class CUIDragDropListEx;
+class CUIDragDropReferenceList;
 class CUICellItem;
 class CUIDragItem;
 class ui_actor_state_wnd;
