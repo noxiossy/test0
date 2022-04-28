@@ -19,7 +19,9 @@
 #include "object_broker.h"
 #include "UIWndCallback.h"
 #include "UIHelper.h"
-
+#include "UIProgressBar.h"
+#include "ui_base.h"
+#include "../string_table.h"
 
 CUIActorMenu::CUIActorMenu()
 {
@@ -49,6 +51,11 @@ void CUIActorMenu::Construct()
 	xml_init.InitWindow					(uiXml, "main", 0, this);
 	m_hint_wnd = UIHelper::CreateHint	(uiXml, "hint_wnd");
 
+	m_LRBackground						= xr_new<CUIStatic>();
+	m_LRBackground->SetAutoDelete		(true);
+	AttachChild							(m_LRBackground);
+	xml_init.InitStatic					(uiXml, "lr_background", 0, m_LRBackground);
+	
 	m_LeftBackground					= xr_new<CUIStatic>();
 	m_LeftBackground->SetAutoDelete		(true);
 	AttachChild							(m_LeftBackground);
@@ -91,6 +98,7 @@ void CUIActorMenu::Construct()
 	m_PartnerBottomInfo->AdjustWidthToText();
 	m_PartnerWeight_end_x = m_PartnerWeight->GetWndPos().x;
 
+
 	m_pInventoryBagList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_bag", this);
 	m_pInventoryBeltList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_belt", this);
 	m_pInventoryOutfitList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_outfit", this);
@@ -101,6 +109,10 @@ void CUIActorMenu::Construct()
 	m_pTradeActorList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_actor_trade", this);
 	m_pTradePartnerBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_bag", this);
 	m_pTradePartnerList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_trade", this);
+	m_pDeadBodyActorBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_actor_bag", this);
+	m_pDeadBodyBagList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_bag", this);	
+	m_pQuickSlot				= UIHelper::CreateDragDropReferenceList(uiXml, "dragdrop_quick_slots", this);
+	m_pQuickSlot->Initialize	();
 
 	m_pTrashList				= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_trash", this);
 	m_pTrashList->m_f_item_drop	= CUIDragDropListEx::DRAG_DROP_EVENT(this, &CUIActorMenu::OnItemDrop);
@@ -109,10 +121,10 @@ void CUIActorMenu::Construct()
 	m_belt_list_over[0] = UIHelper::CreateStatic(uiXml, "belt_list_over", this);
 	Fvector2 pos;
 	pos = m_belt_list_over[0]->GetWndPos();
-	float dy = uiXml.ReadAttribFlt("belt_list_over", 0, "dy", 10.0f);
+	float dx = uiXml.ReadAttribFlt("belt_list_over", 0, "dx", 10.0f);
 	for ( u8 i = 1; i < e_af_count; ++i )
 	{
-		pos.y += dy;
+		pos.x += dx;
 		m_belt_list_over[i] = UIHelper::CreateStatic(uiXml, "belt_list_over", this);
 		m_belt_list_over[i]->SetWndPos( pos );
 	}
@@ -126,11 +138,12 @@ void CUIActorMenu::Construct()
 
 	m_clock_value						= UIHelper::CreateStatic(uiXml, "clock_value", this);
 
+/*
 	m_pDeadBodyBagList					= xr_new<CUIDragDropListEx>(); 
 	AttachChild							(m_pDeadBodyBagList);
 	m_pDeadBodyBagList->SetAutoDelete	(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_deadbody_bag", 0, m_pDeadBodyBagList);
-
+*/
 	m_ActorStateInfo					= xr_new<ui_actor_state_wnd>();
 	m_ActorStateInfo->init_from_xml		(uiXml, "actor_state_info");
 	m_ActorStateInfo->SetAutoDelete		(true);
@@ -192,13 +205,17 @@ void CUIActorMenu::Construct()
 	BindDragDropListEvents				(m_pTradeActorList);
 	BindDragDropListEvents				(m_pTradePartnerBagList);
 	BindDragDropListEvents				(m_pTradePartnerList);
+	BindDragDropListEvents				(m_pDeadBodyActorBagList);
 	BindDragDropListEvents				(m_pDeadBodyBagList);
+	BindDragDropListEvents				(m_pQuickSlot);
 
 	m_allowed_drops[iTrashSlot].push_back(iActorBag);
 	m_allowed_drops[iTrashSlot].push_back(iActorSlot);
 	m_allowed_drops[iTrashSlot].push_back(iActorBelt);
+	m_allowed_drops[iTrashSlot].push_back(iQuickSlot);
 
 	m_allowed_drops[iActorSlot].push_back(iActorBag);
+	m_allowed_drops[iActorSlot].push_back(iActorSlot);
 	m_allowed_drops[iActorSlot].push_back(iActorTrade);
 	m_allowed_drops[iActorSlot].push_back(iDeadBodyBag);
 
@@ -207,6 +224,7 @@ void CUIActorMenu::Construct()
 	m_allowed_drops[iActorBag].push_back(iActorTrade);
 	m_allowed_drops[iActorBag].push_back(iDeadBodyBag);
 	m_allowed_drops[iActorBag].push_back(iActorBag);
+	m_allowed_drops[iActorBag].push_back(iQuickSlot);
 	
 	m_allowed_drops[iActorBelt].push_back(iActorBag);
 	m_allowed_drops[iActorBelt].push_back(iActorTrade);
@@ -217,6 +235,7 @@ void CUIActorMenu::Construct()
 	m_allowed_drops[iActorTrade].push_back(iActorBag);
 	m_allowed_drops[iActorTrade].push_back(iActorBelt);
 	m_allowed_drops[iActorTrade].push_back(iActorTrade);
+	m_allowed_drops[iActorTrade].push_back(iQuickSlot);
 
 	m_allowed_drops[iPartnerTradeBag].push_back(iPartnerTrade);
 	m_allowed_drops[iPartnerTradeBag].push_back(iPartnerTradeBag);
@@ -227,6 +246,9 @@ void CUIActorMenu::Construct()
 	m_allowed_drops[iDeadBodyBag].push_back(iActorBag);
 	m_allowed_drops[iDeadBodyBag].push_back(iActorBelt);
 	m_allowed_drops[iDeadBodyBag].push_back(iDeadBodyBag);
+
+	m_allowed_drops[iQuickSlot].push_back(iActorBag);
+	m_allowed_drops[iQuickSlot].push_back(iActorTrade);
 
 	m_upgrade_selected					= NULL;
 	SetCurrentItem						(NULL);
@@ -286,6 +308,33 @@ void CUIActorMenu::UpdateButtonsLayout()
 	}
 	
 	m_exit_button->SetWndPos(btn_exit_pos);
+	
+	string32 tmp;
+	LPCSTR str = CStringTable().translate("quick_use_str_1").c_str();
+	strncpy_s(tmp, sizeof(tmp), str, 3);
+	if(tmp[2]==',')
+		tmp[1] = '\0';
+	m_QuickSlot1->SetTextST(tmp);
+
+	str = CStringTable().translate("quick_use_str_2").c_str();
+	strncpy_s(tmp, sizeof(tmp), str, 3);
+	if(tmp[2]==',')
+		tmp[1] = '\0';
+	m_QuickSlot2->SetTextST(tmp);
+
+	str = CStringTable().translate("quick_use_str_3").c_str();
+	strncpy_s(tmp, sizeof(tmp), str, 3);
+	if(tmp[2]==',')
+		tmp[1] = '\0';
+	m_QuickSlot3->SetTextST(tmp);
+
+	str = CStringTable().translate("quick_use_str_4").c_str();
+	strncpy_s(tmp, sizeof(tmp), str, 3);
+	if(tmp[2]==',')
+		tmp[1] = '\0';
+	m_QuickSlot4->SetTextST(tmp);
+
+	UpdateConditionProgressBars		();
 }
 
 void CUIActorMenu::SetSimpleHintText(LPCSTR text)

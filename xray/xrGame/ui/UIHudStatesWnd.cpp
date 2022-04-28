@@ -96,6 +96,7 @@ void CUIHudStatesWnd::InitFromXml( CUIXml& xml, LPCSTR path )
 	m_indik[ALife::infl_acid] = UIHelper::CreateStatic( xml, "indik_acid", this );
 	m_indik[ALife::infl_psi]  = UIHelper::CreateStatic( xml, "indik_psi", this );
 
+	m_lanim_name._set( xml.ReadAttrib( "indik_rad", 0, "light_anim", "" ) );
 
 	m_ui_weapon_sign_ammo = UIHelper::CreateStatic( xml, "static_ammo", this );
 	//m_ui_weapon_sign_ammo->SetEllipsis( CUIStatic::eepEnd, 2 );
@@ -596,6 +597,27 @@ void CUIHudStatesWnd::UpdateIndicatorType( CActor* actor, ALife::EInfluenceType 
 	m_indik[type]->SetColor( c_red );
 	SwitchLA( true, type );
 	actor->conditions().SetZoneDanger( hit_power - protect, type );
+}
+
+void CUIHudStatesWnd::SwitchLA( bool state, ALife::EInfluenceType type )
+{
+	if ( state == m_cur_state_LA[type] )
+	{
+		return;
+	}
+
+	if ( state )
+	{
+		m_indik[type]->SetClrLightAnim( m_lanim_name.c_str(), true, false, false, true );
+		m_cur_state_LA[type] = true;
+//-		Msg( "LA = 1    type = %d", type );
+	}
+	else
+	{
+		m_indik[type]->SetClrLightAnim( NULL, false, false, false, false );//off
+		m_cur_state_LA[type] = false;
+//-		Msg( "__LA = 0    type = %d", type );
+	}
 }
 
 float CUIHudStatesWnd::get_zone_cur_power( ALife::EHitType hit_type )

@@ -39,8 +39,8 @@ void CUIActorMenu::InitInventoryMode()
 	m_pInventoryDetectorList->Show		(true);
 	m_pInventoryPistolList->Show		(true);
 	m_pInventoryAutomaticList->Show		(true);
-	
-	m_pTrashList->Show(true);
+	m_pQuickSlot->Show					(true);
+	m_pTrashList->Show					(true);
 
 	m_RightDelimiter->Show				(false);
 	m_clock_value->Show					(true);
@@ -118,8 +118,6 @@ void CUIActorMenu::SendEvent_Item_Eat(PIItem pItem, u16 recipient)
 void CUIActorMenu::SendEvent_Item_Drop(PIItem pItem, u16 recipient)
 {
 	R_ASSERT(pItem->parent_id()==recipient);
-	if (!IsGameTypeSingle())
-		pItem->DenyTrade();
 	//pItem->SetDropManual			(TRUE);
 	NET_Packet					P;
 	pItem->object().u_EventGen	(P,GE_OWNERSHIP_REJECT,pItem->parent_id());
@@ -233,6 +231,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 		m_pInventoryDetectorList, 
 		m_pInventoryBagList,
 		m_pTradeActorBagList,
+		m_pDeadBodyActorBagList,
 		m_pTradeActorList,
 		NULL
 	};
@@ -282,6 +281,10 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 					}
 					++i;
 				}
+				CUICellItem*		ci   = NULL;
+				if(GetMenuMode()==mmDeadBodySearch && FindItemInList(m_pDeadBodyBagList, pItem, ci))
+					break;
+
 				if ( !b_already )
 				{
 					if ( lst_to_add )
@@ -290,6 +293,8 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 						lst_to_add->SetItem	(itm);
 					}
 				}
+				if(m_pActorInvOwner)
+					m_pQuickSlot->ReloadReferences(m_pActorInvOwner);
 			}break;
 		case GE_TRADE_SELL :
 		case GE_OWNERSHIP_REJECT : 
@@ -318,9 +323,12 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 					}
 					++i;
 				}
+				if(m_pActorInvOwner)
+					m_pQuickSlot->ReloadReferences(m_pActorInvOwner);
 			}break;
 	}
 	UpdateItemsPlace();
+	UpdateConditionProgressBars();
 }
 void CUIActorMenu::AttachAddon(PIItem item_to_upgrade)
 {
@@ -362,6 +370,9 @@ void CUIActorMenu::InitCellForSlot( u32 slot_idx )
 	}
 	
 	CUIDragDropListEx* curr_list	= GetSlotList( slot_idx );
+	if (!curr_list)
+		return;
+
 	CUICellItem* cell_item			= create_cell_item( item );
 	curr_list->SetItem( cell_item );
 	if ( m_currMenuMode == mmTrade && m_pPartnerInvOwner )
@@ -408,11 +419,6 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 	ite = ruck_list.end();
 	for ( ; itb != ite; ++itb )
 	{
-		CMPPlayersBag* bag = smart_cast<CMPPlayersBag*>( &(*itb)->object() );
-		if ( bag )
-		{
-			continue;
-		}
 		CUICellItem* itm = create_cell_item( *itb );
 		curr_list->SetItem( itm );
 		if ( m_currMenuMode == mmTrade && m_pPartnerInvOwner )
@@ -420,7 +426,7 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 			ColorizeItem( itm, !CanMoveToPartner( *itb ) );
 		}
 	}
-
+	m_pQuickSlot->ReloadReferences(m_pActorInvOwner);
 }
 
 bool CUIActorMenu::TryActiveSlot(CUICellItem* itm)
@@ -654,6 +660,32 @@ bool CUIActorMenu::TryUseItem( CUICellItem* cell_itm )
 	return true;
 }
 
+bool CUIActorMenu::ToQuickSlot(CUICellItem* itm)
+{
+	PIItem iitem = (PIItem)itm->m_pData;
+	CEatableItemObject* eat_item = smart_cast<CEatableItemObject*>(iitem);
+	if(!eat_item)
+		return false;
+
+	//Alundaio: Fix deep recursion if placing icon greater then col/row set in actor_menu.xml
+	Ivector2 iWH = iitem->GetInvGridRect().rb;
+	if (iWH.x > 1 || iWH.y > 1)
+		return false;
+	//Alundaio: END
+		
+	u8 slot_idx = u8(m_pQuickSlot->PickCell(GetUICursor().GetCursorPosition()).x);
+	if(slot_idx==255)
+		return false;
+	
+	if (!m_pQuickSlot->CanSetItem(itm))
+		return false;
+
+	m_pQuickSlot->SetItem(create_cell_item(iitem), GetUICursor().GetCursorPosition());
+	xr_strcpy(ACTOR_DEFS::g_quick_use_slots[slot_idx], iitem->m_section_id.c_str());
+	return true;
+}
+
+
 bool CUIActorMenu::OnItemDropped(PIItem itm, CUIDragDropListEx* new_owner, CUIDragDropListEx* old_owner)
 {
 	CUICellItem*	_citem	= (new_owner->ItemsCount()==1) ? new_owner->GetItemIdx(0) : NULL;
@@ -795,7 +827,7 @@ void CUIActorMenu::PropertiesBoxForWeapon( CUICellItem* cell_item, PIItem item, 
 		m_UIPropertiesBox->AddItem( "st_detach_silencer",  NULL, INVENTORY_DETACH_SILENCER_ADDON );
 		b_show			= true;
 	}
-	if ( smart_cast<CWeaponMagazined*>(pWeapon) && IsGameTypeSingle() )
+	if ( smart_cast<CWeaponMagazined*>(pWeapon) )
 	{
 		bool b = ( pWeapon->GetAmmoElapsed() !=0 );
 		if ( !b )
@@ -1028,6 +1060,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked( CUIWindow* w, void* d )
 	
 	SetCurrentItem( NULL );
 	UpdateItemsPlace();
+	UpdateConditionProgressBars();
 }//ProcessPropertiesBoxClicked
 
 void CUIActorMenu::UpdateOutfit()
@@ -1049,9 +1082,9 @@ void CUIActorMenu::UpdateOutfit()
 	}
 
 	Ivector2 afc;
-	afc.x = 1; // m_pInventoryBeltList->GetCellsCapacity().x;
-	afc.y = af_count;
-	
+	afc.x = af_count;//1;
+	afc.y = 1;//af_count;
+
 	m_pInventoryBeltList->SetCellsCapacity( afc );
 	for ( u8 i = 0; i < af_count ; ++i )
 	{

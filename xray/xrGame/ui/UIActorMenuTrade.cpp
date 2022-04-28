@@ -18,7 +18,10 @@
 #include "../inventory_item_object.h"
 #include "../string_table.h"
 #include "../ai/monsters/BaseMonster/base_monster.h"
-
+#include "../ai_space.h"
+#include "../../xrServerEntities/script_engine.h"
+#include "../UIGameSP.h"
+#include "UITalkWnd.h"
 
 // -------------------------------------------------
 
@@ -27,6 +30,7 @@ void CUIActorMenu::InitTradeMode()
 	m_pInventoryBagList->Show		(false);
 	m_PartnerCharacterInfo->Show	(true);
 	m_PartnerMoney->Show			(true);
+	m_pQuickSlot->Show				(true);
 
 	m_pTradeActorBagList->Show		(true);
 	m_pTradeActorList->Show			(true);
@@ -36,6 +40,7 @@ void CUIActorMenu::InitTradeMode()
 	m_RightDelimiter->Show			(true);
 	m_LeftDelimiter->Show			(true);
 	m_LeftBackground->Show			(true);
+	m_LRBackground->Show			(false);
 
 	m_PartnerBottomInfo->Show		(true);
 	m_PartnerWeight->Show			(true);
@@ -55,6 +60,26 @@ void CUIActorMenu::InitTradeMode()
 	m_partner_trade->StartTradeEx	( m_pActorInvOwner );
 
 	UpdatePrices();
+
+	CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
+	if (pActor) pActor->RepackAmmo();
+}
+
+bool is_item_in_list(CUIDragDropListEx* pList, PIItem item)
+{
+	for(u16 i=0;i<pList->ItemsCount();i++)
+	{
+		CUICellItem* cell_item = pList->GetItemIdx(i);
+		for(u16 k=0;k<cell_item->ChildsCount();k++)
+		{
+			CUICellItem* inv_cell_item = cell_item->Child(k);
+			if((PIItem)inv_cell_item->m_pData==item)
+				return true;
+		}
+		if((PIItem)cell_item->m_pData==item)
+			return true;
+	}
+	return false;
 }
 
 void CUIActorMenu::InitPartnerInventoryContents()
@@ -69,8 +94,11 @@ void CUIActorMenu::InitPartnerInventoryContents()
 	TIItemContainer::iterator ite = items_list.end();
 	for( ; itb != ite; ++itb ) 
 	{
-		CUICellItem* itm			= create_cell_item( *itb );
-		m_pTradePartnerBagList->SetItem( itm );
+		if(!is_item_in_list(m_pTradePartnerList, *itb))
+		{
+			CUICellItem* itm			= create_cell_item( *itb );
+			m_pTradePartnerBagList->SetItem( itm );
+		}
 	}
 	m_trade_partner_inventory_state = m_pPartnerInvOwner->inventory().ModifyFrame();
 }
@@ -114,7 +142,8 @@ void CUIActorMenu::DeInitTradeMode()
 	m_RightDelimiter->Show			(false);
 	m_LeftDelimiter->Show			(false);
 	m_LeftBackground->Show			(false);
-
+	m_LRBackground->Show			(true);
+	
 	m_PartnerBottomInfo->Show		(false);
 	m_PartnerWeight->Show			(false);
 	m_trade_button->Show			(false);
@@ -133,6 +162,8 @@ bool CUIActorMenu::ToActorTrade(CUICellItem* itm, bool b_use_cursor_pos)
 		CUIDragDropListEx*	old_owner		= itm->OwnerList();
 		CUIDragDropListEx*	new_owner		= NULL;
 		EDDListType			old_owner_type	= GetListType(old_owner);
+		if(old_owner_type==iQuickSlot)
+			return false;
 
 		if(b_use_cursor_pos)
 		{
@@ -279,16 +310,9 @@ bool CUIActorMenu::CanMoveToPartner(PIItem pItem)
 
 void CUIActorMenu::UpdateActor()
 {
-	if ( IsGameTypeSingle() )
-	{
-		string64 buf;
-		sprintf_s( buf, "%d RU", m_pActorInvOwner->get_money() );
-		m_ActorMoney->SetText( buf );
-	}
-	else
-	{
-		UpdateActorMP();
-	}
+	string64 buf;
+	sprintf_s( buf, "%d RU", m_pActorInvOwner->get_money() );
+	m_ActorMoney->SetText( buf );
 	
 	CActor* actor = smart_cast<CActor*>( m_pActorInvOwner );
 	if ( actor )

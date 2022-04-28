@@ -21,6 +21,7 @@ class UIInvUpgradeInfo;
 class CUIMessageBoxEx;
 class CUIPropertiesBox;
 class CTrade;
+class CUIProgressBar;
 
 namespace inventory { namespace upgrade {
 	class Upgrade;
@@ -36,6 +37,7 @@ enum EDDListType{
 		iPartnerTradeBag,
 		iPartnerTrade,
 		iDeadBodyBag,
+		iQuickSlot,
 		iTrashSlot,
 		iListTypeMax
 };
@@ -94,6 +96,7 @@ protected:
 	CUIDragDropListEx*			m_pTradeActorList;
 	CUIDragDropListEx*			m_pTradePartnerBagList;
 	CUIDragDropListEx*			m_pTradePartnerList;
+	CUIDragDropListEx*			m_pDeadBodyActorBagList;
 	CUIDragDropListEx*			m_pDeadBodyBagList;
 	CUIDragDropListEx*			m_pTrashList;
 	enum						{e_af_count = 5};
@@ -102,7 +105,8 @@ protected:
 	CUIInventoryUpgradeWnd*		m_pUpgradeWnd;
 	
 	CUIStatic*					m_LeftBackground;
-
+	CUIStatic*					m_LRBackground;
+	
 	UIInvUpgradeInfo*			m_upgrade_info;
 	CUIMessageBoxEx*			m_message_box_yes_no;
 	CUIMessageBoxEx*			m_message_box_ok;
@@ -113,7 +117,15 @@ protected:
 
 	CUIStatic*					m_ActorMoney;
 	CUIStatic*					m_PartnerMoney;
-
+	CUIStatic*					m_QuickSlot1;
+	CUIStatic*					m_QuickSlot2;
+	CUIStatic*					m_QuickSlot3;
+	CUIStatic*					m_QuickSlot4;
+	
+	CUIProgressBar*				m_WeaponSlot1_progress;
+	CUIProgressBar*				m_WeaponSlot2_progress;
+	//CUIProgressBar*				m_Helmet_progress;
+	CUIProgressBar*				m_Outfit_progress;
 	// bottom ---------------------------------
 	CUIStatic*					m_ActorBottomInfo;
 	CUIStatic*					m_ActorWeight;
@@ -147,12 +159,16 @@ protected:
 	bool						m_repair_mode;
 	u32							m_trade_partner_inventory_state;
 public:
+	CUIDragDropReferenceList*	m_pQuickSlot;
+	
 	void						SetMenuMode					(EMenuMode mode);
+	EMenuMode					GetMenuMode					() {return m_currMenuMode;};
 	void						SetActor					(CInventoryOwner* io);
 	void						SetPartner					(CInventoryOwner* io);
+	CInventoryOwner*			GetPartner					() {return m_pPartnerInvOwner;};
 	void						SetInvBox					(CInventoryBox* box);
 	void						SetSimpleHintText			(LPCSTR text);
-
+	CInventoryBox*				GetInvBox					() {return m_pInvBox;};
 private:
 	void						PropertiesBoxForSlots		(PIItem item, bool& b_show);
 	void						PropertiesBoxForWeapon		(CUICellItem* cell_item, PIItem item, bool& b_show);
@@ -224,6 +240,7 @@ protected:
 	bool						ToBag						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						ToBelt						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						TryUseItem					(CUICellItem* cell_itm);
+	bool						ToQuickSlot					(CUICellItem* itm);
 
 	void						UpdateActorMP				();
 	void						UpdateOutfit				();
@@ -292,6 +309,7 @@ public:
 	void		xr_stdcall		OnBtnExitClicked			(CUIWindow* w, void* d);
 	void		xr_stdcall		TakeAllFromPartner			(CUIWindow* w, void* d);
 	void						TakeAllFromInventoryBox		();
+	void						UpdateConditionProgressBars	();
 
 	IC	UIHint*					get_hint_wnd				() { return m_hint_wnd; }
 

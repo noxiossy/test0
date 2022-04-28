@@ -20,6 +20,8 @@ private:
 	CUIStatic*			m_back;
 	CUIStatic*			m_back_v;
 
+	CUIStatic*			m_indik[it_max];
+
 	CUIStatic*			m_ui_weapon_sign_ammo;
 	CUIStatic*			m_ui_weapon_icon;
 	Frect				m_ui_weapon_icon_rect;
@@ -81,5 +83,6 @@ protected:
 
 			void	Load_section_type	( ALife::EInfluenceType type, LPCSTR section );
 			void	UpdateIndicatorType	( CActor* actor, ALife::EInfluenceType type );
+			void	SwitchLA			( bool state, ALife::EInfluenceType type );
 
 }; // class CUIHudStatesWnd

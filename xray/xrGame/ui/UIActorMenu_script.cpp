@@ -10,6 +10,7 @@
 
 #include "../actor.h"
 #include "../inventory_item.h"
+#include "UICellItem.h"
 #include "../ai_space.h"
 #include "../../xrServerEntities/script_engine.h"
 
@@ -68,6 +69,11 @@ void CUIActorMenu::RepairEffect_CurItem()
 	funct( item_name, item->GetCondition() );
 
 	item->SetCondition( 1.0f );
+	UpdateConditionProgressBars();
+	CUICellItem* itm = CurrentItem();
+	if(itm)
+		itm->UpdateConditionProgressBar();
+
 }
 
 bool CUIActorMenu::CanUpgradeItem( PIItem item )
