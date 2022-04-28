@@ -160,7 +160,8 @@ protected:
 	u32							m_trade_partner_inventory_state;
 public:
 	CUIDragDropReferenceList*	m_pQuickSlot;
-	
+
+public:
 	void						SetMenuMode					(EMenuMode mode);
 	EMenuMode					GetMenuMode					() {return m_currMenuMode;};
 	void						SetActor					(CInventoryOwner* io);

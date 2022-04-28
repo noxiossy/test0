@@ -37,11 +37,12 @@ private:
 		flCustomPlacement	=	(1<<2),
 		flVerticalPlacement	=	(1<<3),
 		flAlwaysShowScroll	=	(1<<4),
+		flVirtualCells		=	(1<<5),
 	};
 	Flags8					m_flags;
 	CUICellItem*			m_selected_item;
 	Ivector2				m_orig_cell_capacity;
-
+	Ivector2				m_virtual_cells_alignment;
 	bool					m_bConditionProgBarVisible;
 protected:
 	
@@ -91,6 +92,10 @@ public:
 			void			SetCellSize			(const Ivector2 new_sz);
 	const	Ivector2&		CellsSpacing		();
 			void			SetCellsSpacing		(const Ivector2& new_sz);
+			void			SetCellsVertAlignment(xr_string alignment);
+			void			SetCellsHorizAlignment(xr_string alignment);
+
+	const	Ivector2		GetVirtualCellsAlignment() {return m_virtual_cells_alignment;};
 
 			int				ScrollPos			();
 			void			ReinitScroll		();
@@ -106,6 +111,8 @@ public:
 			void			SetVerticalPlacement(bool b);
 			bool			GetVerticalPlacement();
 			void			SetAlwaysShowScroll	(bool b);
+			bool			GetVirtualCells		();
+			void			SetVirtualCells		(bool b);
 
 			bool			GetConditionProgBarVisibility() {return m_bConditionProgBarVisible;};
 			void			SetConditionProgBarVisibility(bool b) {m_bConditionProgBarVisible = b;};
@@ -125,13 +132,15 @@ public:
 			void			ClearAll			(bool bDestroy);	
 			void			Compact				();
 			bool			IsOwner				(CUICellItem* itm);
+			Ivector2		PickCell			(const Fvector2& abs_pos);
+			CUICell&		GetCellAt			(const Ivector2& pos);
+
 public:
 	//UIWindow overriding
 	virtual		void		Draw				();
 	virtual		void		Update				();
 	virtual		bool		OnMouse				(float x, float y, EUIMessages mouse_action);
 	virtual		void		SendMessage			(CUIWindow* pWnd, s16 msg, void* pData = NULL);
-
 };
 
 class CUICellContainer :public CUIWindow

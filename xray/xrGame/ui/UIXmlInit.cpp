@@ -495,6 +495,17 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
 	tmp						= xml_doc.ReadAttribInt(path, index, "condition_progress_bar", 0);
 	pWnd->SetConditionProgBarVisibility(tmp!=0);
 
+	tmp						= xml_doc.ReadAttribInt(path, index, "virtual_cells", 0);
+	pWnd->SetVirtualCells(tmp!=0);
+
+	if(tmp!=0)
+	{
+		xr_string vc_vert_align = xml_doc.ReadAttrib(path, index, "vc_vert_align", "");
+		pWnd->SetCellsVertAlignment(vc_vert_align);
+		xr_string vc_horiz_align = xml_doc.ReadAttrib(path, index, "vc_horiz_align", "");
+		pWnd->SetCellsHorizAlignment(vc_horiz_align);
+	}
+
 	pWnd->back_color		= GetColor( xml_doc, path, index, 0xFFFFFFFF );
 
 	return true;
