@@ -20,6 +20,7 @@ class CUI3tButtonEx;
 class CUICheckButton;
 class UIHint;
 class CUIDragDropListEx;
+class CUIDragDropReferenceList;
 
 class UIHelper
 {
@@ -37,6 +38,7 @@ public:
 
 	static	UIHint*				CreateHint			( CUIXml& xml, LPCSTR ui_path /*, CUIWindow* parent*/ );
 	static	CUIDragDropListEx*	CreateDragDropListEx( CUIXml& xml, LPCSTR ui_path, CUIWindow* parent );
+	static	CUIDragDropReferenceList*	CreateDragDropReferenceList( CUIXml& xml, LPCSTR ui_path, CUIWindow* parent );
 
 }; // class UIHelper
 

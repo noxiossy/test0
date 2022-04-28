@@ -14,7 +14,7 @@
 
 CUIDragDropReferenceList::CUIDragDropReferenceList()
 {
-	AddCallbackStr("cell_item_reference", WINDOW_LBUTTON_DB_CLICK, CUIWndCallback::void_function(this, &CUIDragDropReferenceList::OnItemDBClick));
+	AddCallback("cell_item_reference", WINDOW_LBUTTON_DB_CLICK, CUIWndCallback::void_function(this, &CUIDragDropReferenceList::OnItemDBClick));
 }
 CUIDragDropReferenceList::~CUIDragDropReferenceList()
 {
@@ -56,7 +56,7 @@ void CUIDragDropReferenceList::SetItem(CUICellItem* itm, Ivector2 cell_pos)
 {
 	CUIStatic* ref = m_references[cell_pos.x];
 	ref->SetShader(itm->GetShader());
-	ref->SetTextureRect(itm->GetTextureRect());
+	ref->SetOriginalRect(itm->GetOriginalRect());
 	ref->TextureOn();
 	ref->SetTextureColor(color_rgba(255,255,255,255));
 	ref->SetStretchTexture(true);
@@ -76,7 +76,7 @@ CUICellItem* CUIDragDropReferenceList::RemoveItem(CUICellItem* itm, bool force_r
 	if(vec2.x!=-1&&vec2.y!=-1)
 	{
 		u8 index = u8(vec2.x);
-		xr_strcpy(ACTOR_DEFS::g_quick_use_slots[index], "");
+		strcpy_s(ACTOR_DEFS::g_quick_use_slots[index], "");
 		m_references[index]->SetTextureColor(color_rgba(255,255,255,0));
 	}
 	inherited::RemoveItem(itm, force_root);
@@ -93,7 +93,7 @@ void CUIDragDropReferenceList::LoadItemTexture(LPCSTR section, Ivector2 cell_pos
 	texture_rect.x2	= pSettings->r_float(section, "inv_grid_width")	*INV_GRID_WIDTH;
 	texture_rect.y2	= pSettings->r_float(section, "inv_grid_height")*INV_GRID_HEIGHT;
 	texture_rect.rb.add(texture_rect.lt);
-	ref->SetTextureRect(texture_rect);
+	ref->SetOriginalRect(texture_rect);
 	ref->TextureOn();
 	ref->SetTextureColor(color_rgba(255,255,255,255));
 	ref->SetStretchTexture(true);
@@ -148,7 +148,7 @@ void CUIDragDropReferenceList::OnItemDBClick(CUIWindow* w, void* pData)
 			if(itm)
 				inherited::RemoveItem(GetCellAt(Ivector2().set(index, 0)).m_item, false);
 		}
-		xr_strcpy(ACTOR_DEFS::g_quick_use_slots[index], "");
+		strcpy_s(ACTOR_DEFS::g_quick_use_slots[index], "");
 		(*it)->SetTextureColor(color_rgba(255,255,255,0));
 	}
 }
@@ -176,7 +176,7 @@ void CUIDragDropReferenceList::OnItemDrop(CUIWindow* w, void* pData)
 	CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
 	if(actor)
 	{
-		Ivector2 vec = PickCell(GetUICursor().GetCursorPosition());
+		Ivector2 vec = PickCell(GetUICursor()->GetCursorPosition());
 		if(vec.x!=-1&&vec.y!=-1)
 		{
 			Ivector2 vec2 = m_container->GetItemPos(itm);
@@ -184,8 +184,8 @@ void CUIDragDropReferenceList::OnItemDrop(CUIWindow* w, void* pData)
 			{
 				u8 index = u8(vec2.x);
 				shared_str tmp = ACTOR_DEFS::g_quick_use_slots[vec.x];
-				xr_strcpy(ACTOR_DEFS::g_quick_use_slots[vec.x], ACTOR_DEFS::g_quick_use_slots[index]);
-				xr_strcpy(ACTOR_DEFS::g_quick_use_slots[index], tmp.c_str());
+				strcpy_s(ACTOR_DEFS::g_quick_use_slots[vec.x], ACTOR_DEFS::g_quick_use_slots[index]);
+				strcpy_s(ACTOR_DEFS::g_quick_use_slots[index], tmp.c_str());
 				ReloadReferences(actor);
 				return;
 			}

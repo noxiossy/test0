@@ -674,7 +674,7 @@ bool CUIActorMenu::ToQuickSlot(CUICellItem* itm)
 		return false;
 	//Alundaio: END
 		
-	u8 slot_idx = u8(m_pQuickSlot->PickCell(GetUICursor().GetCursorPosition()).x);
+	u8 slot_idx = u8(m_pQuickSlot->PickCell(GetUICursor()->GetCursorPosition()).x);
 	if(slot_idx==255)
 		return false;
 	
@@ -682,7 +682,7 @@ bool CUIActorMenu::ToQuickSlot(CUICellItem* itm)
 		return false;
 
 	m_pQuickSlot->SetItem(create_cell_item(iitem), GetUICursor().GetCursorPosition());
-	xr_strcpy(ACTOR_DEFS::g_quick_use_slots[slot_idx], iitem->m_section_id.c_str());
+	strcpy_s(ACTOR_DEFS::g_quick_use_slots[slot_idx], iitem->m_section_id.c_str());
 	return true;
 }
 

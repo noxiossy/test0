@@ -17,14 +17,18 @@
 #include "UICheckButton.h"
 #include "UIHint.h"
 #include "UIDragDropListEx.h"
+#include "UIDragDropReferenceList.h"
 
 #include "UIWndCallback.h"
 
 CUIStatic* UIHelper::CreateStatic( CUIXml& xml, LPCSTR ui_path, CUIWindow* parent )
 {
 	CUIStatic* ui			= xr_new<CUIStatic>();
-	parent->AttachChild		( ui );
-	ui->SetAutoDelete		( true );
+	if(parent)
+	{
+		parent->AttachChild	( ui );
+		ui->SetAutoDelete	( true );
+	}
 	CUIXmlInit::InitStatic	( xml, ui_path, 0, ui );
 	return ui;
 }
@@ -41,8 +45,11 @@ CUIProgressBar* UIHelper::CreateProgressBar( CUIXml& xml, LPCSTR ui_path, CUIWin
 CUIFrameLineWnd* UIHelper::CreateFrameLine( CUIXml& xml, LPCSTR ui_path, CUIWindow* parent )
 {
 	CUIFrameLineWnd* ui			= xr_new<CUIFrameLineWnd>();
-	parent->AttachChild			( ui );
-	ui->SetAutoDelete			( true );
+	if(parent)
+	{
+		parent->AttachChild		( ui );
+		ui->SetAutoDelete		( true );
+	}
 	CUIXmlInit::InitFrameLine	( xml, ui_path, 0, ui );
 	return ui;
 }
@@ -50,8 +57,11 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine( CUIXml& xml, LPCSTR ui_path, CUIWind
 CUIFrameWindow* UIHelper::CreateFrameWindow( CUIXml& xml, LPCSTR ui_path, CUIWindow* parent )
 {
 	CUIFrameWindow* ui			= xr_new<CUIFrameWindow>();
-	parent->AttachChild			( ui );
-	ui->SetAutoDelete			( true );
+	if(parent)
+	{
+		parent->AttachChild		( ui );
+		ui->SetAutoDelete		( true );
+	}
 	CUIXmlInit::InitFrameWindow	( xml, ui_path, 0, ui );
 	return ui;
 }
@@ -96,6 +106,15 @@ UIHint* UIHelper::CreateHint( CUIXml& xml, LPCSTR ui_path /*, CUIWindow* parent*
 CUIDragDropListEx* UIHelper::CreateDragDropListEx( CUIXml& xml, LPCSTR ui_path, CUIWindow* parent )
 {
 	CUIDragDropListEx* ui			= xr_new<CUIDragDropListEx>();
+	parent->AttachChild				( ui );
+	ui->SetAutoDelete				( true );
+	CUIXmlInit::InitDragDropListEx	( xml, ui_path, 0, ui );
+	return ui;
+}
+
+CUIDragDropReferenceList* UIHelper::CreateDragDropReferenceList( CUIXml& xml, LPCSTR ui_path, CUIWindow* parent )
+{
+	CUIDragDropReferenceList* ui	= xr_new<CUIDragDropReferenceList>();
 	parent->AttachChild				( ui );
 	ui->SetAutoDelete				( true );
 	CUIXmlInit::InitDragDropListEx	( xml, ui_path, 0, ui );

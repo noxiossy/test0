@@ -31,6 +31,7 @@
 #include "../EntityCondition.h"
 #include "../CustomOutfit.h"
 #include "../Inventory.h"
+#include "../Artefact.h"
 #include "../string_table.h"
 
 ui_actor_state_wnd::ui_actor_state_wnd()
@@ -109,6 +110,30 @@ void ui_actor_state_wnd::UpdateActorInfo( CInventoryOwner* owner )
 	}*/
 
 	// -----------------------------------------------------------------------------------
+	
+	
+	float burn_value = 0.0f;
+	float radi_value = 0.0f;
+	float cmbn_value = 0.0f;
+	float tele_value = 0.0f;
+	float woun_value = 0.0f;
+	float shoc_value = 0.0f;
+	float fwou_value = 0.0f;
+
+	CEntityCondition::BOOSTER_MAP cur_booster_influences = actor->conditions().GetCurBoosterInfluences();
+	CEntityCondition::BOOSTER_MAP::const_iterator it;
+	it = cur_booster_influences.find(eBoostRadiationProtection);
+	if(it!=cur_booster_influences.end())
+		radi_value += it->second.fBoostValue;
+
+	it = cur_booster_influences.find(eBoostChemicalBurnProtection);
+	if(it!=cur_booster_influences.end())
+		cmbn_value += it->second.fBoostValue;
+
+	it = cur_booster_influences.find(eBoostTelepaticProtection);
+	if(it!=cur_booster_influences.end())
+		tele_value += it->second.fBoostValue;
+
 //fire burn protection progress bar
 	{
 		burn_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeBurn);
