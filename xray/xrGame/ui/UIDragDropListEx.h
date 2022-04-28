@@ -40,12 +40,11 @@ private:
 		flVirtualCells		=	(1<<5),
 	};
 	Flags8					m_flags;
-	CUICellItem*			m_selected_item;
 	Ivector2				m_orig_cell_capacity;
 	Ivector2				m_virtual_cells_alignment;
 	bool					m_bConditionProgBarVisible;
 protected:
-	
+	CUICellItem*			m_selected_item;
 	CUICellContainer*		m_container;
 	CUIScrollBar*			m_vScrollBar;
 

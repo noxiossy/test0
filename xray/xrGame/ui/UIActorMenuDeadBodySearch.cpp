@@ -149,13 +149,6 @@ bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
 			return false;
 		}
 	}
-	else // box
-	{
-		if ( !m_pInvBox->can_take() )
-		{
-			return false;
-		}
-	}
 
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	CUIDragDropListEx*	new_owner		= NULL;

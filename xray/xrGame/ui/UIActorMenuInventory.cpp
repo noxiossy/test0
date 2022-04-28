@@ -681,7 +681,7 @@ bool CUIActorMenu::ToQuickSlot(CUICellItem* itm)
 	if (!m_pQuickSlot->CanSetItem(itm))
 		return false;
 
-	m_pQuickSlot->SetItem(create_cell_item(iitem), GetUICursor().GetCursorPosition());
+	m_pQuickSlot->SetItem(create_cell_item(iitem), GetUICursor()->GetCursorPosition());
 	strcpy_s(ACTOR_DEFS::g_quick_use_slots[slot_idx], iitem->m_section_id.c_str());
 	return true;
 }
