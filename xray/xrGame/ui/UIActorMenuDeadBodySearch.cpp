@@ -142,14 +142,6 @@ bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
 	if(quest_item->IsQuestItem())
 		return false;
 
-	if ( m_pPartnerInvOwner )
-	{
-		if ( !m_pPartnerInvOwner->deadbody_can_take_status() )
-		{
-			return false;
-		}
-	}
-
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	CUIDragDropListEx*	new_owner		= NULL;
 

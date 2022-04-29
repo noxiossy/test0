@@ -218,8 +218,6 @@ private:
 	CTradeParameters			*m_trade_parameters;
 	CPurchaseList				*m_purchase_list;
 	BOOL						m_need_osoznanie_mode;
-	bool						m_deadbody_can_take;
-	bool						m_deadbody_closed;
 
 public:
 	IC		CTradeParameters	&trade_parameters		() const;
@@ -234,11 +232,6 @@ public:
 	virtual	float				missile_throw_force		(); 
 	virtual	bool				use_throw_randomness	();
 	virtual bool				NeedOsoznanieMode		() {return m_need_osoznanie_mode!=FALSE;}
-
-			void				deadbody_can_take		(bool status);
-	IC		bool				deadbody_can_take_status() const { return m_deadbody_can_take; }
-			void				deadbody_closed			(bool status);
-	IC		bool				deadbody_closed_status	() const { return m_deadbody_closed; }
 
 	void						SetNextItemSlot			( u32 );
 };
