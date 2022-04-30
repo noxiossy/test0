@@ -424,6 +424,19 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 	}
 	switch(t_new)
 	{
+		case iTrashSlot:
+		{
+			if (CurrentIItem()->IsQuestItem())
+				return true;
+
+			if(t_old==iQuickSlot)	
+			{
+				old_owner->RemoveItem(itm, false);
+				return true;
+			}
+			SendEvent_Item_Drop(CurrentIItem(), m_pActorInvOwner->object_id());
+			SetCurrentItem(NULL);
+		}break;
 		case iActorSlot:
 		{
 			if(GetSlotList(CurrentIItem()->GetSlot())==new_owner)
@@ -457,19 +470,16 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 		{
 			ToDeadBodyBag(itm, true);
 		}break;
-		case iTrashSlot:
+		case iQuickSlot:
 		{
-			if (CurrentIItem()->IsQuestItem())
-				return true;
-
-			SendEvent_Item_Drop(CurrentIItem(), m_pActorInvOwner->object_id());
-			SetCurrentItem(NULL);
+			ToQuickSlot(itm);
 		}break;
 	};
 
 	OnItemDropped			(CurrentIItem(), new_owner, old_owner);
 	
 	UpdateItemsPlace();
+	UpdateConditionProgressBars	();
 
 	return true;
 }
