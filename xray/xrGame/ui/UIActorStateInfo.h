@@ -33,7 +33,7 @@ private:
 		//stt_health,
 		//stt_armor,
 		//stt_main,
-		stt_fire,
+		stt_fire = 0,
 		stt_radia,
 		stt_acid,
 		stt_psi,
