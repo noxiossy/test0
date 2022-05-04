@@ -56,7 +56,7 @@ void CUIActorMenu::Construct()
 	m_LRBackground->SetAutoDelete		(true);
 	AttachChild							(m_LRBackground);
 	xml_init.InitStatic					(uiXml, "lr_background", 0, m_LRBackground);
-	
+
 	m_LeftBackground					= xr_new<CUIStatic>();
 	m_LeftBackground->SetAutoDelete		(true);
 	AttachChild							(m_LeftBackground);
@@ -201,7 +201,6 @@ void CUIActorMenu::Construct()
 	BindDragDropListEvents				(m_pTradeActorList);
 	BindDragDropListEvents				(m_pTradePartnerBagList);
 	BindDragDropListEvents				(m_pTradePartnerList);
-	BindDragDropListEvents				(m_pDeadBodyActorBagList);
 	BindDragDropListEvents				(m_pDeadBodyBagList);
 
 	m_allowed_drops[iTrashSlot].push_back(iActorBag);
