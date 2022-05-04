@@ -105,8 +105,6 @@ void CUIActorMenu::Construct()
 	m_pTradeActorList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_actor_trade", this);
 	m_pTradePartnerBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_bag", this);
 	m_pTradePartnerList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_trade", this);
-	m_pQuickSlot				= UIHelper::CreateDragDropReferenceList(uiXml, "dragdrop_quick_slots", this);
-	m_pQuickSlot->Initialize	();
 
 	m_pTrashList				= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_trash", this);
 	m_pTrashList->m_f_item_drop	= CUIDragDropListEx::DRAG_DROP_EVENT(this, &CUIActorMenu::OnItemDrop);
@@ -181,8 +179,8 @@ void CUIActorMenu::Construct()
 	m_message_box_ok->SetText			( "" );
 
 	m_UIPropertiesBox					= xr_new<CUIPropertiesBox>();
-	m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0,0),Fvector2().set(300,300));
 	AttachChild							(m_UIPropertiesBox);
+	m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0,0),Fvector2().set(300,300));
 	m_UIPropertiesBox->Hide				();
 	m_UIPropertiesBox->SetWindowName	( "property_box" );
 
@@ -199,12 +197,10 @@ void CUIActorMenu::Construct()
 	BindDragDropListEvents				(m_pTradePartnerBagList);
 	BindDragDropListEvents				(m_pTradePartnerList);
 	BindDragDropListEvents				(m_pDeadBodyBagList);
-	BindDragDropListEvents				(m_pQuickSlot);
 
 	m_allowed_drops[iTrashSlot].push_back(iActorBag);
 	m_allowed_drops[iTrashSlot].push_back(iActorSlot);
 	m_allowed_drops[iTrashSlot].push_back(iActorBelt);
-	m_allowed_drops[iTrashSlot].push_back(iQuickSlot);
 
 	m_allowed_drops[iActorSlot].push_back(iActorBag);
 	m_allowed_drops[iActorSlot].push_back(iActorTrade);
@@ -215,7 +211,6 @@ void CUIActorMenu::Construct()
 	m_allowed_drops[iActorBag].push_back(iActorTrade);
 	m_allowed_drops[iActorBag].push_back(iDeadBodyBag);
 	m_allowed_drops[iActorBag].push_back(iActorBag);
-	m_allowed_drops[iActorBag].push_back(iQuickSlot);
 	
 	m_allowed_drops[iActorBelt].push_back(iActorBag);
 	m_allowed_drops[iActorBelt].push_back(iActorTrade);
@@ -226,7 +221,6 @@ void CUIActorMenu::Construct()
 	m_allowed_drops[iActorTrade].push_back(iActorBag);
 	m_allowed_drops[iActorTrade].push_back(iActorBelt);
 	m_allowed_drops[iActorTrade].push_back(iActorTrade);
-	m_allowed_drops[iActorTrade].push_back(iQuickSlot);
 
 	m_allowed_drops[iPartnerTradeBag].push_back(iPartnerTrade);
 	m_allowed_drops[iPartnerTradeBag].push_back(iPartnerTradeBag);
@@ -237,9 +231,6 @@ void CUIActorMenu::Construct()
 	m_allowed_drops[iDeadBodyBag].push_back(iActorBag);
 	m_allowed_drops[iDeadBodyBag].push_back(iActorBelt);
 	m_allowed_drops[iDeadBodyBag].push_back(iDeadBodyBag);
-
-	m_allowed_drops[iQuickSlot].push_back(iActorBag);
-	m_allowed_drops[iQuickSlot].push_back(iActorTrade);
 
 	m_upgrade_selected					= NULL;
 	SetCurrentItem						(NULL);
@@ -299,31 +290,6 @@ void CUIActorMenu::UpdateButtonsLayout()
 	}
 	
 	m_exit_button->SetWndPos(btn_exit_pos);
-	
-	string32 tmp;
-	LPCSTR str = CStringTable().translate("quick_use_str_1").c_str();
-	strncpy_s(tmp, sizeof(tmp), str, 3);
-	if(tmp[2]==',')
-		tmp[1] = '\0';
-	m_QuickSlot1->SetTextST(tmp);
-
-	str = CStringTable().translate("quick_use_str_2").c_str();
-	strncpy_s(tmp, sizeof(tmp), str, 3);
-	if(tmp[2]==',')
-		tmp[1] = '\0';
-	m_QuickSlot2->SetTextST(tmp);
-
-	str = CStringTable().translate("quick_use_str_3").c_str();
-	strncpy_s(tmp, sizeof(tmp), str, 3);
-	if(tmp[2]==',')
-		tmp[1] = '\0';
-	m_QuickSlot3->SetTextST(tmp);
-
-	str = CStringTable().translate("quick_use_str_4").c_str();
-	strncpy_s(tmp, sizeof(tmp), str, 3);
-	if(tmp[2]==',')
-		tmp[1] = '\0';
-	m_QuickSlot4->SetTextST(tmp);
 }
 
 void CUIActorMenu::SetSimpleHintText(LPCSTR text)
