@@ -38,7 +38,6 @@ enum EDDListType{
 		iPartnerTradeBag,
 		iPartnerTrade,
 		iDeadBodyBag,
-		iQuickSlot,
 		iTrashSlot,
 		iListTypeMax
 };
@@ -118,11 +117,7 @@ protected:
 
 	CUIStatic*					m_ActorMoney;
 	CUIStatic*					m_PartnerMoney;
-	CUIStatic*					m_QuickSlot1;
-	CUIStatic*					m_QuickSlot2;
-	CUIStatic*					m_QuickSlot3;
-	CUIStatic*					m_QuickSlot4;
-	
+
 	CUIProgressBar*				m_WeaponSlot1_progress;
 	CUIProgressBar*				m_WeaponSlot2_progress;
 	//CUIProgressBar*				m_Helmet_progress;
@@ -159,9 +154,6 @@ protected:
 	u32							m_last_time;
 	bool						m_repair_mode;
 	u32							m_trade_partner_inventory_state;
-public:
-	CUIDragDropReferenceList*	m_pQuickSlot;
-
 public:
 	void						SetMenuMode					(EMenuMode mode);
 	EMenuMode					GetMenuMode					() {return m_currMenuMode;};
@@ -242,7 +234,6 @@ protected:
 	bool						ToBag						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						ToBelt						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						TryUseItem					(CUICellItem* cell_itm);
-	bool						ToQuickSlot					(CUICellItem* itm);
 
 	void						UpdateActorMP				();
 	void						UpdateOutfit				();

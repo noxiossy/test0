@@ -305,7 +305,6 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pDeadBodyBagList)			return iDeadBodyBag;
 	if(l==m_pDeadBodyActorBagList)		return iActorBag;
 
-	if(l==m_pQuickSlot)					return iQuickSlot;
 	if(l==m_pTrashList)					return iTrashSlot;
 
 	R_ASSERT(0);
@@ -429,11 +428,6 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 			if (CurrentIItem()->IsQuestItem())
 				return true;
 
-			if(t_old==iQuickSlot)	
-			{
-				old_owner->RemoveItem(itm, false);
-				return true;
-			}
 			SendEvent_Item_Drop(CurrentIItem(), m_pActorInvOwner->object_id());
 			SetCurrentItem(NULL);
 		}break;
@@ -469,10 +463,6 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 		case iDeadBodyBag:
 		{
 			ToDeadBodyBag(itm, true);
-		}break;
-		case iQuickSlot:
-		{
-			ToQuickSlot(itm);
 		}break;
 	};
 
@@ -644,7 +634,6 @@ void CUIActorMenu::ClearAllLists()
 	m_pInventoryDetectorList->ClearAll			(true);
 	m_pInventoryPistolList->ClearAll			(true);
 	m_pInventoryAutomaticList->ClearAll			(true);
-	m_pQuickSlot->ClearAll						(true);
 
 	m_pTradeActorBagList->ClearAll				(true);
 	m_pTradeActorList->ClearAll					(true);

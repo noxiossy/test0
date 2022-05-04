@@ -40,7 +40,6 @@ void CUIActorMenu::InitInventoryMode()
 	m_pInventoryDetectorList->Show		(true);
 	m_pInventoryPistolList->Show		(true);
 	m_pInventoryAutomaticList->Show		(true);
-	m_pQuickSlot->Show					(true);
 	m_pTrashList->Show					(true);
 
 	m_RightDelimiter->Show				(false);
@@ -294,8 +293,6 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 						lst_to_add->SetItem	(itm);
 					}
 				}
-				if(m_pActorInvOwner)
-					m_pQuickSlot->ReloadReferences(m_pActorInvOwner);
 			}break;
 		case GE_TRADE_SELL :
 		case GE_OWNERSHIP_REJECT : 
@@ -324,8 +321,6 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 					}
 					++i;
 				}
-				if(m_pActorInvOwner)
-					m_pQuickSlot->ReloadReferences(m_pActorInvOwner);
 			}break;
 	}
 	UpdateItemsPlace();
@@ -427,7 +422,7 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 			ColorizeItem( itm, !CanMoveToPartner( *itb ) );
 		}
 	}
-	m_pQuickSlot->ReloadReferences(m_pActorInvOwner);
+
 }
 
 bool CUIActorMenu::TryActiveSlot(CUICellItem* itm)
@@ -660,32 +655,6 @@ bool CUIActorMenu::TryUseItem( CUICellItem* cell_itm )
 	SetCurrentItem			( NULL );
 	return true;
 }
-
-bool CUIActorMenu::ToQuickSlot(CUICellItem* itm)
-{
-	PIItem iitem = (PIItem)itm->m_pData;
-	CEatableItemObject* eat_item = smart_cast<CEatableItemObject*>(iitem);
-	if(!eat_item)
-		return false;
-
-	//Alundaio: Fix deep recursion if placing icon greater then col/row set in actor_menu.xml
-	Ivector2 iWH = iitem->GetInvGridRect().rb;
-	if (iWH.x > 1 || iWH.y > 1)
-		return false;
-	//Alundaio: END
-		
-	u8 slot_idx = u8(m_pQuickSlot->PickCell(GetUICursor()->GetCursorPosition()).x);
-	if(slot_idx==255)
-		return false;
-	
-	if (!m_pQuickSlot->CanSetItem(itm))
-		return false;
-
-	m_pQuickSlot->SetItem(create_cell_item(iitem), GetUICursor()->GetCursorPosition());
-	strcpy_s(ACTOR_DEFS::g_quick_use_slots[slot_idx], iitem->m_section_id.c_str());
-	return true;
-}
-
 
 bool CUIActorMenu::OnItemDropped(PIItem itm, CUIDragDropListEx* new_owner, CUIDragDropListEx* old_owner)
 {
