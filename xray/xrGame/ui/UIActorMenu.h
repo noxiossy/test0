@@ -105,7 +105,7 @@ protected:
 	
 	CUIStatic*					m_LeftBackground;
 	CUIStatic*					m_LRBackground;
-
+	
 	UIInvUpgradeInfo*			m_upgrade_info;
 	CUIMessageBoxEx*			m_message_box_yes_no;
 	CUIMessageBoxEx*			m_message_box_ok;

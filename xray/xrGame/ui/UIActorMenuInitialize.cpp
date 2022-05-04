@@ -56,7 +56,7 @@ void CUIActorMenu::Construct()
 	m_LRBackground->SetAutoDelete		(true);
 	AttachChild							(m_LRBackground);
 	xml_init.InitStatic					(uiXml, "lr_background", 0, m_LRBackground);
-
+	
 	m_LeftBackground					= xr_new<CUIStatic>();
 	m_LeftBackground->SetAutoDelete		(true);
 	AttachChild							(m_LeftBackground);
@@ -128,18 +128,23 @@ void CUIActorMenu::Construct()
 
 	m_ActorMoney	= UIHelper::CreateStatic(uiXml, "actor_money_static", this);
 	m_PartnerMoney	= UIHelper::CreateStatic(uiXml, "partner_money_static", this);
-	
+
+	m_WeaponSlot1_progress	= UIHelper::CreateProgressBar(uiXml, "progess_bar_weapon1", this);
+	m_WeaponSlot2_progress	= UIHelper::CreateProgressBar(uiXml, "progess_bar_weapon2", this);
+	m_Outfit_progress		= UIHelper::CreateProgressBar(uiXml, "progess_bar_outfit", this);
+
 	m_trade_button		= UIHelper::Create3tButtonEx(uiXml, "trade_button", this);
 	m_takeall_button	= UIHelper::Create3tButtonEx(uiXml, "takeall_button", this);
 	m_exit_button		= UIHelper::Create3tButtonEx(uiXml, "exit_button", this);
 
 	m_clock_value						= UIHelper::CreateStatic(uiXml, "clock_value", this);
 
+/*
 	m_pDeadBodyBagList					= xr_new<CUIDragDropListEx>(); 
 	AttachChild							(m_pDeadBodyBagList);
 	m_pDeadBodyBagList->SetAutoDelete	(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_deadbody_bag", 0, m_pDeadBodyBagList);
-	
+*/
 	m_ActorStateInfo					= xr_new<ui_actor_state_wnd>();
 	m_ActorStateInfo->init_from_xml		(uiXml, "actor_state_info");
 	m_ActorStateInfo->SetAutoDelete		(true);
@@ -184,8 +189,8 @@ void CUIActorMenu::Construct()
 	m_message_box_ok->SetText			( "" );
 
 	m_UIPropertiesBox					= xr_new<CUIPropertiesBox>();
-	AttachChild							(m_UIPropertiesBox);
 	m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0,0),Fvector2().set(300,300));
+	AttachChild							(m_UIPropertiesBox);
 	m_UIPropertiesBox->Hide				();
 	m_UIPropertiesBox->SetWindowName	( "property_box" );
 

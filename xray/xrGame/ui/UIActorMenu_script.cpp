@@ -50,9 +50,7 @@ void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 		CallMessageBoxYesNo( question );
 	} 
 	else
-	{
 		CallMessageBoxOK( question );
-	}
 }
 
 void CUIActorMenu::RepairEffect_CurItem()
@@ -70,6 +68,7 @@ void CUIActorMenu::RepairEffect_CurItem()
 
 	item->SetCondition( 1.0f );
 	UpdateConditionProgressBars();
+	SeparateUpgradeItem();
 	CUICellItem* itm = CurrentItem();
 	if(itm)
 		itm->UpdateConditionProgressBar();
