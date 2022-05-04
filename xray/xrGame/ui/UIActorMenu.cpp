@@ -537,6 +537,8 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 	}; //switch 
 
 	UpdateItemsPlace();
+	UpdateConditionProgressBars();
+
 	return true;
 }
 
@@ -580,7 +582,8 @@ bool CUIActorMenu::OnItemRButtonClick(CUICellItem* itm)
 
 bool CUIActorMenu::OnItemFocusReceive(CUICellItem* itm)
 {
-	InfoCurItem( NULL );
+	InfoCurItem( NULL );	
+	itm->m_selected = true;
 	return true;
 }
 
@@ -652,7 +655,8 @@ bool CUIActorMenu::OnKeyboard(int dik, EUIMessages keyboard_action)
 	InfoCurItem( NULL );
 	if ( is_binded(kDROP, dik) )
 	{
-		if ( WINDOW_KEY_PRESSED == keyboard_action && CurrentIItem() && !CurrentIItem()->IsQuestItem() )
+		if ( WINDOW_KEY_PRESSED == keyboard_action && CurrentIItem() && !CurrentIItem()->IsQuestItem()
+			&& CurrentIItem()->parent_id()==m_pActorInvOwner->object_id() )
 		{
 
 			SendEvent_Item_Drop		(CurrentIItem(), m_pActorInvOwner->object_id());
@@ -670,7 +674,7 @@ bool CUIActorMenu::OnKeyboard(int dik, EUIMessages keyboard_action)
 		return true;
 	}	
 	
-	if ( is_binded(kUSE, dik) )
+	if ( is_binded(kUSE, dik) || is_binded(kINVENTORY, dik) )
 	{
 		if ( WINDOW_KEY_PRESSED == keyboard_action )
 		{
@@ -678,6 +682,15 @@ bool CUIActorMenu::OnKeyboard(int dik, EUIMessages keyboard_action)
 		}
 		return true;
 	}	
+	
+	if ( is_binded(kQUIT, dik) )
+	{
+		if ( WINDOW_KEY_PRESSED == keyboard_action )
+		{
+			GetHolder()->StartStopMenu( this, true );
+		}
+		return true;
+	}
 
 	if( inherited::OnKeyboard(dik,keyboard_action) )return true;
 
