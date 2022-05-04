@@ -38,6 +38,7 @@ enum EDDListType{
 		iPartnerTradeBag,
 		iPartnerTrade,
 		iDeadBodyBag,
+		iQuickSlot,
 		iTrashSlot,
 		iListTypeMax
 };
@@ -158,6 +159,9 @@ protected:
 	bool						m_repair_mode;
 	u32							m_trade_partner_inventory_state;
 public:
+	CUIDragDropReferenceList*	m_pQuickSlot;
+
+public:
 	void						SetMenuMode					(EMenuMode mode);
 	EMenuMode					GetMenuMode					() {return m_currMenuMode;};
 	void						SetActor					(CInventoryOwner* io);
@@ -237,6 +241,7 @@ protected:
 	bool						ToBag						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						ToBelt						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						TryUseItem					(CUICellItem* cell_itm);
+	bool						ToQuickSlot					(CUICellItem* itm);
 
 	void						UpdateActorMP				();
 	void						UpdateOutfit				();

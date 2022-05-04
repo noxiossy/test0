@@ -24,6 +24,7 @@ void CUIActorMenu::InitUpgradeMode()
 	m_PartnerCharacterInfo->Show( true );
 	m_PartnerMoney->Show( false );
 	m_pUpgradeWnd->Show( true );
+	m_pQuickSlot->Show(true);
 	
 	InitInventoryContents( m_pInventoryBagList );
 	VERIFY( m_pPartnerInvOwner );

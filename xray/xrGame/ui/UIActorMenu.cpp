@@ -304,6 +304,7 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pTradePartnerList)			return iPartnerTrade;
 	if(l==m_pDeadBodyBagList)			return iDeadBodyBag;
 
+	if(l==m_pQuickSlot)					return iQuickSlot;
 	if(l==m_pTrashList)					return iTrashSlot;
 
 	R_ASSERT(0);
@@ -360,7 +361,7 @@ void CUIActorMenu::SetCurrentItem(CUICellItem* itm)
 
 void CUIActorMenu::InfoCurItem( CUICellItem* cell_item )
 {
-	if ( !cell_item )
+	if ( !cell_item || !cell_item->m_pData )
 	{
 		m_ItemInfo->InitItem( NULL );
 		return;
@@ -417,6 +418,11 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 			if (CurrentIItem()->IsQuestItem())
 				return true;
 
+			if(t_old==iQuickSlot)	
+			{
+				old_owner->RemoveItem(itm, false);
+				return true;
+			}
 			SendEvent_Item_Drop(CurrentIItem(), m_pActorInvOwner->object_id());
 			SetCurrentItem(NULL);
 		}break;
@@ -452,6 +458,10 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 		case iDeadBodyBag:
 		{
 			ToDeadBodyBag(itm, true);
+		}break;
+		case iQuickSlot:
+		{
+			ToQuickSlot(itm);
 		}break;
 	};
 
@@ -491,7 +501,7 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 				ToDeadBodyBag( itm, false );
 				break;
 			}
-			if ( TryUseItem( itm ) )
+			if(m_currMenuMode!=mmUpgrade && TryUseItem( itm ))
 			{
 				break;
 			}
@@ -533,6 +543,10 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 			ToBag( itm, false );
 			break;
 		}
+	case iQuickSlot:
+		{
+			ToQuickSlot(itm);
+		}break;
 
 	}; //switch 
 
@@ -626,6 +640,7 @@ void CUIActorMenu::ClearAllLists()
 	m_pInventoryDetectorList->ClearAll			(true);
 	m_pInventoryPistolList->ClearAll			(true);
 	m_pInventoryAutomaticList->ClearAll			(true);
+	m_pQuickSlot->ClearAll						(true);
 
 	m_pTradeActorBagList->ClearAll				(true);
 	m_pTradeActorList->ClearAll					(true);

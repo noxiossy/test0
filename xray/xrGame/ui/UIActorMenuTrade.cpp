@@ -31,6 +31,7 @@ void CUIActorMenu::InitTradeMode()
 	m_pInventoryBagList->Show		(false);
 	m_PartnerCharacterInfo->Show	(true);
 	m_PartnerMoney->Show			(true);
+	m_pQuickSlot->Show				(true);
 
 	m_pTradeActorBagList->Show		(true);
 	m_pTradeActorList->Show			(true);
@@ -142,6 +143,8 @@ bool CUIActorMenu::ToActorTrade(CUICellItem* itm, bool b_use_cursor_pos)
 		CUIDragDropListEx*	old_owner		= itm->OwnerList();
 		CUIDragDropListEx*	new_owner		= NULL;
 		EDDListType			old_owner_type	= GetListType(old_owner);
+		if(old_owner_type==iQuickSlot)
+			return false;
 
 		if(b_use_cursor_pos)
 		{
