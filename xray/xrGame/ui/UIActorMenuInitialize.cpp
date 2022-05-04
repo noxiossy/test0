@@ -145,12 +145,11 @@ void CUIActorMenu::Construct()
 
 	m_clock_value						= UIHelper::CreateStatic(uiXml, "clock_value", this);
 
-/*
 	m_pDeadBodyBagList					= xr_new<CUIDragDropListEx>(); 
 	AttachChild							(m_pDeadBodyBagList);
 	m_pDeadBodyBagList->SetAutoDelete	(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_deadbody_bag", 0, m_pDeadBodyBagList);
-*/
+
 	m_ActorStateInfo					= xr_new<ui_actor_state_wnd>();
 	m_ActorStateInfo->init_from_xml		(uiXml, "actor_state_info");
 	m_ActorStateInfo->SetAutoDelete		(true);
