@@ -152,7 +152,6 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
 			R_ASSERT(0);
 			break;
 		}
-		UpdateConditionProgressBars();
 		CurModeToScript();
 	}//if
 
@@ -303,7 +302,6 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pTradePartnerBagList)		return iPartnerTradeBag;
 	if(l==m_pTradePartnerList)			return iPartnerTrade;
 	if(l==m_pDeadBodyBagList)			return iDeadBodyBag;
-	if(l==m_pDeadBodyActorBagList)		return iActorBag;
 
 	if(l==m_pTrashList)					return iTrashSlot;
 
@@ -320,18 +318,8 @@ CUIDragDropListEx* CUIActorMenu::GetListByType(EDDListType t)
 			{
 				if(m_currMenuMode==mmTrade)
 					return m_pTradeActorBagList;
-				else if(m_currMenuMode==mmDeadBodySearch)
-					return m_pDeadBodyActorBagList;
 				else
 					return m_pInventoryBagList;
-			}break;
-		case iDeadBodyBag:
-			{
-				return m_pDeadBodyBagList;
-			}break;
-		case iActorBelt:
-			{
-				return m_pInventoryBeltList;
 			}break;
 		default:
 			{
@@ -469,7 +457,6 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 	OnItemDropped			(CurrentIItem(), new_owner, old_owner);
 	
 	UpdateItemsPlace();
-	UpdateConditionProgressBars	();
 
 	return true;
 }
@@ -639,7 +626,6 @@ void CUIActorMenu::ClearAllLists()
 	m_pTradeActorList->ClearAll					(true);
 	m_pTradePartnerBagList->ClearAll			(true);
 	m_pTradePartnerList->ClearAll				(true);
-	m_pDeadBodyActorBagList->ClearAll			(true);
 	m_pDeadBodyBagList->ClearAll				(true);
 }
 
@@ -833,33 +819,4 @@ void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
 		item->SetCustomDraw(new CUITrashIcon());
 	else
 		item->SetCustomDraw(NULL);
-}
-
-void CUIActorMenu::UpdateConditionProgressBars()
-{
-	PIItem itm = m_pActorInvOwner->inventory().ItemFromSlot(PISTOL_SLOT);
-	if(itm)
-	{
-		m_WeaponSlot1_progress->SetProgressPos(iCeil(itm->GetCondition()*15.0f)/15.0f);
-	}
-	else
-		m_WeaponSlot1_progress->SetProgressPos(0);
-
-	itm = m_pActorInvOwner->inventory().ItemFromSlot(RIFLE_SLOT);
-	if(itm)
-		m_WeaponSlot2_progress->SetProgressPos(iCeil(itm->GetCondition()*15.0f)/15.0f);
-	else
-		m_WeaponSlot2_progress->SetProgressPos(0);
-
-	itm = m_pActorInvOwner->inventory().ItemFromSlot(OUTFIT_SLOT);
-	if(itm)
-		m_Outfit_progress->SetProgressPos(iCeil(itm->GetCondition()*15.0f)/15.0f);
-	else
-		m_Outfit_progress->SetProgressPos(0);
-
-	/*itm = m_pActorInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
-	if(itm)
-		m_Helmet_progress->SetProgressPos(iCeil(itm->GetCondition()*15.0f)/15.0f);
-	else
-		m_Helmet_progress->SetProgressPos(0);*/
 }

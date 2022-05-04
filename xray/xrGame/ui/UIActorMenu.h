@@ -96,7 +96,6 @@ protected:
 	CUIDragDropListEx*			m_pTradeActorList;
 	CUIDragDropListEx*			m_pTradePartnerBagList;
 	CUIDragDropListEx*			m_pTradePartnerList;
-	CUIDragDropListEx*			m_pDeadBodyActorBagList;
 	CUIDragDropListEx*			m_pDeadBodyBagList;
 	CUIDragDropListEx*			m_pTrashList;
 	enum						{e_af_count = 5};
@@ -105,8 +104,7 @@ protected:
 	CUIInventoryUpgradeWnd*		m_pUpgradeWnd;
 	
 	CUIStatic*					m_LeftBackground;
-	CUIStatic*					m_LRBackground;
-	
+
 	UIInvUpgradeInfo*			m_upgrade_info;
 	CUIMessageBoxEx*			m_message_box_yes_no;
 	CUIMessageBoxEx*			m_message_box_ok;
@@ -118,10 +116,6 @@ protected:
 	CUIStatic*					m_ActorMoney;
 	CUIStatic*					m_PartnerMoney;
 
-	CUIProgressBar*				m_WeaponSlot1_progress;
-	CUIProgressBar*				m_WeaponSlot2_progress;
-	//CUIProgressBar*				m_Helmet_progress;
-	CUIProgressBar*				m_Outfit_progress;
 	// bottom ---------------------------------
 	CUIStatic*					m_ActorBottomInfo;
 	CUIStatic*					m_ActorWeight;
@@ -302,7 +296,6 @@ public:
 	void		xr_stdcall		OnBtnExitClicked			(CUIWindow* w, void* d);
 	void		xr_stdcall		TakeAllFromPartner			(CUIWindow* w, void* d);
 	void						TakeAllFromInventoryBox		();
-	void						UpdateConditionProgressBars	();
 
 	IC	UIHint*					get_hint_wnd				() { return m_hint_wnd; }
 
