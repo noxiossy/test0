@@ -138,12 +138,11 @@ void CUIActorMenu::Construct()
 
 	m_clock_value						= UIHelper::CreateStatic(uiXml, "clock_value", this);
 
-/*
 	m_pDeadBodyBagList					= xr_new<CUIDragDropListEx>(); 
 	AttachChild							(m_pDeadBodyBagList);
 	m_pDeadBodyBagList->SetAutoDelete	(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_deadbody_bag", 0, m_pDeadBodyBagList);
-*/
+
 	m_ActorStateInfo					= xr_new<ui_actor_state_wnd>();
 	m_ActorStateInfo->init_from_xml		(uiXml, "actor_state_info");
 	m_ActorStateInfo->SetAutoDelete		(true);
@@ -215,7 +214,6 @@ void CUIActorMenu::Construct()
 	m_allowed_drops[iTrashSlot].push_back(iQuickSlot);
 
 	m_allowed_drops[iActorSlot].push_back(iActorBag);
-	m_allowed_drops[iActorSlot].push_back(iActorSlot);
 	m_allowed_drops[iActorSlot].push_back(iActorTrade);
 	m_allowed_drops[iActorSlot].push_back(iDeadBodyBag);
 
@@ -333,8 +331,6 @@ void CUIActorMenu::UpdateButtonsLayout()
 	if(tmp[2]==',')
 		tmp[1] = '\0';
 	m_QuickSlot4->SetTextST(tmp);
-
-	UpdateConditionProgressBars		();
 }
 
 void CUIActorMenu::SetSimpleHintText(LPCSTR text)
