@@ -29,14 +29,18 @@ private:
 
 	enum EStateType
 	{
-		stt_stamina = 0,
-		stt_health,
-		stt_armor,
-		stt_main,
-		stt_fire,
+		//stt_stamina = 0,
+		//stt_health,
+		//stt_armor,
+		//stt_main,
+		stt_fire = 0,
 		stt_radia,
 		stt_acid,
 		stt_psi,
+		stt_wound,
+		stt_fire_wound,
+		stt_shock,
+		stt_power,
 		stt_count
 	};
 	ui_actor_state_item*	m_state[stt_count];
