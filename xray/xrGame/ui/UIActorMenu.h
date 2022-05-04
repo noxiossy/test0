@@ -116,7 +116,15 @@ protected:
 
 	CUIStatic*					m_ActorMoney;
 	CUIStatic*					m_PartnerMoney;
-
+	CUIStatic*					m_QuickSlot1;
+	CUIStatic*					m_QuickSlot2;
+	CUIStatic*					m_QuickSlot3;
+	CUIStatic*					m_QuickSlot4;
+	
+	CUIProgressBar*				m_WeaponSlot1_progress;
+	CUIProgressBar*				m_WeaponSlot2_progress;
+	//CUIProgressBar*				m_Helmet_progress;
+	CUIProgressBar*				m_Outfit_progress;
 	// bottom ---------------------------------
 	CUIStatic*					m_ActorBottomInfo;
 	CUIStatic*					m_ActorWeight;
@@ -297,6 +305,7 @@ public:
 	void		xr_stdcall		OnBtnExitClicked			(CUIWindow* w, void* d);
 	void		xr_stdcall		TakeAllFromPartner			(CUIWindow* w, void* d);
 	void						TakeAllFromInventoryBox		();
+	void						UpdateConditionProgressBars	();
 
 	IC	UIHint*					get_hint_wnd				() { return m_hint_wnd; }
 
