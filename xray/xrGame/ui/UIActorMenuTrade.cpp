@@ -40,6 +40,7 @@ void CUIActorMenu::InitTradeMode()
 	m_RightDelimiter->Show			(true);
 	m_LeftDelimiter->Show			(true);
 	m_LeftBackground->Show			(true);
+	m_LRBackground->Show			(false);
 
 	m_PartnerBottomInfo->Show		(true);
 	m_PartnerWeight->Show			(true);
@@ -121,7 +122,8 @@ void CUIActorMenu::DeInitTradeMode()
 	m_RightDelimiter->Show			(false);
 	m_LeftDelimiter->Show			(false);
 	m_LeftBackground->Show			(false);
-
+	m_LRBackground->Show			(true);
+	
 	m_PartnerBottomInfo->Show		(false);
 	m_PartnerWeight->Show			(false);
 	m_trade_button->Show			(false);
