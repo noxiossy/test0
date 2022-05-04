@@ -302,7 +302,6 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pTradePartnerBagList)		return iPartnerTradeBag;
 	if(l==m_pTradePartnerList)			return iPartnerTrade;
 	if(l==m_pDeadBodyBagList)			return iDeadBodyBag;
-	if(l==m_pDeadBodyActorBagList)		return iActorBag;
 
 	if(l==m_pQuickSlot)					return iQuickSlot;
 	if(l==m_pTrashList)					return iTrashSlot;
@@ -320,18 +319,8 @@ CUIDragDropListEx* CUIActorMenu::GetListByType(EDDListType t)
 			{
 				if(m_currMenuMode==mmTrade)
 					return m_pTradeActorBagList;
-				else if(m_currMenuMode==mmDeadBodySearch)
-					return m_pDeadBodyActorBagList;
 				else
 					return m_pInventoryBagList;
-			}break;
-		case iDeadBodyBag:
-			{
-				return m_pDeadBodyBagList;
-			}break;
-		case iActorBelt:
-			{
-				return m_pInventoryBeltList;
 			}break;
 		default:
 			{
@@ -648,7 +637,6 @@ void CUIActorMenu::ClearAllLists()
 	m_pTradeActorList->ClearAll					(true);
 	m_pTradePartnerBagList->ClearAll			(true);
 	m_pTradePartnerList->ClearAll				(true);
-	m_pDeadBodyActorBagList->ClearAll			(true);
 	m_pDeadBodyBagList->ClearAll				(true);
 }
 

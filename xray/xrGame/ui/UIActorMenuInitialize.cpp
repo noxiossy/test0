@@ -52,11 +52,6 @@ void CUIActorMenu::Construct()
 	xml_init.InitWindow					(uiXml, "main", 0, this);
 	m_hint_wnd = UIHelper::CreateHint	(uiXml, "hint_wnd");
 
-	m_LRBackground						= xr_new<CUIStatic>();
-	m_LRBackground->SetAutoDelete		(true);
-	AttachChild							(m_LRBackground);
-	xml_init.InitStatic					(uiXml, "lr_background", 0, m_LRBackground);
-	
 	m_LeftBackground					= xr_new<CUIStatic>();
 	m_LeftBackground->SetAutoDelete		(true);
 	AttachChild							(m_LeftBackground);
@@ -110,7 +105,6 @@ void CUIActorMenu::Construct()
 	m_pTradeActorList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_actor_trade", this);
 	m_pTradePartnerBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_bag", this);
 	m_pTradePartnerList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_trade", this);
-	m_pDeadBodyActorBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_actor_bag", this);
 	m_pQuickSlot				= UIHelper::CreateDragDropReferenceList(uiXml, "dragdrop_quick_slots", this);
 	m_pQuickSlot->Initialize	();
 
@@ -204,7 +198,6 @@ void CUIActorMenu::Construct()
 	BindDragDropListEvents				(m_pTradeActorList);
 	BindDragDropListEvents				(m_pTradePartnerBagList);
 	BindDragDropListEvents				(m_pTradePartnerList);
-	BindDragDropListEvents				(m_pDeadBodyActorBagList);
 	BindDragDropListEvents				(m_pDeadBodyBagList);
 	BindDragDropListEvents				(m_pQuickSlot);
 
