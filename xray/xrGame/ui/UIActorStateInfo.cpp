@@ -110,8 +110,18 @@ void ui_actor_state_wnd::UpdateActorInfo( CInventoryOwner* owner )
 	}*/
 
 	// -----------------------------------------------------------------------------------
-	
-	
+
+	CCustomOutfit* outfit = actor->GetOutfit();
+
+	m_state[stt_fire]->set_progress(0.0f);
+	m_state[stt_radia]->set_progress(0.0f);
+	m_state[stt_acid]->set_progress(0.0f);
+	m_state[stt_psi]->set_progress(0.0f);
+	m_state[stt_wound]->set_progress(0.0f);
+	m_state[stt_fire_wound]->set_progress(0.0f);
+	m_state[stt_shock]->set_progress(0.0f);
+	m_state[stt_power]->set_progress(0.0f);
+
 	float burn_value = 0.0f;
 	float radi_value = 0.0f;
 	float cmbn_value = 0.0f;
@@ -133,6 +143,21 @@ void ui_actor_state_wnd::UpdateActorInfo( CInventoryOwner* owner )
 	it = cur_booster_influences.find(eBoostTelepaticProtection);
 	if(it!=cur_booster_influences.end())
 		tele_value += it->second.fBoostValue;
+
+	if(outfit)
+	{
+		burn_value += outfit->GetDefHitTypeProtection(ALife::eHitTypeBurn);
+		radi_value += outfit->GetDefHitTypeProtection(ALife::eHitTypeRadiation);
+		cmbn_value += outfit->GetDefHitTypeProtection(ALife::eHitTypeChemicalBurn);
+		tele_value += outfit->GetDefHitTypeProtection(ALife::eHitTypeTelepatic);
+		woun_value += outfit->GetDefHitTypeProtection(ALife::eHitTypeWound);
+		shoc_value += outfit->GetDefHitTypeProtection(ALife::eHitTypeShock);
+
+		IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
+		VERIFY(ikv);
+		u16 spine_bone = ikv->LL_BoneID("bip01_spine");
+		fwou_value += outfit->GetBoneArmor(spine_bone)*outfit->GetCondition();					
+	}
 
 //fire burn protection progress bar
 	{
