@@ -233,7 +233,7 @@ protected:
 		
 		Fvector			m_ZoomDof;
 		Fvector4		m_ReloadDof;
-        Fvector4		m_ReloadEmptyDof; //Swartz: reload when empty mag. DOF
+		Fvector4		m_ReloadEmptyDof; //Swartz: reload when empty mag. DOF
 	} m_zoom_params;
 	
 	CUIWindow*				m_UIScope;
@@ -274,8 +274,7 @@ public:
 	virtual	float			CurrentZoomFactor	();
 	//показывает, что оружие находится в соостоянии поворота для приближенного прицеливания
 			bool			IsRotatingToZoom	() const		{	return (m_zoom_params.m_fZoomRotationFactor<1.f);}
-
-	virtual	u8				GetCurrentHudOffsetIdx ();
+			bool			IsRotatingFromZoom	() const 		{ return (m_zoom_params.m_fZoomRotationFactor > 0.f); }
 
 	virtual float				Weight			();		
 
