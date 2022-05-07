@@ -1727,24 +1727,15 @@ u8 CWeapon::GetCurrentHudOffsetIdx()
 
 		if (IsGrenadeMode())
 		{
-			if (m_bUseScopeGrenadeZoom && has_scope)
-				return hud_item_measures::m_hands_offset_type_gl_scope;
-			else
-				return hud_item_measures::m_hands_offset_type_gl;
+			return hud_item_measures::m_hands_offset_type_gl;
 		}
 		else if (has_gl)
 		{
-			if (m_bUseScopeZoom && has_scope)
-				return hud_item_measures::m_hands_offset_type_gl_normal_scope;
-			else
-				return hud_item_measures::m_hands_offset_type_aim_gl_normal;
+			return hud_item_measures::m_hands_offset_type_aim_gl_normal;
 		}
 		else
 		{
-			if (m_bUseScopeZoom && has_scope)
-				return hud_item_measures::m_hands_offset_type_aim_scope;
-			else
-				return hud_item_measures::m_hands_offset_type_aim;
+			return hud_item_measures::m_hands_offset_type_aim;
 		}
 	}
 
