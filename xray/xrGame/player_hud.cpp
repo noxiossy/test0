@@ -318,14 +318,14 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 
 	m_prop_flags.set(e_16x9_mode_now,is_16x9);
 
-	m_strafe_offset[0][0] = Fvector().set(0.015f, 0.0f, 0.0f);
-	m_strafe_offset[1][0] = Fvector().set(0.0f, 0.0f, 5.5f);
+	m_strafe_offset[0][0] = Fvector().set(0.015f, 0.0f, 0.0f);// normal
+	m_strafe_offset[1][0] = Fvector().set(0.0f, 0.0f, 4.5f);
 
-	m_strafe_offset[0][1] = Fvector().set(0.02f, 0.0f, 0.0f);
-	m_strafe_offset[1][1] = Fvector().set(0.0f, 0.0f, 1.5f);
+	m_strafe_offset[0][1] = Fvector().set(0.002f, 0.0f, 0.0f); // aim
+	m_strafe_offset[1][1] = Fvector().set(0.0f, 0.0f, 0.5f);
 
 	bool  bStrafeEnabled        = true;
-	bool  bStrafeEnabled_aim    = false;
+	bool  bStrafeEnabled_aim    = true;
 	float fFullStrafeTime       = 0.25f;
 	float fFullStrafeTime_aim   = 0.15f;
 
