@@ -35,7 +35,7 @@ struct hud_item_measures
 	enum{e_fire_point=(1<<0), e_fire_point2=(1<<1), e_shell_point=(1<<2), e_16x9_mode_now=(1<<3)};
 	Flags8							m_prop_flags;
 
-	Fvector m_item_attach[2]{}; // pos,rot
+	Fvector							m_item_attach[2];//pos,rot
 
 
 	enum m_hands_offset_coords : u8 {
@@ -62,7 +62,7 @@ struct hud_item_measures
 	u16								m_shell_bone;
 	Fvector							m_shell_point_offset;
 
-	Fvector m_hands_attach[2]{}; // pos,rot
+	Fvector							m_hands_attach[2];//pos,rot
 
 	void load						(const shared_str& sect_name, IKinematics* K);
 };
