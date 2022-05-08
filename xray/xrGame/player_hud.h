@@ -36,7 +36,7 @@ struct hud_item_measures
 	Flags8							m_prop_flags;
 
 	Fvector							m_item_attach[2];//pos,rot
-	Fvector							m_hands_offset[2][3];//pos,rot/ normal,aim,GL
+
 	
 	u16								m_fire_bone;
 	Fvector							m_fire_point_offset;
