@@ -85,6 +85,8 @@ public:
 	virtual bool				Action				(s32 cmd, u32 flags)			{return false;}
 			void				OnMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)	;
 	
+	virtual	u8					GetCurrentHudOffsetIdx ()							{return 0;}
+
 	BOOL						GetHUDmode			();
 	IC BOOL						IsPending			()		const					{ return !!m_huditem_flags.test(fl_pending);}
 
@@ -132,7 +134,6 @@ public:
 	attachable_hud_item*		HudItemData				();
 	virtual void				on_a_hud_attach			();
 	virtual void				on_b_hud_detach			();
-	virtual u8		GetCurrentHudOffsetIdx	() { return 0; }
 	IC BOOL						HudInertionEnabled		()	const			{ return m_huditem_flags.test(fl_inertion_enable);}
 	IC BOOL						HudInertionAllowed		()	const			{ return m_huditem_flags.test(fl_inertion_allow);}
 	virtual float				GetInertionFactor		()					{ return 1.f; }; //--#SM+#--
