@@ -1830,7 +1830,7 @@ void CWeapon::UpdateHudAdditonal		(Fmatrix& trans)
 		}
 		else
 		{ // Во время аима
-			moving_offs.mul(m_zoom_params.m_fZoomRotationFactor);
+			moving_offs.mulm_zoom_params.(m_fZoomRotationFactor);
 			moving_rot.mul(m_zoom_params.m_fZoomRotationFactor);
 		}
 
