@@ -314,12 +314,9 @@ protected:
 	virtual void			UpdatePosition			(const Fmatrix& transform);	//.
 	virtual void			UpdateXForm				();
 
-private:
-	float m_fLR_MovingFactor{}, m_fLookout_MovingFactor{};
-	Fvector m_strafe_offset[3][2]{}, m_lookout_offset[3][2]{};
+	float 					m_fLR_MovingFactor; // !!!!
+	u8						 GetCurrentHudOffsetIdx() const;
 
-protected:
-	virtual	u8				GetCurrentHudOffsetIdx	() override;
 	virtual void			UpdateHudAdditonal		(Fmatrix&);
 	IC		void			UpdateFireDependencies	()			{ if (dwFP_Frame==Device.dwFrame) return; UpdateFireDependencies_internal(); };
 
