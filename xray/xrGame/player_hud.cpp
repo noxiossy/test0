@@ -298,16 +298,18 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 	}else
 		m_shell_point_offset.set(0,0,0);
 
+	m_hands_offset[0][0].set	(0,0,0);
+	m_hands_offset[1][0].set	(0,0,0);
 
 	strconcat					(sizeof(val_name),val_name,"aim_hud_offset_pos",_prefix);
-	m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+	m_hands_offset[0][1]		= pSettings->r_fvector3(sect_name, val_name);
 	strconcat					(sizeof(val_name),val_name,"aim_hud_offset_rot",_prefix);
-	m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+	m_hands_offset[1][1]		= pSettings->r_fvector3(sect_name, val_name);
 
 	strconcat					(sizeof(val_name),val_name,"gl_hud_offset_pos",_prefix);
-	m_hands_offset[m_hands_offset_pos][m_hands_offset_type_gl] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+	m_hands_offset[0][2]		= pSettings->r_fvector3(sect_name, val_name);
 	strconcat					(sizeof(val_name),val_name,"gl_hud_offset_rot",_prefix);
-	m_hands_offset[m_hands_offset_rot][m_hands_offset_type_gl] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+	m_hands_offset[1][2]		= pSettings->r_fvector3(sect_name, val_name);
 
 
 	R_ASSERT2(pSettings->line_exist(sect_name,"fire_point")==pSettings->line_exist(sect_name,"fire_bone"),		sect_name.c_str());
