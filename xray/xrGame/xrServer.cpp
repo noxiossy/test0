@@ -26,6 +26,8 @@
 #pragma warning(pop)
 #include <functional>
 
+using namespace std::placeholders;
+
 xrClientData::xrClientData	():IClient(Device.GetTimerGlobal())
 {
 	ps			= Level().Server->game->createPlayerState();
@@ -167,14 +169,14 @@ void		xrServer::client_Destroy	(IClient* C)
 	// xrClientData*	D = (xrClientData*)C;
 	// CSE_Abstract* E = D->owner;
 	IClient* deleted_client = net_players.FindAndEraseDisconnectedClient(
-		std::bind1st(std::equal_to<IClient*>(), C)
+		std::bind(std::equal_to<IClient*>(), C, _1)
 	);
 	if (deleted_client)
 	{
 		xr_delete(deleted_client);
 	}
 	IClient* alife_client = net_players.FindAndEraseClient(
-		std::bind1st(std::equal_to<IClient*>(), C)
+		std::bind(std::equal_to<IClient*>(), C, _1)
 	);
 	//VERIFY(alife_client);
 	if (alife_client)
