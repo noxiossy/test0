@@ -607,7 +607,7 @@ bool CUIActorMenu::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
 		else
 			return false;
 
-		Ivector2 belt_cell_pos				= belt_list->PickCell(GetUICursor().GetCursorPosition());
+		Ivector2 belt_cell_pos				= belt_list->PickCell(GetUICursor()->GetCursorPosition());
 		if(belt_cell_pos.x==-1 && belt_cell_pos.y==-1)
 			return false;
 

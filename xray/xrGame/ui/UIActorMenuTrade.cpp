@@ -349,17 +349,19 @@ void CUIActorMenu::UpdateActor()
 	pos.x = pos.x - m_ActorBottomInfo->GetWndSize().x - 5.0f;
 	m_ActorBottomInfo->SetWndPos( pos );
 
+
+
 	InventoryUtilities::UpdateWeightStr( *m_ActorWeightT, *m_ActorWeightMaxT, m_pActorInvOwner );
 	
 	m_ActorWeightT->AdjustWidthToText();
 	m_ActorWeightMaxT->AdjustWidthToText();
 	m_ActorBottomInfoT->AdjustWidthToText();
 
-	Fvector2 pos = m_ActorWeightT->GetWndPos();
-	pos.x = m_ActorWeightMaxT->GetWndPos().x - m_ActorWeightT->GetWndSize().x - 5.0f;
-	m_ActorWeightT->SetWndPos( pos );
-	pos.x = pos.x - m_ActorBottomInfoT->GetWndSize().x - 5.0f;
-	m_ActorBottomInfoT->SetWndPos( pos );
+	Fvector2 posT = m_ActorWeightT->GetWndPos();
+	posT.x = m_ActorWeightMaxT->GetWndPos().x - m_ActorWeightT->GetWndSize().x - 5.0f;
+	m_ActorWeightT->SetWndPos( posT );
+	posT.x = posT.x - m_ActorBottomInfoT->GetWndSize().x - 5.0f;
+	m_ActorBottomInfoT->SetWndPos( posT );
 }
 
 void CUIActorMenu::UpdatePartnerBag()
