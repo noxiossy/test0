@@ -276,9 +276,6 @@ void	CActor::cam_Lookout	( const Fmatrix &xform, float camera_height )
 }
 void CActor::cam_Update(float dt, float fFOV)
 {
-	if(m_holder)
-		return;
-
 	// HUD FOV Update --#SM+#--
 	if (this == Level().CurrentControlEntity())
 	{
@@ -328,7 +325,7 @@ void CActor::cam_Update(float dt, float fFOV)
 		if (flCurrentPlayerY-fPrevCamPos>0.2f)
 			fPrevCamPos		= flCurrentPlayerY-0.2f;
 		point.y				+= fPrevCamPos-flCurrentPlayerY;
-	}else{
+	} else if ( !m_holder ) {
 		fPrevCamPos			= flCurrentPlayerY;
 	}
 
@@ -340,6 +337,9 @@ void CActor::cam_Update(float dt, float fFOV)
 
 	C->Update						(point,dangle);
 	C->f_fov						= fFOV;
+
+	if(m_holder)
+		return;
 
 	if(eacFirstEye != cam_active)
 	{
