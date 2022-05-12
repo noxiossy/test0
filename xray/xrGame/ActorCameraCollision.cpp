@@ -114,11 +114,10 @@ static void get_viewport_geom(Fvector &box, Fmatrix &form, const CCameraBase &ca
 
 static const float actor_camera_hudge_mass = 10.f;
 static const float actor_camera_hudge_mass_size = 10000000.f;
-CPhysicsShell	* create_camera_shell( CPhysicsShellHolder *actor )
+CPhysicsShell	* create_camera_shell( )
 {
-	VERIFY(actor);
-	//CGameObject	*actor = smart_cast<CGameObject	*>( Level().CurrentEntity() );
-	//VERIFY( Level().CurrentEntity() );
+	CGameObject	*actor = smart_cast<CGameObject	*>( Level().CurrentEntity() );
+	VERIFY( Level().CurrentEntity() );
 	CPhysicsShell	*shell = P_build_SimpleShell( actor, actor_camera_hudge_mass , true );
 	CPhysicsElement* roote = shell->get_ElementByStoreOrder( 0 );
 	//Fobb obb; obb.m_halfsize.set(0.5f,0.5f,0.5f); obb.m_rotate.identity();obb.m_translate.set(0,0,0);
