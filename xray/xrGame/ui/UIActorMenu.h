@@ -117,6 +117,7 @@ protected:
 	CInventoryBox*				m_pInvBox;
 
 	CUIStatic*					m_ActorMoney;
+	CUIStatic*					m_ActorMoneyT;
 	CUIStatic*					m_PartnerMoney;
 	CUIStatic*					m_QuickSlot1;
 	CUIStatic*					m_QuickSlot2;

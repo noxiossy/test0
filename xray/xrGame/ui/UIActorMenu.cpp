@@ -815,6 +815,7 @@ void CUIActorMenu::UpdateActorMP()
 	{
 		m_ActorCharacterInfo->ClearInfo();
 		m_ActorMoney->SetText( "" );
+		m_ActorMoneyT->SetText( "" );
 		return;
 	}
 
@@ -823,6 +824,7 @@ void CUIActorMenu::UpdateActorMP()
 	string64 buf;
 	sprintf_s( buf, "%d RU", money );
 	m_ActorMoney->SetText( buf );
+	m_ActorMoneyT->SetText( buf );
 
 	m_ActorCharacterInfo->InitCharacterMP( Game().local_player->name, "ui_npc_u_nebo_1" );
 

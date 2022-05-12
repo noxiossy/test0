@@ -31,6 +31,8 @@ void CUIActorMenu::InitTradeMode()
 	m_pInventoryBagList->Show		(false);
 	m_PartnerCharacterInfo->Show	(true);
 	m_PartnerMoney->Show			(true);
+	m_ActorMoney->Show				(false);
+	m_ActorMoneyT->Show				(true);
 	m_pQuickSlot->Show				(true);
 
 	m_pTradeActorBagList->Show		(true);
@@ -140,6 +142,8 @@ void CUIActorMenu::DeInitTradeMode()
 	m_pInventoryBagList->Show		(true);
 	m_PartnerCharacterInfo->Show	(false);
 	m_PartnerMoney->Show			(false);
+	m_ActorMoney->Show				(true);
+	m_ActorMoneyT->Show				(false);
 
 	m_pTradeActorBagList->Show		(false);
 	m_pTradeActorList->Show			(false);
@@ -326,6 +330,7 @@ void CUIActorMenu::UpdateActor()
 	string64 buf;
 	sprintf_s( buf, "%d RU", m_pActorInvOwner->get_money() );
 	m_ActorMoney->SetText( buf );
+	m_ActorMoneyT->SetText( buf );
 	
 	CActor* actor = smart_cast<CActor*>( m_pActorInvOwner );
 	if ( actor )

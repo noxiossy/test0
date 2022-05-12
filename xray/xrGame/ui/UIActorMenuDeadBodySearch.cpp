@@ -57,7 +57,9 @@ void CUIActorMenu::InitDeadBodySearchMode()
 	m_LeftBackground->Show			(true);
 	m_LRBackground->Show			(false);
 	m_PartnerBottomInfo->Show		(true);
-	m_PartnerWeight->Show			(true);
+	m_PartnerWeight->Show			(false);
+	m_ActorMoney->Show				(false);
+	m_ActorMoneyT->Show				(true);
 	m_ActorBottomInfo->Show			(false);
 	m_ActorWeight->Show				(false);
 	m_ActorWeightMax->Show			(false);
@@ -126,17 +128,19 @@ void CUIActorMenu::InitDeadBodySearchMode()
 
 void CUIActorMenu::DeInitDeadBodySearchMode()
 {
-	m_pInventoryBagList->Show		(true);
+	/*m_pInventoryBagList->Show		(true);
+	m_LRBackground->Show			(true);
+	m_ActorBottomInfo->Show			(true);
+	m_ActorWeight->Show				(true);
+	m_ActorWeightMax->Show			(true);
+	m_ActorMoney->Show				(true);*/
 	m_pDeadBodyActorBagList->Show	(false);
 	m_pDeadBodyBagList->Show		(false);
 	m_PartnerCharacterInfo->Show	(false);
 	m_LeftBackground->Show			(false);
-	m_LRBackground->Show			(true);
 	m_PartnerBottomInfo->Show		(false);
 	m_PartnerWeight->Show			(false);
-	m_ActorBottomInfo->Show			(true);
-	m_ActorWeight->Show				(true);
-	m_ActorWeightMax->Show			(true);
+	m_ActorMoneyT->Show				(false);
 	m_ActorBottomInfoT->Show		(false);
 	m_ActorWeightT->Show			(false);
 	m_ActorWeightMaxT->Show			(false);
