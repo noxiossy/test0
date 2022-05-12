@@ -170,7 +170,7 @@ void	update_current_entity_camera_collision( CPhysicsShellHolder* l_actor )
 				destroy_physics_shell( CActor::actor_camera_shell );
 	
 	if( !CActor::actor_camera_shell )
-			CActor::actor_camera_shell = create_camera_shell( l_actor );
+			CActor::actor_camera_shell = create_camera_shell( );
 }
 
 void get_camera_box( Fvector &box_size, Fmatrix &xform, const CCameraBase & camera, float _viewport_near)
@@ -277,10 +277,10 @@ bool do_collide_not_move(const Fmatrix &xform, CPhysicsShellHolder* l_actor, CPh
 	return cam_collided;
 }
 
-bool test_camera_box( const Fvector &box_size, const Fmatrix &xform, CPhysicsShellHolder* l_actor )
+bool test_camera_box( const Fvector &box_size, const Fmatrix &xform )
 {
-	//CPhysicsShellHolder* l_actor = smart_cast<CPhysicsShellHolder*>( Level().CurrentEntity() );
-	VERIFY( l_actor );
+	CPhysicsShellHolder* l_actor = smart_cast<CPhysicsShellHolder*>( Level().CurrentEntity() );
+
 	update_current_entity_camera_collision( l_actor );
 
 	CPhysicsShell	*shell =  CActor::actor_camera_shell;
@@ -301,10 +301,10 @@ bool test_camera_box( const Fvector &box_size, const Fmatrix &xform, CPhysicsShe
 	return ret;
 }
 
-void	collide_camera( CCameraBase & camera, float _viewport_near, CPhysicsShellHolder *l_actor )
+void	collide_camera( CCameraBase & camera, float _viewport_near )
 {
-	//CPhysicsShellHolder* l_actor = smart_cast<CPhysicsShellHolder*>( Level().CurrentEntity() );
-	VERIFY( l_actor );
+	CPhysicsShellHolder* l_actor = smart_cast<CPhysicsShellHolder*>( Level().CurrentEntity() );
+	
 	update_current_entity_camera_collision( l_actor );
 	Fvector box_size; Fmatrix xform;
 	get_camera_box( box_size, xform , camera, _viewport_near );
