@@ -671,6 +671,16 @@ void CCylinderGeom::get_Extensions( const Fvector& axis, float center_prg, float
 	get_final_tx_bt( pos, rot, p, r )		;
 	GetCylinderExtensions( g, cast_fp( axis ), pos, rot, center_prg, &lo_ext, &hi_ext );	
 }
+
+
+void	CCylinderGeom::set_radius( float r )
+{
+	m_cylinder.m_radius = r;
+	VERIFY( geom() );
+	dGeomCylinderSetParams ( geom(), m_cylinder.m_radius, m_cylinder.m_height );
+}
+
+
 const Fvector& CCylinderGeom::local_center()
 {
 	return m_cylinder.m_center;

@@ -221,7 +221,7 @@ void set_camera_collision( const Fvector &box_size, const Fmatrix &xform, CPhysi
 	);
 	//character_collision_geom_local_xform.c.y =-0.8f;
 	character_collision_geom->set_local_form_bt( character_collision_geom_local_xform );
-	roote->SetTransform( xform, mh_clear );
+	roote->SetTransform( xform );
 }
 
 void	do_collide_and_move(const Fmatrix &xform, CPhysicsShellHolder* l_actor, CPhysicsShell	*shell, CPhysicsElement *roote )
