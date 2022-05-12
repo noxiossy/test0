@@ -59,9 +59,9 @@ string_path		g_last_saved_game;
 	extern float air_resistance_epsilon;
 #endif // #ifdef DEBUG
 
-extern void show_smart_cast_stats		();
-extern void clear_smart_cast_stats		();
-extern void release_smart_cast_stats	();
+//extern void show_smart_cast_stats		();
+//extern void clear_smart_cast_stats		();
+//extern void release_smart_cast_stats	();
 
 extern	u64		g_qwStartGameTime;
 extern	u64		g_qwEStartGameTime;
@@ -148,7 +148,6 @@ public:
 		u32		_crt_heap		= mem_usage_impl((HANDLE)_get_heap_handle(),0,0);
 		u32		_process_heap	= mem_usage_impl(GetProcessHeap(),0,0);
 #ifdef SEVERAL_ALLOCATORS
-		u32		_game_lua		= game_lua_memory_usage();
 		u32		_render			= ::Render->memory_usage();
 #endif // SEVERAL_ALLOCATORS
 		int		_eco_strings	= (int)g_pStringContainer->stat_economy			();
@@ -167,7 +166,7 @@ public:
 #ifndef SEVERAL_ALLOCATORS
 		Msg		("* [x-ray]: crt heap[%d K], process heap[%d K]",_crt_heap/1024,_process_heap/1024);
 #else // SEVERAL_ALLOCATORS
-		Msg		("* [x-ray]: crt heap[%d K], process heap[%d K], game lua[%d K], render[%d K]",_crt_heap/1024,_process_heap/1024,_game_lua/1024,_render/1024);
+		Msg		("* [x-ray]: crt heap[%d K], process heap[%d K], game lua[??? K], render[%d K]",_crt_heap/1024,_process_heap/1024,_render/1024);
 #endif // SEVERAL_ALLOCATORS
 
 		Msg		("* [x-ray]: economy: strings[%d K], smem[%d K]",_eco_strings/1024,_eco_smem);
@@ -973,25 +972,27 @@ public:
 };
 #endif // DEBUG
 
-class CCC_PHFps : public IConsole_Command {
+class CCC_PHFps : public CCC_Float
+{
 public:
-	CCC_PHFps(LPCSTR N) :
-	  IConsole_Command(N)
-	  {};
-	  virtual void	Execute	(LPCSTR args)
-	  {
-		  float				step_count = (float)atof(args);
-#ifndef		DEBUG
-		  clamp				(step_count,50.f,200.f);
-#endif
-		  CPHWorld::SetStep(1.f/step_count);
-	  }
-	  virtual void	Status	(TStatus& S)
-	  {	
-		 	sprintf_s	(S,"%3.5f",1.f/fixed_step);	  
-	  }
+    CCC_PHFps(LPCSTR N)
+        : CCC_Float(N, &m_dummy, 50.f, 200.f){};
 
+    void Execute(LPCSTR args) override
+    {
+        CCC_Float::Execute(args);
+        CPHWorld::SetStep(1.f / m_dummy);
+    }
+
+    void Status(TStatus& S) override
+    {
+        m_dummy = 1.f / fixed_step;
+        CCC_Float::Status(S);
+    }
+private:
+    static float m_dummy;
 };
+float CCC_PHFps::m_dummy = 0.0f;
 
 #ifdef DEBUG
 extern void print_help(lua_State *L);
@@ -1004,7 +1005,7 @@ struct CCC_LuaHelp : public IConsole_Command {
 	}
 };
 
-struct CCC_ShowSmartCastStats : public IConsole_Command {
+/*struct CCC_ShowSmartCastStats : public IConsole_Command {
 	CCC_ShowSmartCastStats(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 
 	virtual void Execute(LPCSTR args) {
@@ -1018,7 +1019,7 @@ struct CCC_ClearSmartCastStats : public IConsole_Command {
 	virtual void Execute(LPCSTR args) {
 		clear_smart_cast_stats();
 	}
-};
+};*/
 #endif
 
 #	include "game_graph.h"
@@ -1713,8 +1714,8 @@ CMD4(CCC_Integer,			"hit_anims_tune",						&tune_hit_anims,		0, 1);
 
 #ifdef DEBUG
 	CMD1(CCC_LuaHelp,				"lua_help");
-	CMD1(CCC_ShowSmartCastStats,	"show_smart_cast_stats");
-	CMD1(CCC_ClearSmartCastStats,	"clear_smart_cast_stats");
+	//CMD1(CCC_ShowSmartCastStats,	"show_smart_cast_stats");
+	//CMD1(CCC_ClearSmartCastStats,	"clear_smart_cast_stats");
 
 	CMD3(CCC_Mask,		"dbg_draw_actor_alive",		&dbg_net_Draw_Flags,	dbg_draw_actor_alive);
 	CMD3(CCC_Mask,		"dbg_draw_actor_dead",		&dbg_net_Draw_Flags,	dbg_draw_actor_dead );
