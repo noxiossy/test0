@@ -9,8 +9,6 @@
 #include <direct.h>
 #pragma warning(pop)
 #include <intrin.h>
-extern bool shared_str_initialized;
-
 #ifdef __BORLANDC__
     #	include "d3d9.h"
     #	include "d3dx9.h"
@@ -36,6 +34,7 @@ extern bool shared_str_initialized;
 #endif // USE_BUG_TRAP
 #include <new.h>							// for _set_new_mode
 #include <signal.h>							// for signals
+#include <Shellapi.h>
 
 #ifdef DEBUG
 #	define USE_OWN_ERROR_MESSAGE_WINDOW
@@ -50,6 +49,7 @@ static bool	error_after_dialog = false;
 extern void BuildStackTrace();
 extern char g_stackTrace[100][4096];
 extern int	g_stackTraceCount;
+extern bool shared_str_initialized;
 
 void LogStackTrace	(LPCSTR header)
 {
@@ -223,7 +223,14 @@ void xrDebug::backend	(const char *expression, const char *description, const ch
 #		ifdef USE_BUG_TRAP
 			BT_SetUserMessage	(assertion_info);
 #		endif // USE_BUG_TRAP
+#       ifndef DEBUG
+			if (strstr(GetCommandLine(),"-show_log"))
+				ShellExecute(nullptr, nullptr, logFullName(), nullptr, nullptr, SW_SHOWNORMAL);
+			//TerminateProcess(GetCurrentProcess(), 1);
+			DEBUG_INVOKE;
+#       else
 		DEBUG_INVOKE;
+#       endif
 #	endif // USE_OWN_ERROR_MESSAGE_WINDOW
 	ShowCursor(FALSE);
 #endif

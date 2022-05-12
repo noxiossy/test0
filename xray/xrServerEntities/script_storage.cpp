@@ -352,6 +352,10 @@ int CScriptStorage::vscript_log		(ScriptStorage::ELuaMessageType tLuaMessageType
 			S	= "[LUA][HOOK_TAIL_RETURN] ";
 			SS	= "[TAIL_RETURN] ";
 			break;
+		case ScriptStorage::eLuaMessageTypeUser:
+			S = "";
+			SS = "";
+			break;
 		}
 		default : NODEFAULT;
 	}
