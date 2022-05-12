@@ -25,6 +25,12 @@ void CUIActorMenu::InitUpgradeMode()
 	m_PartnerMoney->Show( false );
 	m_pUpgradeWnd->Show( true );
 	m_pQuickSlot->Show(true);
+	m_ActorBottomInfo->Show			(false);
+	m_ActorWeight->Show				(false);
+	m_ActorWeightMax->Show			(false);
+	m_ActorBottomInfoT->Show		(true);
+	m_ActorWeightT->Show			(true);
+	m_ActorWeightMaxT->Show			(true);
 	
 	InitInventoryContents( m_pInventoryBagList );
 	VERIFY( m_pPartnerInvOwner );
@@ -39,6 +45,13 @@ void CUIActorMenu::DeInitUpgradeMode()
 	m_pUpgradeWnd->set_info_cur_upgrade( NULL );
 	m_pUpgradeWnd->m_btn_repair->Enable( false );
 
+	m_ActorBottomInfo->Show			(true);
+	m_ActorWeight->Show				(true);
+	m_ActorWeightMax->Show			(true);
+	m_ActorBottomInfoT->Show		(false);
+	m_ActorWeightT->Show			(false);
+	m_ActorWeightMaxT->Show			(false);
+	
 	if ( m_upgrade_selected )
 	{
 		m_upgrade_selected->Mark( false );

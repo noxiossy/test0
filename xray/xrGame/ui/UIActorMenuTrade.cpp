@@ -45,6 +45,12 @@ void CUIActorMenu::InitTradeMode()
 
 	m_PartnerBottomInfo->Show		(true);
 	m_PartnerWeight->Show			(true);
+	m_ActorBottomInfo->Show			(false);
+	m_ActorWeight->Show				(false);
+	m_ActorWeightMax->Show			(false);
+	m_ActorBottomInfoT->Show		(true);
+	m_ActorWeightT->Show			(true);
+	m_ActorWeightMaxT->Show			(true);
 	m_trade_button->Show			(true);
 
 	VERIFY							( m_pPartnerInvOwner );
@@ -66,6 +72,23 @@ void CUIActorMenu::InitTradeMode()
 	if (pActor) pActor->RepackAmmo();
 }
 
+bool is_item_in_list(CUIDragDropListEx* pList, PIItem item)
+{
+	for(u16 i=0;i<pList->ItemsCount();i++)
+	{
+		CUICellItem* cell_item = pList->GetItemIdx(i);
+		for(u16 k=0;k<cell_item->ChildsCount();k++)
+		{
+			CUICellItem* inv_cell_item = cell_item->Child(k);
+			if((PIItem)inv_cell_item->m_pData==item)
+				return true;
+		}
+		if((PIItem)cell_item->m_pData==item)
+			return true;
+	}
+	return false;
+}
+
 void CUIActorMenu::InitPartnerInventoryContents()
 {
 	m_pTradePartnerBagList->ClearAll( true );
@@ -78,8 +101,11 @@ void CUIActorMenu::InitPartnerInventoryContents()
 	TIItemContainer::iterator ite = items_list.end();
 	for( ; itb != ite; ++itb ) 
 	{
-		CUICellItem* itm			= create_cell_item( *itb );
-		m_pTradePartnerBagList->SetItem( itm );
+		if(!is_item_in_list(m_pTradePartnerList, *itb))
+		{
+			CUICellItem* itm			= create_cell_item( *itb );
+			m_pTradePartnerBagList->SetItem( itm );
+		}
 	}
 	m_trade_partner_inventory_state = m_pPartnerInvOwner->inventory().ModifyFrame();
 }
@@ -127,6 +153,12 @@ void CUIActorMenu::DeInitTradeMode()
 	
 	m_PartnerBottomInfo->Show		(false);
 	m_PartnerWeight->Show			(false);
+	m_ActorBottomInfo->Show			(true);
+	m_ActorWeight->Show				(true);
+	m_ActorWeightMax->Show			(true);
+	m_ActorBottomInfoT->Show		(false);
+	m_ActorWeightT->Show			(false);
+	m_ActorWeightMaxT->Show			(false);
 	m_trade_button->Show			(false);
 }
 
@@ -316,6 +348,18 @@ void CUIActorMenu::UpdateActor()
 	m_ActorWeight->SetWndPos( pos );
 	pos.x = pos.x - m_ActorBottomInfo->GetWndSize().x - 5.0f;
 	m_ActorBottomInfo->SetWndPos( pos );
+
+	InventoryUtilities::UpdateWeightStr( *m_ActorWeightT, *m_ActorWeightMaxT, m_pActorInvOwner );
+	
+	m_ActorWeightT->AdjustWidthToText();
+	m_ActorWeightMaxT->AdjustWidthToText();
+	m_ActorBottomInfoT->AdjustWidthToText();
+
+	Fvector2 pos = m_ActorWeightT->GetWndPos();
+	pos.x = m_ActorWeightMaxT->GetWndPos().x - m_ActorWeightT->GetWndSize().x - 5.0f;
+	m_ActorWeightT->SetWndPos( pos );
+	pos.x = pos.x - m_ActorBottomInfoT->GetWndSize().x - 5.0f;
+	m_ActorBottomInfoT->SetWndPos( pos );
 }
 
 void CUIActorMenu::UpdatePartnerBag()

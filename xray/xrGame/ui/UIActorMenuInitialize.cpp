@@ -93,6 +93,11 @@ void CUIActorMenu::Construct()
 	m_ActorWeight		= UIHelper::CreateStatic(uiXml, "actor_weight", this);
 	m_ActorWeightMax	= UIHelper::CreateStatic(uiXml, "actor_weight_max", this);
 	m_ActorBottomInfo->AdjustWidthToText();
+	
+	m_ActorBottomInfoT	= UIHelper::CreateStatic(uiXml, "actor_weight_caption_trade", this);
+	m_ActorWeightT		= UIHelper::CreateStatic(uiXml, "actor_weight_trade", this);
+	m_ActorWeightMaxT	= UIHelper::CreateStatic(uiXml, "actor_weight_max_trade", this);
+	m_ActorBottomInfoT->AdjustWidthToText();
 
 	m_PartnerBottomInfo	= UIHelper::CreateStatic(uiXml, "partner_weight_caption", this);
 	m_PartnerWeight		= UIHelper::CreateStatic(uiXml, "partner_weight", this);
@@ -110,6 +115,8 @@ void CUIActorMenu::Construct()
 	m_pTradeActorList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_actor_trade", this);
 	m_pTradePartnerBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_bag", this);
 	m_pTradePartnerList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_trade", this);
+	m_pDeadBodyActorBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_actor_bag", this);
+	m_pDeadBodyBagList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_bag", this);	
 	m_pQuickSlot				= UIHelper::CreateDragDropReferenceList(uiXml, "dragdrop_quick_slots", this);
 	m_pQuickSlot->Initialize	();
 
@@ -145,11 +152,12 @@ void CUIActorMenu::Construct()
 
 	m_clock_value						= UIHelper::CreateStatic(uiXml, "clock_value", this);
 
+/*
 	m_pDeadBodyBagList					= xr_new<CUIDragDropListEx>(); 
 	AttachChild							(m_pDeadBodyBagList);
 	m_pDeadBodyBagList->SetAutoDelete	(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_deadbody_bag", 0, m_pDeadBodyBagList);
-
+*/
 	m_ActorStateInfo					= xr_new<ui_actor_state_wnd>();
 	m_ActorStateInfo->init_from_xml		(uiXml, "actor_state_info");
 	m_ActorStateInfo->SetAutoDelete		(true);
@@ -211,6 +219,7 @@ void CUIActorMenu::Construct()
 	BindDragDropListEvents				(m_pTradeActorList);
 	BindDragDropListEvents				(m_pTradePartnerBagList);
 	BindDragDropListEvents				(m_pTradePartnerList);
+	BindDragDropListEvents				(m_pDeadBodyActorBagList);
 	BindDragDropListEvents				(m_pDeadBodyBagList);
 	BindDragDropListEvents				(m_pQuickSlot);
 

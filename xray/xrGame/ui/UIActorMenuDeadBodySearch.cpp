@@ -51,11 +51,19 @@ bool move_item_check( PIItem itm, CInventoryOwner* from, CInventoryOwner* to, bo
 
 void CUIActorMenu::InitDeadBodySearchMode()
 {
+	m_pInventoryBagList->Show		(false);
+	m_pDeadBodyActorBagList->Show	(true);
 	m_pDeadBodyBagList->Show		(true);
 	m_LeftBackground->Show			(true);
 	m_LRBackground->Show			(false);
 	m_PartnerBottomInfo->Show		(true);
 	m_PartnerWeight->Show			(true);
+	m_ActorBottomInfo->Show			(false);
+	m_ActorWeight->Show				(false);
+	m_ActorWeightMax->Show			(false);
+	m_ActorBottomInfoT->Show		(true);
+	m_ActorWeightT->Show			(true);
+	m_ActorWeightMaxT->Show			(true);
 	m_takeall_button->Show			(true);
 
 	if ( m_pPartnerInvOwner )
@@ -67,7 +75,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
 		m_PartnerCharacterInfo->Show(false);
 	}
 
-	InitInventoryContents			(m_pInventoryBagList);
+	InitInventoryContents			(m_pDeadBodyActorBagList);
 
 	TIItemContainer					items_list;
 	if ( m_pPartnerInvOwner )
@@ -118,12 +126,20 @@ void CUIActorMenu::InitDeadBodySearchMode()
 
 void CUIActorMenu::DeInitDeadBodySearchMode()
 {
+	m_pInventoryBagList->Show		(true);
+	m_pDeadBodyActorBagList->Show	(false);
 	m_pDeadBodyBagList->Show		(false);
 	m_PartnerCharacterInfo->Show	(false);
 	m_LeftBackground->Show			(false);
 	m_LRBackground->Show			(true);
 	m_PartnerBottomInfo->Show		(false);
 	m_PartnerWeight->Show			(false);
+	m_ActorBottomInfo->Show			(true);
+	m_ActorWeight->Show				(true);
+	m_ActorWeightMax->Show			(true);
+	m_ActorBottomInfoT->Show		(false);
+	m_ActorWeightT->Show			(false);
+	m_ActorWeightMaxT->Show			(false);
 	m_takeall_button->Show			(false);
 
 	if ( m_pInvBox )

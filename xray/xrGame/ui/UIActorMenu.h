@@ -97,6 +97,7 @@ protected:
 	CUIDragDropListEx*			m_pTradeActorList;
 	CUIDragDropListEx*			m_pTradePartnerBagList;
 	CUIDragDropListEx*			m_pTradePartnerList;
+	CUIDragDropListEx*			m_pDeadBodyActorBagList;
 	CUIDragDropListEx*			m_pDeadBodyBagList;
 	CUIDragDropListEx*			m_pTrashList;
 	enum						{e_af_count = 5};
@@ -130,6 +131,10 @@ protected:
 	CUIStatic*					m_ActorBottomInfo;
 	CUIStatic*					m_ActorWeight;
 	CUIStatic*					m_ActorWeightMax;
+
+	CUIStatic*					m_ActorBottomInfoT;
+	CUIStatic*					m_ActorWeightT;
+	CUIStatic*					m_ActorWeightMaxT;
 	
 	CUIStatic*					m_PartnerBottomInfo;
 	CUIStatic*					m_PartnerWeight;

@@ -792,7 +792,7 @@ void CActor::g_Physics			(Fvector& _accel, float jump, float dt)
 		}
 	}
 }
-float g_fov = 67.5f;
+float g_fov = 75.0f;
 
 float CActor::currentFOV()
 {
@@ -1076,10 +1076,10 @@ void CActor::shedule_Update	(u32 DT)
 		mstate_old = mstate_real;
 	}
 
-	if (this == Level().CurrentViewEntity())
+	/*if (this == Level().CurrentViewEntity())
 	{
 		UpdateMotionIcon		(mstate_real);
-	};
+	};*/
 
 	NET_Jump = 0;
 
@@ -1453,7 +1453,6 @@ float CActor::Radius()const
 
 bool		CActor::use_bolts				() const
 {
-	if (!IsGameTypeSingle()) return false;
 	return CInventoryOwner::use_bolts();
 };
 
@@ -1461,20 +1460,7 @@ int		g_iCorpseRemove = 1;
 
 bool  CActor::NeedToDestroyObject() const
 {
-	if(IsGameTypeSingle())
-	{
-		return false;
-	}
-	else 
-	{
-		if (g_Alive()) return false;
-		if (g_iCorpseRemove == -1) return false;
-		if (g_iCorpseRemove == 0 && m_bAllowDeathRemove) return true;
-		if(TimePassedAfterDeath()>m_dwBodyRemoveTime && m_bAllowDeathRemove)
-			return true;
-		else
-			return false;
-	}
+    return false;
 }
 
 ALife::_TIME_ID	 CActor::TimePassedAfterDeath()	const
@@ -1698,13 +1684,13 @@ void CActor::AnimTorsoPlayCallBack(CBlend* B)
 
 void CActor::SetActorVisibility(u16 who, float value)
 {
-	CUIMotionIcon		&motion_icon	= HUD().GetUI()->UIMainIngameWnd->MotionIcon();
-	motion_icon.SetActorVisibility		(who, value);
+	//CUIMotionIcon		&motion_icon	= HUD().GetUI()->UIMainIngameWnd->MotionIcon();
+	//motion_icon.SetActorVisibility		(who, value);
 }
 
 void CActor::UpdateMotionIcon(u32 mstate_rl)
 {
-	CUIMotionIcon		&motion_icon=HUD().GetUI()->UIMainIngameWnd->MotionIcon();
+	/*CUIMotionIcon		&motion_icon=HUD().GetUI()->UIMainIngameWnd->MotionIcon();
 	if(mstate_rl&mcClimb)
 	{
 		motion_icon.ShowState(CUIMotionIcon::stClimb);
@@ -1726,7 +1712,7 @@ void CActor::UpdateMotionIcon(u32 mstate_rl)
 			motion_icon.ShowState(CUIMotionIcon::stRun);
 		else
 			motion_icon.ShowState(CUIMotionIcon::stNormal);
-	}
+	}*/
 
 /*
 						stNormal, --

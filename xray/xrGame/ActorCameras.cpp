@@ -294,7 +294,7 @@ void CActor::cam_Update(float dt, float fFOV)
 		camUpdateLadder(dt);
 	on_weapon_shot_update();
 	if (!CurrentHeight)CurrentHeight = CameraHeight();
-	float HeightInterpolationSpeed = 9.f;
+	float HeightInterpolationSpeed = 4.f;
 	if (CurrentHeight != CameraHeight() && !Device.dwPrecacheFrame)
 	{
 		CurrentHeight = (CurrentHeight * (1.0f - HeightInterpolationSpeed*dt)) + (CameraHeight() * HeightInterpolationSpeed*dt);
