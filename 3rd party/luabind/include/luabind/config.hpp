@@ -38,6 +38,11 @@
 #else
 #   define LUABIND_DTOR_NOEXCEPT
 #endif // NDEBUG
+//
+#include "xrCore.h" //KRodin: „тобы использовались операторы new/delete из xrCore. »наче могут возникать проблемы при освобождении пам€ти.
+//
+//*************************************************************************************************
+
 // LUABIND_NO_ERROR_CHECKING
 // define this to remove all error checks
 // this will improve performance and memory

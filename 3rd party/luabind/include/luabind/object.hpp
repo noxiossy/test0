@@ -497,7 +497,7 @@ namespace luabind
 			{
 			}
 
-			~array_iterator() {}
+			~array_iterator() = default;
 
 			array_iterator& operator=(const array_iterator& rhs)
 			{
@@ -1009,10 +1009,10 @@ private:
 			}
 		}
 
-		mutable lua_State* m_state;
 #pragma warning(push)
 #pragma warning(disable:4251)
 		mutable detail::lua_reference m_ref;
+		mutable lua_State* m_state;
 #pragma warning(pop)
 	};
 
@@ -1056,7 +1056,7 @@ private:
 
 			struct assign_into
 			{
-				assign_into() {}
+				assign_into() = default;
 
 				template<class T>
 				assign_into(tuple_object_ref& to, const T& val)
@@ -1075,8 +1075,8 @@ private:
 					return *this;
 				}
 
-				tuple_object_ref* target;
-				std::size_t n;
+				tuple_object_ref* target = nullptr;
+				std::size_t n = 0;
 			};
 
 			template<class T>
@@ -1109,7 +1109,7 @@ private:
 					objs[i] = *x.refs[i];
 			}
 
-			std::size_t n;
+			std::size_t n{};
 			object objs[10];
 		};
 
@@ -1254,10 +1254,13 @@ private:
 #else
 				error_callback_fun e = get_error_callback();
 				if (e) e(L);
-	
-				assert(0 && "the lua function threw an error and exceptions are disabled."
-					"if you want to handle this error use luabind::set_error_callback()");
-				std::terminate();
+                else
+                {
+
+                    assert(0 && "the lua function threw an error and exceptions are disabled."
+                        "if you want to handle this error use luabind::set_error_callback()");
+                    std::terminate();
+                }
 #endif
 			}
 		}
