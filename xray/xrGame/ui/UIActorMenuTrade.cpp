@@ -31,8 +31,6 @@ void CUIActorMenu::InitTradeMode()
 	m_pInventoryBagList->Show		(false);
 	m_PartnerCharacterInfo->Show	(true);
 	m_PartnerMoney->Show			(true);
-	m_ActorMoney->Show				(false);
-	m_ActorMoneyT->Show				(true);
 	m_pQuickSlot->Show				(true);
 
 	m_pTradeActorBagList->Show		(true);
@@ -142,8 +140,6 @@ void CUIActorMenu::DeInitTradeMode()
 	m_pInventoryBagList->Show		(true);
 	m_PartnerCharacterInfo->Show	(false);
 	m_PartnerMoney->Show			(false);
-	m_ActorMoney->Show				(true);
-	m_ActorMoneyT->Show				(false);
 
 	m_pTradeActorBagList->Show		(false);
 	m_pTradeActorList->Show			(false);

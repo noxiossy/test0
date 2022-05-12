@@ -46,10 +46,6 @@ void CUIActorMenu::InitInventoryMode()
 	m_ActorBottomInfo->Show				(true);
 	m_ActorWeight->Show					(true);
 	m_ActorWeightMax->Show				(true);
-	//m_ActorMoneyT->Show					(false);
-	//m_ActorBottomInfoT->Show			(false);
-	//m_ActorWeightT->Show				(false);
-	//m_ActorWeightMaxT->Show				(false);
 
 	m_RightDelimiter->Show				(false);
 	m_clock_value->Show					(true);

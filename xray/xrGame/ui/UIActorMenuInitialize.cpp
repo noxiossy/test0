@@ -136,7 +136,6 @@ void CUIActorMenu::Construct()
 	}
 
 	m_ActorMoney	= UIHelper::CreateStatic(uiXml, "actor_money_static", this);
-	m_ActorMoneyT	= UIHelper::CreateStatic(uiXml, "actor_money_static_trade", this);
 	m_PartnerMoney	= UIHelper::CreateStatic(uiXml, "partner_money_static", this);
 	m_QuickSlot1	= UIHelper::CreateStatic(uiXml, "quick_slot1_text", this);
 	m_QuickSlot2	= UIHelper::CreateStatic(uiXml, "quick_slot2_text", this);

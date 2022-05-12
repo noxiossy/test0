@@ -25,8 +25,8 @@
 
 extern const LPCSTR g_inventory_upgrade_xml;
 
-#define  INV_GRID_WIDTH2  40
-#define  INV_GRID_HEIGHT2 40
+#define  INV_GRID_WIDTH2  40.0f
+#define  INV_GRID_HEIGHT2 40.0f
 
 CUIItemInfo::CUIItemInfo()
 {

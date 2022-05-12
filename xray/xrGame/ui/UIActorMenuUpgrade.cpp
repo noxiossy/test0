@@ -23,8 +23,6 @@ void CUIActorMenu::InitUpgradeMode()
 {
 	m_PartnerCharacterInfo->Show	(true);
 	m_PartnerMoney->Show			(false);
-	m_ActorMoney->Show				(false);
-	m_ActorMoneyT->Show				(true);
 	m_pUpgradeWnd->Show				(true);
 	m_pQuickSlot->Show				(true);
 	m_ActorBottomInfo->Show			(false);
@@ -46,9 +44,6 @@ void CUIActorMenu::DeInitUpgradeMode()
 	m_pUpgradeWnd->Show( false );
 	m_pUpgradeWnd->set_info_cur_upgrade( NULL );
 	m_pUpgradeWnd->m_btn_repair->Enable( false );
-	
-	m_ActorMoney->Show				(true);
-	m_ActorMoneyT->Show				(false);
 
 	m_ActorBottomInfo->Show			(true);
 	m_ActorWeight->Show				(true);

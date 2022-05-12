@@ -391,7 +391,181 @@ void CUIActorMenu::InfoCurItem( CUICellItem* cell_item )
 	m_ItemInfo->AlignHintWndPos( Frect().set( 0.0f, 0.0f, 1024.0f - dx_pos, 768.0f ), 10.0f, dx_pos );
 }
 
+bool CUIActorMenu::OnItemStartDrag(CUICellItem* itm)
+{
+	InfoCurItem( NULL );
+	return false; //default behaviour
+}
 
+bool CUIActorMenu::OnItemSelected(CUICellItem* itm)
+{
+	SetCurrentItem		(itm);
+	InfoCurItem			(NULL);
+	return				false;
+}
+
+bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
+{
+	InfoCurItem( NULL );
+	CUIDragDropListEx*	old_owner		= itm->OwnerList();
+	CUIDragDropListEx*	new_owner		= CUIDragDropListEx::m_drag_item->BackList();
+	if ( old_owner==new_owner || !old_owner || !new_owner )
+	{
+		return false;
+	}
+
+	EDDListType t_new		= GetListType(new_owner);
+	EDDListType t_old		= GetListType(old_owner);
+	
+	if ( !AllowItemDrops(t_old, t_new) )
+	{
+		Msg("incorrect action [%d]->[%d]",t_old, t_new);
+		return true;
+	}
+	switch(t_new)
+	{
+		case iTrashSlot:
+		{
+			if (CurrentIItem()->IsQuestItem())
+				return true;
+
+			if(t_old==iQuickSlot)	
+			{
+				old_owner->RemoveItem(itm, false);
+				return true;
+			}
+			SendEvent_Item_Drop(CurrentIItem(), m_pActorInvOwner->object_id());
+			SetCurrentItem(NULL);
+		}break;
+		case iActorSlot:
+		{
+			if(GetSlotList(CurrentIItem()->GetSlot())==new_owner)
+				ToSlot	(itm, true);
+		}break;
+		case iActorBag:
+		{
+			ToBag	(itm, true);
+		}break;
+		case iActorBelt:
+		{
+			ToBelt	(itm, true);
+		}break;
+		case iActorTrade:
+		{
+			ToActorTrade(itm, true);
+		}break;
+		case iPartnerTrade:
+		{
+			if(t_old!=iPartnerTradeBag)	
+				return false;
+			ToPartnerTrade(itm, true);
+		}break;
+		case iPartnerTradeBag:
+		{
+			if(t_old!=iPartnerTrade)	
+				return false;
+			ToPartnerTradeBag(itm, true);
+		}break;
+		case iDeadBodyBag:
+		{
+			ToDeadBodyBag(itm, true);
+		}break;
+		case iQuickSlot:
+		{
+			ToQuickSlot(itm);
+		}break;
+	};
+
+	OnItemDropped			(CurrentIItem(), new_owner, old_owner);
+	
+	UpdateItemsPlace();
+	UpdateConditionProgressBars	();
+
+	return true;
+}
+
+bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
+{
+	InfoCurItem( NULL );
+	CUIDragDropListEx*	old_owner		= itm->OwnerList();
+	EDDListType t_old					= GetListType(old_owner);
+
+	switch ( t_old )
+	{
+		case iActorSlot:
+		{
+			if ( m_currMenuMode == mmDeadBodySearch )
+				ToDeadBodyBag	( itm, false );
+			else
+				ToBag			( itm, false );
+			break;
+		}
+		case iActorBag:
+		{
+			if ( m_currMenuMode == mmTrade )
+			{
+				ToActorTrade( itm, false );
+				break;
+			}else
+			if ( m_currMenuMode == mmDeadBodySearch )
+			{
+				ToDeadBodyBag( itm, false );
+				break;
+			}
+			if(m_currMenuMode!=mmUpgrade && TryUseItem( itm ))
+			{
+				break;
+			}
+			if ( TryActiveSlot( itm ) )
+			{
+				break;
+			}
+			if ( !ToSlot( itm, false ) )
+			{
+				if ( !ToBelt( itm, false ) )
+				{
+					ToSlot( itm, true );
+				}
+			}
+			break;
+		}
+		case iActorBelt:
+		{
+			ToBag( itm, false );
+			break;
+		}
+		case iActorTrade:
+		{
+			ToBag( itm, false );
+			break;
+		}
+		case iPartnerTradeBag:
+		{
+			ToPartnerTrade( itm, false );
+			break;
+		}
+		case iPartnerTrade:
+		{
+			ToPartnerTradeBag( itm, false );
+			break;
+		}
+		case iDeadBodyBag:
+		{
+			ToBag( itm, false );
+			break;
+		}
+	case iQuickSlot:
+		{
+			ToQuickSlot(itm);
+		}break;
+
+	}; //switch 
+
+	UpdateItemsPlace();
+	UpdateConditionProgressBars();
+
+	return true;
+}
 
 void CUIActorMenu::UpdateItemsPlace()
 {
@@ -423,6 +597,50 @@ void CUIActorMenu::UpdateItemsPlace()
 	}
 }
 
+bool CUIActorMenu::OnItemRButtonClick(CUICellItem* itm)
+{
+	SetCurrentItem( itm );
+	InfoCurItem( NULL );
+	ActivatePropertiesBox();
+	return false;
+}
+
+bool CUIActorMenu::OnItemFocusReceive(CUICellItem* itm)
+{
+	InfoCurItem( NULL );	
+	itm->m_selected = true;
+	return true;
+}
+
+bool CUIActorMenu::OnItemFocusLost(CUICellItem* itm)
+{
+	if ( itm )
+	{
+		itm->m_selected = false;
+	}
+	InfoCurItem( NULL );
+	return true;
+}
+
+bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
+{
+	if ( itm )
+	{
+		itm->m_selected = true;
+	}
+	VERIFY( m_ItemInfo );
+	if ( Device.dwTimeGlobal < itm->FocusReceiveTime() + m_ItemInfo->delay )
+	{
+		return true; //false
+	}
+	if ( CUIDragDropListEx::m_drag_item || m_UIPropertiesBox->IsShown() )
+	{
+		return true;
+	}	
+	
+	InfoCurItem( itm );
+	return true;
+}
 
 void CUIActorMenu::ClearAllLists()
 {
@@ -443,11 +661,102 @@ void CUIActorMenu::ClearAllLists()
 	m_pDeadBodyBagList->ClearAll				(true);
 }
 
+bool CUIActorMenu::OnMouse( float x, float y, EUIMessages mouse_action )
+{
+	inherited::OnMouse( x, y, mouse_action );
+	return true; // no click`s
+}
+
+void CUIActorMenu::OnMouseMove()
+{
+	//SetInfoItem( NULL );
+	inherited::OnMouseMove		();
+}
+
+bool CUIActorMenu::OnKeyboard(int dik, EUIMessages keyboard_action)
+{
+/*
+	if (UIPropertiesBox.GetVisible())
+	{	UIPropertiesBox.OnKeyboard(dik, keyboard_action); }
+*/
+	InfoCurItem( NULL );
+	if ( is_binded(kDROP, dik) )
+	{
+		if ( WINDOW_KEY_PRESSED == keyboard_action && CurrentIItem() && !CurrentIItem()->IsQuestItem()
+			&& CurrentIItem()->parent_id()==m_pActorInvOwner->object_id() )
+		{
+
+			SendEvent_Item_Drop		(CurrentIItem(), m_pActorInvOwner->object_id());
+			SetCurrentItem			(NULL);
+		}
+		return true;
+	}
+	
+	if ( is_binded(kSPRINT_TOGGLE, dik) )
+	{
+		if ( WINDOW_KEY_PRESSED == keyboard_action )
+		{
+			OnPressUserKey();
+		}
+		return true;
+	}	
+	
+	if ( is_binded(kUSE, dik) || is_binded(kINVENTORY, dik) )
+	{
+		if ( WINDOW_KEY_PRESSED == keyboard_action )
+		{
+			GetHolder()->StartStopMenu( this, true );
+		}
+		return true;
+	}	
+	
+	if ( is_binded(kQUIT, dik) )
+	{
+		if ( WINDOW_KEY_PRESSED == keyboard_action )
+		{
+			GetHolder()->StartStopMenu( this, true );
+		}
+		return true;
+	}
+
+	if( inherited::OnKeyboard(dik,keyboard_action) )return true;
+
+	return false;
+}
+
+void CUIActorMenu::OnPressUserKey()
+{
+	switch ( m_currMenuMode )
+	{
+	case mmUndefined:		break;
+	case mmInventory:		break;
+	case mmTrade:			
+		OnBtnPerformTrade( this, 0 );
+		break;
+	case mmUpgrade:			
+		TrySetCurUpgrade();
+		break;
+	case mmDeadBodySearch:	
+		TakeAllFromPartner( this, 0 );
+		break;
+	default:
+		R_ASSERT(0);
+		break;
+	}
+}
+
+bool  CUIActorMenu::AllowItemDrops(EDDListType from, EDDListType to)
+{
+	xr_vector<EDDListType>& v = m_allowed_drops[to];
+	xr_vector<EDDListType>::iterator it = std::find(v.begin(), v.end(), from);
+	
+	return(it!=v.end());
+}
+
 void CUIActorMenu::CallMessageBoxYesNo( LPCSTR text )
 {
 	m_message_box_yes_no->SetText( text );
 	m_message_box_yes_no->func_on_ok = CUIWndCallback::void_function( this, &CUIActorMenu::OnMesBoxYes );
-	m_message_box_yes_no->func_on_no = CUIWndCallback::void_function( this, &CUIActorMenu::OnMesBoxNo );
 	HUD().GetUI()->StartStopMenu( m_message_box_yes_no, false );
 }
 
@@ -455,6 +764,41 @@ void CUIActorMenu::CallMessageBoxOK( LPCSTR text )
 {
 	m_message_box_ok->SetText( text );
 	HUD().GetUI()->StartStopMenu( m_message_box_ok, false );
+}
+
+void CUIActorMenu::OnMesBoxYes( CUIWindow*, void* )
+{
+	switch( m_currMenuMode )
+	{
+	case mmUndefined:
+		break;
+	case mmInventory:
+		break;
+	case mmTrade:
+		break;
+	case mmUpgrade:
+		if ( m_repair_mode )
+		{
+			RepairEffect_CurItem();
+			m_repair_mode = false;
+		}
+		else
+		{
+			m_pUpgradeWnd->OnMesBoxYes();
+		}
+		break;
+	case mmDeadBodySearch:
+		break;
+	default:
+		R_ASSERT(0);
+		break;
+	}
+	UpdateItemsPlace();
+}
+
+void CUIActorMenu::OnBtnExitClicked(CUIWindow* w, void* d)
+{
+	GetHolder()->StartStopMenu			(this,true);
 }
 
 void CUIActorMenu::ResetMode()
@@ -486,6 +830,40 @@ void CUIActorMenu::UpdateActorMP()
 
 }
 
+class CUITrashIcon :public ICustomDrawDragItem
+{
+	CUIStatic			m_icon;
+public:
+	CUITrashIcon()
+	{
+		m_icon.SetWndSize(Fvector2().set(29.0f * UI()->get_current_kx(), 36.0f));
+		m_icon.SetStretchTexture(true);
+		//		m_icon.SetAlignment		(waCenter);
+		m_icon.InitTexture("a_icon_trash");
+	}
+	virtual void		OnDraw(CUIDragItem* drag_item)
+	{
+		Fvector2 pos = drag_item->GetWndPos();
+		Fvector2 icon_sz = m_icon.GetWndSize();
+		Fvector2 drag_sz = drag_item->GetWndSize();
+
+		pos.x -= icon_sz.x;
+		pos.y += drag_sz.y;
+
+		m_icon.SetWndPos(pos);
+		//		m_icon.SetWndSize(sz);
+		m_icon.Draw();
+	}
+
+};
+
+void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
+{
+	if (b_receive && !CurrentIItem()->IsQuestItem())
+		item->SetCustomDraw(new CUITrashIcon());
+	else
+		item->SetCustomDraw(NULL);
+}
 
 void CUIActorMenu::UpdateConditionProgressBars()
 {
