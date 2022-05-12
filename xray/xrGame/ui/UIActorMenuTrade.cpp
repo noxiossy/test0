@@ -326,7 +326,6 @@ void CUIActorMenu::UpdateActor()
 	string64 buf;
 	sprintf_s( buf, "%d RU", m_pActorInvOwner->get_money() );
 	m_ActorMoney->SetText( buf );
-	m_ActorMoneyT->SetText( buf );
 	
 	CActor* actor = smart_cast<CActor*>( m_pActorInvOwner );
 	if ( actor )
