@@ -129,8 +129,8 @@ CPhysicsShell	* create_camera_shell( )
 	CPHElement *eeroot = static_cast<CPHElement *>( roote );
 
 	character_test_geom->set_body( eeroot->get_body() );
-	//character_test_geom->set_ref_object(smart_cast<CPhysicsShellHolder*>(actor));
-	character_test_geom->set_ref_object( actor );
+	character_test_geom->set_ref_object(smart_cast<CPhysicsShellHolder*>(actor));
+	//character_test_geom->set_ref_object( actor );
 	CPHGeometryBits::set_ignore_static( *character_test_geom );
 	roote->add_geom( character_test_geom );
 	VERIFY( shell );
