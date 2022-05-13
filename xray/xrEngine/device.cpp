@@ -156,6 +156,26 @@ void CRenderDevice::End		(void)
 }
 
 
+void CRenderDevice::SecondaryThreadProc(void* context)
+{
+    auto& device = *static_cast<CRenderDevice*>(context);
+    while (true)
+    {
+        device.syncProcessFrame.Wait();
+        if (device.mt_bMustExit)
+        {
+            device.mt_bMustExit = FALSE;
+            device.syncThreadExit.Set();
+            return;
+        }
+        for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
+            device.seqParallel[pit]();
+        device.seqParallel.clear();
+        device.seqFrameMT.Process(rp_Frame);
+        device.syncFrameDone.Set();
+    }
+}
+
 #include "igame_level.h"
 void CRenderDevice::PreCache	(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
 {
@@ -179,6 +199,9 @@ void CRenderDevice::PreCache	(u32 amount, bool b_draw_loadscreen, bool b_wait_us
 }
 
 ENGINE_API xr_list<LOADING_EVENT>			g_loading_events;
+
+#include "render.h"
+#include "IGame_Level.h"
 
 void CRenderDevice::on_idle		()
 {
@@ -258,7 +281,7 @@ void CRenderDevice::on_idle		()
 
 	constexpr u32 menuFPSlimit{ 60 }, pauseFPSlimit{ 60 };
 	const u32 curFPSLimit = IsMainMenuActive() ? menuFPSlimit : Device.Paused() ? pauseFPSlimit : g_dwFPSlimit;
-	if (curFPSLimit > 0 && !m_SecondViewport.IsSVPFrame())
+	if (curFPSLimit > 0 )
 	{
 		const std::chrono::duration<double, std::milli> FpsLimitMs{ std::floor(1000.f / (curFPSLimit + 1)) };
 		if (FrameElapsedTime < FpsLimitMs)
@@ -270,18 +293,7 @@ void CRenderDevice::on_idle		()
 		}
 	}
 
-#ifdef SHOW_SECOND_THREAD_STATS
-	const auto SecondThreadEndTime = std::chrono::high_resolution_clock::now();
-#endif
-
-	syncFrameDone.WaitEx(66); // wait until secondary thread finish its job
-
-#ifdef SHOW_SECOND_THREAD_STATS
-	const std::chrono::duration<double, std::milli> SecondThreadElapsedTime = SecondThreadEndTime - SecondThreadStartTime;
-	const std::chrono::duration<double, std::milli> SecondThreadFreeTime = SecondThreadElapsedTime - SecondThreadTasksElapsedTime;
-	Msg("##[%s] Second thread work time: [%f]ms, used: [%f]ms, free: [%f]ms", __FUNCTION__, SecondThreadElapsedTime.count(), SecondThreadTasksElapsedTime.count(), SecondThreadFreeTime.count());
-#endif
-
+    syncFrameDone.Wait(); // wait until secondary thread finish its job
 	if (!b_is_Active)
 		Sleep		(1);
 }
@@ -322,7 +334,7 @@ void CRenderDevice::Run			()
 //	DUMP_PHASE;
 	g_bLoaded		= FALSE;
 	Log				("Starting engine...");
-	set_current_thread_name("X-RAY Primary thread");
+    thread_name("X-RAY Primary thread");
 
 	// Startup timers and calculate timer delta
 	dwTimeGlobal				= 0;
@@ -336,40 +348,9 @@ void CRenderDevice::Run			()
 	}
 
 	// Start all threads
-	mt_bMustExit = false;
-	// KRodin: TODO: Use C++20 std::jthread
-	std::thread second_thread([] (void* context) {
-		set_current_thread_name("X-RAY Secondary thread");
+    mt_bMustExit = FALSE;
+    thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
 
-		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-
-		auto& device = *static_cast<CRenderDevice*>(context);
-
-		while (true) {
-			device.syncProcessFrame.Wait();
-
-			if (device.mt_bMustExit) {
-				device.syncThreadExit.Set();
-				return;
-			}
-
-#ifdef SHOW_SECOND_THREAD_STATS
-			const auto SecondThreadTasksStartTime = std::chrono::high_resolution_clock::now();
-#endif
-
-			for (const auto& Func : device.seqParallel)
-				Func();
-			device.seqParallel.clear_and_free();
-			device.seqFrameMT.Process(rp_Frame);
-
-#ifdef SHOW_SECOND_THREAD_STATS
-			const auto SecondThreadTasksEndTime = std::chrono::high_resolution_clock::now();
-			device.SecondThreadTasksElapsedTime = SecondThreadTasksEndTime - SecondThreadTasksStartTime;
-#endif
-
-			device.syncFrameDone.Set();
-		}
-	}, this);
 
 	// Message cycle
 	seqAppStart.Process			(rp_AppStart);
@@ -381,11 +362,11 @@ void CRenderDevice::Run			()
 
 	seqAppEnd.Process		(rp_AppEnd);
 
-	// Stop Balance-Thread
-	mt_bMustExit = true;
-	syncProcessFrame.Set();
-	syncThreadExit.Wait();
-	second_thread.join();
+    // Stop Balance-Thread
+    mt_bMustExit = TRUE;
+    syncProcessFrame.Set();
+    syncThreadExit.Wait();
+    while (mt_bMustExit) Sleep(0);
 }
 
 u32 app_inactive_time		= 0;

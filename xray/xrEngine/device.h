@@ -133,6 +133,9 @@ public:
 	void	Pause							(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason);
 	BOOL	Paused							();
 
+private:
+        static void SecondaryThreadProc(void* context);
+public:
 	// Scene control
 	void PreCache							(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input);
 	BOOL Begin								();
@@ -176,10 +179,10 @@ public:
 private:
 	// Multi-threading
 	Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
-	std::atomic_bool mt_bMustExit;
-	std::chrono::duration<double, std::milli> SecondThreadTasksElapsedTime;
 
 public:
+    volatile BOOL mt_bMustExit;
+
 	ICF		void			remove_from_seq_parallel	(const fastdelegate::FastDelegate0<> &delegate)
 	{
 		xr_vector<fastdelegate::FastDelegate0<> >::iterator I = std::find(
