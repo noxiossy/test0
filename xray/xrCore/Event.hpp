@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 
 class XRCORE_API Event
 {
