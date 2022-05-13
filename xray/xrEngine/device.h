@@ -1,14 +1,22 @@
+#ifndef xr_device
+#define xr_device
 #pragma once
 
-#include <atomic>
-#include "../xrCore/Event.hpp"
+// Note:
+// ZNear - always 0.0f
+// ZFar  - always 1.0f
+
+//class	ENGINE_API	CResourceManager;
+//class	ENGINE_API	CGammaControl;
 
 #include "pure.h"
+//#include "hw.h"
 #include "../xrcore/ftimer.h"
 #include "stats.h"
+//#include "shader.h"
+//#include "R_Backend.h"
 
 extern u32 g_dwFPSlimit;
-
 #define VIEWPORT_NEAR 0.2f
 #define HUD_VIEWPORT_NEAR 0.05f
 
@@ -122,6 +130,10 @@ public:
 		m_editor(0),
 		m_engine(0)
 #endif // #ifdef INGAME_EDITOR
+#ifdef PROFILE_CRITICAL_SECTIONS
+		,mt_csEnter(MUTEX_PROFILE_ID(CRenderDevice::mt_csEnter))
+		,mt_csLeave(MUTEX_PROFILE_ID(CRenderDevice::mt_csLeave))
+#endif // #ifdef PROFILE_CRITICAL_SECTIONS
 	{
 	    m_hWnd              = NULL;
 		b_is_Active			= FALSE;
@@ -133,9 +145,6 @@ public:
 	void	Pause							(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason);
 	BOOL	Paused							();
 
-private:
-        static void SecondaryThreadProc(void* context);
-public:
 	// Scene control
 	void PreCache							(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input);
 	BOOL Begin								();
@@ -176,12 +185,10 @@ public:
 		return					(Timer.time_factor());
 	}
 
-private:
 	// Multi-threading
-	Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
-
-public:
-    volatile BOOL mt_bMustExit;
+	xrCriticalSection	mt_csEnter;
+	xrCriticalSection	mt_csLeave;
+	volatile BOOL		mt_bMustExit;
 
 	ICF		void			remove_from_seq_parallel	(const fastdelegate::FastDelegate0<> &delegate)
 	{
@@ -240,6 +247,8 @@ public:
 	virtual void	OnRender			();
 
 	bool			b_registered;
-	bool			b_need_user_input{};
+	bool			b_need_user_input;
 };
 extern ENGINE_API CLoadScreenRenderer load_screen_renderer;
+
+#endif

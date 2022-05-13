@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "frustum.h"
-#include "../xrCore/Event.hpp"
+
 #pragma warning(disable:4995)
 // mmsystem.h
 #define MMNOSOUND
@@ -100,7 +100,6 @@ void CRenderDevice::End		(void)
 		//pApp->load_draw_internal	();
 		if (!load_screen_renderer.b_registered)
 			m_pRender->ClearTarget();
-
 		if (!dwPrecacheFrame)
 		{
 
@@ -156,24 +155,32 @@ void CRenderDevice::End		(void)
 }
 
 
-void CRenderDevice::SecondaryThreadProc(void* context)
-{
-    auto& device = *static_cast<CRenderDevice*>(context);
-    while (true)
-    {
-        device.syncProcessFrame.Wait();
-        if (device.mt_bMustExit)
-        {
-            device.mt_bMustExit = FALSE;
-            device.syncThreadExit.Set();
-            return;
-        }
-        for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
-            device.seqParallel[pit]();
-        device.seqParallel.clear();
-        device.seqFrameMT.Process(rp_Frame);
-        device.syncFrameDone.Set();
-    }
+volatile u32	mt_Thread_marker		= 0x12345678;
+void 			mt_Thread	(void *ptr)	{
+	while (true) {
+		// waiting for Device permission to execute
+		Device.mt_csEnter.Enter	();
+
+		if (Device.mt_bMustExit) {
+			Device.mt_bMustExit = FALSE;				// Important!!!
+			Device.mt_csEnter.Leave();					// Important!!!
+			return;
+		}
+		// we has granted permission to execute
+		mt_Thread_marker			= Device.dwFrame;
+ 
+		for (u32 pit=0; pit<Device.seqParallel.size(); pit++)
+			Device.seqParallel[pit]	();
+		Device.seqParallel.clear_not_free	();
+		Device.seqFrameMT.Process	(rp_Frame);
+
+		// now we give control to device - signals that we are ended our work
+		Device.mt_csEnter.Leave	();
+		// waits for device signal to continue - to start again
+		Device.mt_csLeave.Enter	();
+		// returns sync signal to device
+		Device.mt_csLeave.Leave	();
+	}
 }
 
 #include "igame_level.h"
@@ -200,9 +207,6 @@ void CRenderDevice::PreCache	(u32 amount, bool b_draw_loadscreen, bool b_wait_us
 
 ENGINE_API xr_list<LOADING_EVENT>			g_loading_events;
 
-#include "render.h"
-#include "IGame_Level.h"
-
 void CRenderDevice::on_idle		()
 {
 	if (!b_is_Ready) {
@@ -211,8 +215,16 @@ void CRenderDevice::on_idle		()
 	}
 
 	// FPS Lock
-	const auto FrameStartTime = std::chrono::high_resolution_clock::now();
-
+	constexpr u32 menuFPSlimit = 60, pauseFPSlimit = 60;
+	u32 curFPSLimit = IsMainMenuActive() ? menuFPSlimit : Device.Paused() ? pauseFPSlimit : g_dwFPSlimit;
+	if (curFPSLimit > 0)
+	{
+		static DWORD dwLastFrameTime = 0;
+		DWORD dwCurrentTime = timeGetTime();
+		if (dwCurrentTime - dwLastFrameTime < 1000 / (curFPSLimit + 1))
+			return;
+		dwLastFrameTime = dwCurrentTime;
+	}
 
 	if (psDeviceFlags.test(rsStatistic))	g_bEnableStatGather	= TRUE;
 	else									g_bEnableStatGather	= FALSE;
@@ -251,11 +263,12 @@ void CRenderDevice::on_idle		()
 	//RCache.set_xform_project	( mProject			);
 	D3DXMatrixInverse			( (D3DXMATRIX*)&mInvFullTransform, 0, (D3DXMATRIX*)&mFullTransform);
 
-#ifdef SHOW_SECOND_THREAD_STATS
-	const auto SecondThreadStartTime = std::chrono::high_resolution_clock::now();
-#endif
-
-	syncProcessFrame.Set(); // allow secondary thread to do its job
+	// *** Resume threads
+	// Capture end point - thread must run only ONE cycle
+	// Release start point - allow thread to run
+	mt_csLeave.Enter			();
+	mt_csEnter.Leave			();
+	Sleep						(0);
 
 	Statistic->RenderTOTAL_Real.FrameStart	();
 	Statistic->RenderTOTAL_Real.Begin		();
@@ -275,25 +288,20 @@ void CRenderDevice::on_idle		()
 	Statistic->RenderTOTAL_Real.FrameEnd	();
 	Statistic->RenderTOTAL.accum	= Statistic->RenderTOTAL_Real.accum;
 
+	// *** Suspend threads
+	// Capture startup point
+	// Release end point - allow thread to wait for startup point
+	mt_csEnter.Enter						();
+	mt_csLeave.Leave						();
 
-	const auto FrameEndTime = std::chrono::high_resolution_clock::now();
-	const std::chrono::duration<double, std::milli> FrameElapsedTime = FrameEndTime - FrameStartTime;
-
-	constexpr u32 menuFPSlimit{ 60 }, pauseFPSlimit{ 60 };
-	const u32 curFPSLimit = IsMainMenuActive() ? menuFPSlimit : Device.Paused() ? pauseFPSlimit : g_dwFPSlimit;
-	if (curFPSLimit > 0 )
-	{
-		const std::chrono::duration<double, std::milli> FpsLimitMs{ std::floor(1000.f / (curFPSLimit + 1)) };
-		if (FrameElapsedTime < FpsLimitMs)
-		{
-			const auto TimeToSleep = FpsLimitMs - FrameElapsedTime;
-			//std::this_thread::sleep_until(FrameEndTime + TimeToSleep); // часто спит больше, чем надо. Скорее всего из-за округлений в большую сторону.
-			Sleep(iFloor(TimeToSleep.count()));
-			//Msg("~~[%s] waited [%f] ms", __FUNCTION__, TimeToSleep.count());
-		}
+	// Ensure, that second thread gets chance to execute anyway
+	if (dwFrame!=mt_Thread_marker)			{
+		for (u32 pit=0; pit<Device.seqParallel.size(); pit++)
+			Device.seqParallel[pit]			();
+		Device.seqParallel.clear_not_free	();
+		seqFrameMT.Process					(rp_Frame);
 	}
 
-    syncFrameDone.Wait(); // wait until secondary thread finish its job
 	if (!b_is_Active)
 		Sleep		(1);
 }
@@ -334,7 +342,7 @@ void CRenderDevice::Run			()
 //	DUMP_PHASE;
 	g_bLoaded		= FALSE;
 	Log				("Starting engine...");
-    thread_name("X-RAY Primary thread");
+	thread_name		("X-RAY Primary thread");
 
 	// Startup timers and calculate timer delta
 	dwTimeGlobal				= 0;
@@ -348,9 +356,11 @@ void CRenderDevice::Run			()
 	}
 
 	// Start all threads
-    mt_bMustExit = FALSE;
-    thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
-
+//	InitializeCriticalSection	(&mt_csEnter);
+//	InitializeCriticalSection	(&mt_csLeave);
+	mt_csEnter.Enter			();
+	mt_bMustExit				= FALSE;
+	thread_spawn				(mt_Thread,"X-RAY Secondary thread",0,0);
 
 	// Message cycle
 	seqAppStart.Process			(rp_AppStart);
@@ -362,16 +372,18 @@ void CRenderDevice::Run			()
 
 	seqAppEnd.Process		(rp_AppEnd);
 
-    // Stop Balance-Thread
-    mt_bMustExit = TRUE;
-    syncProcessFrame.Set();
-    syncThreadExit.Wait();
-    while (mt_bMustExit) Sleep(0);
+	// Stop Balance-Thread
+	mt_bMustExit			= TRUE;
+	mt_csEnter.Leave		();
+	while (mt_bMustExit)	Sleep(0);
+//	DeleteCriticalSection	(&mt_csEnter);
+//	DeleteCriticalSection	(&mt_csLeave);
 }
 
 u32 app_inactive_time		= 0;
 u32 app_inactive_time_start = 0;
 
+void ProcessLoading(RP_FUNC *f);
 void CRenderDevice::FrameMove()
 {
 	dwFrame			++;
@@ -408,12 +420,19 @@ void CRenderDevice::FrameMove()
 	// Frame move
 	Statistic->EngineTOTAL.Begin	();
 
-	Device.seqFrame.Process(rp_Frame);
-	g_bLoaded = TRUE;
-
+	//	TODO: HACK to test loading screen.
+	//if(!g_bLoaded) 
+		ProcessLoading				(rp_Frame);
+	//else
+	//	seqFrame.Process			(rp_Frame);
 	Statistic->EngineTOTAL.End	();
 }
 
+void ProcessLoading				(RP_FUNC *f)
+{
+	Device.seqFrame.Process				(rp_Frame);
+	g_bLoaded							= TRUE;
+}
 
 ENGINE_API BOOL bShowPauseString = TRUE;
 #include "IGame_Persistent.h"
