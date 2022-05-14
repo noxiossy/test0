@@ -34,6 +34,7 @@ public:
 	virtual void	InitAddons				();
 	virtual bool	UseScopeTexture			();
 	virtual	float	CurrentZoomFactor		();
+	virtual	u8		GetCurrentHudOffsetIdx	();
 	virtual void	FireEnd					();
 			void	LaunchGrenade			();
 	
