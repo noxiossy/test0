@@ -32,7 +32,7 @@ void CUIActorMenu::InitUpgradeMode()
 	m_ActorWeightT->Show			(true);
 	m_ActorWeightMaxT->Show			(true);
 	
-	InitInventoryContents( m_pInventoryBagList );
+	InitInventoryContents( m_pDeadBodyActorBagList );
 	VERIFY( m_pPartnerInvOwner );
 	m_pPartnerInvOwner->StartTrading();
 //-	UpdateUpgradeItem();
