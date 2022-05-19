@@ -45,7 +45,7 @@ CUIActorMenu::~CUIActorMenu()
 void CUIActorMenu::Construct()
 {
 	CUIXml								uiXml;
-	uiXml.Load							(CONFIG_PATH, UI_PATH, "actor_menu.xml");
+	uiXml.Load							(CONFIG_PATH, UI_PATH, "a_inventory.xml");
 
 	CUIXmlInit							xml_init;
 
