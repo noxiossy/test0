@@ -31,7 +31,7 @@
 
 // -----
 
-const LPCSTR g_inventory_upgrade_xml = "inventory_upgrade.xml";
+const LPCSTR g_inventory_upgrade_xml = "a_inventory_upgrade.xml";
 
 CUIInventoryUpgradeWnd::Scheme::Scheme()
 {
