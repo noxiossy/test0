@@ -165,7 +165,6 @@ public:
 
 
 			void			SetWndRect_script(Frect rect)										{CUISimpleWindow::SetWndRect(rect);}
-			void			SetWndPos_script(Fvector2 pos)										{CUISimpleWindow::SetWndPos(pos);}
 			void			SetWndSize_script(Fvector2 size)									{CUISimpleWindow::SetWndSize(size);}
 			void			GetWndPos_script	(Fvector2& pos)										{pos = CUISimpleWindow::GetWndPos();}
 
