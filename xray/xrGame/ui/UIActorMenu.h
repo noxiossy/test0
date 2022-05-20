@@ -157,7 +157,6 @@ protected:
 
 	CUI3tButtonEx*				m_trade_button;
 	CUI3tButtonEx*				m_takeall_button;
-
 	CUI3tButtonEx*				m_sleep_button;
 	CUI3tButtonEx*				m_exit_button;
 	CUIStatic*					m_clock_value;
@@ -315,7 +314,6 @@ public:
 
 	void		xr_stdcall		OnBtnPerformTrade			(CUIWindow* w, void* d);
 	void		xr_stdcall		OnBtnExitClicked			(CUIWindow* w, void* d);
-
 	void		xr_stdcall		OnBtnSleepClicked			(CUIWindow* w, void* d);
 	void		xr_stdcall		TakeAllFromPartner			(CUIWindow* w, void* d);
 	void						TakeAllFromInventoryBox		();
