@@ -16,6 +16,14 @@
 
 using namespace luabind;
 
+void CUIActorMenu::OnBtnSleepClicked(CUIWindow* w, void* d)
+{
+	luabind::functor<void> functor;
+	ai().script_engine().functor("a_inventory_sleep.main",funct);
+	funct(1);
+	GetHolder()->StartStopMenu			(this,true);
+}
+
 void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 {
 	PIItem item = get_upgrade_item();
