@@ -34,6 +34,7 @@
 #include "ui/UIOptConCom.h"
 #include "UIGameSP.h"
 #include "ui/UIActorMenu.h"
+#include "ui/UIStatic.h"
 #include "zone_effector.h"
 #include "GameTask.h"
 #include "MainMenu.h"
@@ -1901,6 +1902,8 @@ extern BOOL dbg_moving_bones_snd_player;
 	CMD4(CCC_Float,		"ai_smart_cover_animation_speed_factor",	&g_smart_cover_animation_speed_factor,	.1f, 10.f);
 	CMD4(CCC_Float,		"air_resistance_epsilon",	&air_resistance_epsilon,	.0f, 1.f);
 #endif // #ifdef DEBUG
+
+	CMD4(CCC_Integer,	"g_sleep_time",			&psActorSleepTime,			1,		24		);
 	
 	
 	*g_last_saved_game	= 0;

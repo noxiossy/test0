@@ -86,6 +86,7 @@ static Fvector	vFootCenter;
 static Fvector	vFootExt;
 
 Flags32			psActorFlags={/*AF_DYNAMIC_MUSIC|*/AF_GODMODE_RT};
+int				psActorSleepTime = 1;
 
 
 

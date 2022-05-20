@@ -16,3 +16,5 @@ extern Flags32 psActorFlags;
 
 extern BOOL		GodMode	();	
 
+extern int		psActorSleepTime;
+
