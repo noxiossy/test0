@@ -46,6 +46,7 @@ void CUIActorMenu::InitInventoryMode()
 	m_ActorBottomInfo->Show				(true);
 	m_ActorWeight->Show					(true);
 	m_ActorWeightMax->Show				(true);
+	m_sleep_button->Show				(true);
 
 	m_RightDelimiter->Show				(false);
 	m_clock_value->Show					(true);
@@ -58,6 +59,7 @@ void CUIActorMenu::InitInventoryMode()
 
 void CUIActorMenu::DeInitInventoryMode()
 {
+	m_sleep_button->Show				(false);
 	m_clock_value->Show					(false);
 	m_pTrashList->Show(false);
 }
