@@ -13,7 +13,7 @@
 #include "UICellItem.h"
 #include "../ai_space.h"
 #include "../../xrServerEntities/script_engine.h"
-#include "UI3tButton.h"
+#include "UI3tButtonEx.h"
 #include "UIWindow.h"
 #include "../uigamesp.h"
 
