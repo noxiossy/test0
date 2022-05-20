@@ -28,7 +28,6 @@
 
 void CUIActorMenu::InitTradeMode()
 {
-	m_pInventoryBagList->Show		(false);
 	m_PartnerCharacterInfo->Show	(true);
 	m_PartnerMoney->Show			(true);
 	m_pQuickSlot->Show				(true);
@@ -41,13 +40,9 @@ void CUIActorMenu::InitTradeMode()
 	m_RightDelimiter->Show			(true);
 	m_LeftDelimiter->Show			(true);
 	m_LeftBackground->Show			(true);
-	m_LRBackground->Show			(false);
 
 	m_PartnerBottomInfo->Show		(true);
 	m_PartnerWeight->Show			(true);
-	m_ActorBottomInfo->Show			(false);
-	m_ActorWeight->Show				(false);
-	m_ActorWeightMax->Show			(false);
 	m_ActorBottomInfoT->Show		(true);
 	m_ActorWeightT->Show			(true);
 	m_ActorWeightMaxT->Show			(true);
@@ -137,7 +132,6 @@ void CUIActorMenu::DeInitTradeMode()
 		m_pPartnerInvOwner->StopTrading();
 	}
 
-	m_pInventoryBagList->Show		(true);
 	m_PartnerCharacterInfo->Show	(false);
 	m_PartnerMoney->Show			(false);
 
@@ -149,13 +143,9 @@ void CUIActorMenu::DeInitTradeMode()
 	m_RightDelimiter->Show			(false);
 	m_LeftDelimiter->Show			(false);
 	m_LeftBackground->Show			(false);
-	m_LRBackground->Show			(true);
 	
 	m_PartnerBottomInfo->Show		(false);
 	m_PartnerWeight->Show			(false);
-	m_ActorBottomInfo->Show			(true);
-	m_ActorWeight->Show				(true);
-	m_ActorWeightMax->Show			(true);
 	m_ActorBottomInfoT->Show		(false);
 	m_ActorWeightT->Show			(false);
 	m_ActorWeightMaxT->Show			(false);

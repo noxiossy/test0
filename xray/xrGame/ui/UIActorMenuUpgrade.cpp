@@ -21,6 +21,7 @@
 
 void CUIActorMenu::InitUpgradeMode()
 {
+	m_pDeadBodyActorBagList->Show	(true);
 	m_PartnerCharacterInfo->Show	(true);
 	m_PartnerMoney->Show			(false);
 	m_pUpgradeWnd->Show				(true);
@@ -40,6 +41,7 @@ void CUIActorMenu::InitUpgradeMode()
 
 void CUIActorMenu::DeInitUpgradeMode()
 {
+	m_pDeadBodyActorBagList->Show	(false);
 	m_PartnerCharacterInfo->Show( false );
 	m_pUpgradeWnd->Show( false );
 	m_pUpgradeWnd->set_info_cur_upgrade( NULL );

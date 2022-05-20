@@ -47,6 +47,7 @@ void CUIActorMenu::InitInventoryMode()
 	m_ActorBottomInfo->Show				(true);
 	m_ActorWeight->Show					(true);
 	m_ActorWeightMax->Show				(true);
+	m_LRBackground->Show				(true);
 	m_sleep_button->Show				(true);
 
 	m_RightDelimiter->Show				(false);
@@ -60,9 +61,14 @@ void CUIActorMenu::InitInventoryMode()
 
 void CUIActorMenu::DeInitInventoryMode()
 {
+	m_pInventoryBagList->Show			(false);
+	m_LRBackground->Show				(false);
 	m_sleep_button->Show				(false);
 	m_clock_value->Show					(false);
-	m_pTrashList->Show(false);
+	m_ActorBottomInfo->Show				(false);
+	m_ActorWeight->Show					(false);
+	m_ActorWeightMax->Show				(false);
+	m_pTrashList->Show					(false);
 }
 
 void CUIActorMenu::SendEvent_ActivateSlot(u32 slot, u16 recipient)
