@@ -43,6 +43,7 @@ protected:
 	bool				m_b_invert;
 	bool				m_b_is_float;
 	bool				m_b_mouse_capturer;
+    bool 				m_b_bound_already_set;
 
 	union{
 		struct{
