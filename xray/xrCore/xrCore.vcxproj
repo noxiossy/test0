@@ -455,6 +455,7 @@
     <ClCompile Include="_math.cpp" />
     <ClCompile Include="_sphere.cpp" />
     <ClCompile Include="_std_extensions.cpp" />
+    <ClCompile Include="Event.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="blackbox\BugslayerUtil.h" />
@@ -561,6 +562,7 @@
     <ClInclude Include="_vector3d.h" />
     <ClInclude Include="_vector3d_ext.h" />
     <ClInclude Include="_vector4.h" />
+    <ClInclude Include="Event.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc" />
