@@ -214,17 +214,9 @@ void CRenderDevice::on_idle		()
 		return;
 	}
 
-	// FPS Lock
-	constexpr u32 menuFPSlimit = 60, pauseFPSlimit = 60;
-	u32 curFPSLimit = IsMainMenuActive() ? menuFPSlimit : Device.Paused() ? pauseFPSlimit : g_dwFPSlimit;
-	if (curFPSLimit > 0)
-	{
-		static DWORD dwLastFrameTime = 0;
-		DWORD dwCurrentTime = timeGetTime();
-		if (dwCurrentTime - dwLastFrameTime < 1000 / (curFPSLimit + 1))
-			return;
-		dwLastFrameTime = dwCurrentTime;
-	}
+
+	const auto FrameStartTime = std::chrono::high_resolution_clock::now();
+
 
 	if (psDeviceFlags.test(rsStatistic))	g_bEnableStatGather	= TRUE;
 	else									g_bEnableStatGather	= FALSE;
@@ -234,15 +226,10 @@ void CRenderDevice::on_idle		()
 			g_loading_events.pop_front();
 		pApp->LoadDraw				();
 		return;
-	}
-	/*else 
+	}else 
 	{
-		if ( (!Device.dwPrecacheFrame) && (!g_SASH.IsBenchmarkRunning())
-			&& g_bLoaded)
-			g_SASH.StartBenchmark();*/
-
 		FrameMove						( );
-	//}
+	}
 
 	// Precache
 	if (dwPrecacheFrame)
@@ -287,6 +274,23 @@ void CRenderDevice::on_idle		()
 	Statistic->RenderTOTAL_Real.End			();
 	Statistic->RenderTOTAL_Real.FrameEnd	();
 	Statistic->RenderTOTAL.accum	= Statistic->RenderTOTAL_Real.accum;
+
+	const auto FrameEndTime = std::chrono::high_resolution_clock::now();
+	const std::chrono::duration<double, std::milli> FrameElapsedTime = FrameEndTime - FrameStartTime;
+
+	constexpr u32 menuFPSlimit{ 60 }, pauseFPSlimit{ 60 };
+	const u32 curFPSLimit = IsMainMenuActive() ? menuFPSlimit : Device.Paused() ? pauseFPSlimit : g_dwFPSlimit;
+	if (curFPSLimit > 0)
+	{
+		const std::chrono::duration<double, std::milli> FpsLimitMs{ std::floor(1000.f / (curFPSLimit + 1)) };
+		if (FrameElapsedTime < FpsLimitMs)
+		{
+			const auto TimeToSleep = FpsLimitMs - FrameElapsedTime;
+			//std::this_thread::sleep_until(FrameEndTime + TimeToSleep); // часто спит больше, чем надо. Скорее всего из-за округлений в большую сторону.
+			Sleep(iFloor(TimeToSleep.count()));
+			//Msg("~~[%s] waited [%f] ms", __FUNCTION__, TimeToSleep.count());
+		}
+	}
 
 	// *** Suspend threads
 	// Capture startup point
