@@ -3,7 +3,7 @@
 #include "FS_impl.h"
 
 XRCORE_API	extern		str_container*	g_pStringContainer	= NULL;
-const int HEADER = sizeof(str_value);// ref + len + crc + next
+constexpr size_t HEADER = sizeof(str_value);
 
 #if 1
 
@@ -134,11 +134,11 @@ str_value*	str_container::dock		(str_c value)
 	u32		s_len				= xr_strlen(value);
 	u32		s_len_with_zero		= (u32)s_len+1;
 
-	if (sizeof(str_value) + s_len_with_zero >= 4096)
-	{
-		LogStackTrace("ERROR: sizeof(str_value) + s_len_with_zero >= 4096");
-	}
-	VERIFY(sizeof(str_value) + s_len_with_zero < 4096);
+//	if (sizeof(str_value) + s_len_with_zero >= 4096)
+//	{
+//		LogStackTrace("ERROR: sizeof(str_value) + s_len_with_zero >= 4096");
+//	}
+//	VERIFY(sizeof(str_value) + s_len_with_zero < 4096);
 
 	// setup find structure
 	char	header[sizeof(str_value)];

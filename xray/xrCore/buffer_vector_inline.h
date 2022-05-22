@@ -6,8 +6,7 @@
 //	Description : buffer vector template class inline functions
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef BUFFER_VECTOR_INLINE_H_INCLUDED
-#define BUFFER_VECTOR_INLINE_H_INCLUDED
+#pragma once
 
 #define TEMPLATE_SPECIALIZATION					template <typename T>
 #define buffer_vector_specialized				buffer_vector<T>
@@ -394,5 +393,3 @@ inline void swap	(buffer_vector_specialized &left, buffer_vector_specialized &ri
 
 #undef TEMPLATE_SPECIALIZATION
 #undef buffer_vector_specialized
-
-#endif // BUFFER_VECTOR_INLINE_H_INCLUDED
