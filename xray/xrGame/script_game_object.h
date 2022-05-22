@@ -188,6 +188,7 @@ public:
 	_DECLARE_FUNCTION11	(SetPower,			void, float);
 	_DECLARE_FUNCTION11	(ChangeSatiety,		void, float);
 	_DECLARE_FUNCTION11	(SetRadiation,		void, float);
+	_DECLARE_FUNCTION11	(SetBleeding,		void, float);
 	_DECLARE_FUNCTION11	(SetCircumspection,	void, float);
 	_DECLARE_FUNCTION11	(SetMorale,			void, float);
 
