@@ -1,8 +1,9 @@
 #pragma once
 
 #include <atomic>
-#include "Event.hpp"
-
+#include "../xrCore/Event.hpp"
+#include <atomic>
+#include <thread>
 #include "pure.h"
 //#include "hw.h"
 #include "../xrcore/ftimer.h"
