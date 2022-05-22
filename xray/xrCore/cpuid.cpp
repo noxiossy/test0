@@ -6,11 +6,10 @@
 #include <bitset>
 #include <memory>
 
-DWORD countSetBits(ULONG_PTR bitMask)
-{
+decltype(auto) countSetBits(ULONG_PTR bitMask) {
 	DWORD LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
 	DWORD bitSetCount = 0;
-	ULONG_PTR bitTest = static_cast<ULONG_PTR>(1) << LSHIFT;
+	auto bitTest = static_cast<ULONG_PTR>(1) << LSHIFT;
 	DWORD i;
 
 	for (i = 0; i <= LSHIFT; ++i) {
