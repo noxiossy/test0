@@ -274,8 +274,7 @@ public:
 	virtual	float			CurrentZoomFactor	();
 	//показывает, что оружие находится в соостоянии поворота для приближенного прицеливания
 			bool			IsRotatingToZoom	() const		{	return (m_zoom_params.m_fZoomRotationFactor<1.f);}
-
-	virtual	u8				GetCurrentHudOffsetIdx ();
+			bool			IsRotatingFromZoom	() const		{	return (m_zoom_params.m_fZoomRotationFactor > 0.f); }
 
 	virtual float				Weight			();		
 
@@ -314,9 +313,12 @@ protected:
 	virtual void			UpdatePosition			(const Fmatrix& transform);	//.
 	virtual void			UpdateXForm				();
 
-	float 					m_fLR_MovingFactor; // !!!!
-	u8						 GetCurrentHudOffsetIdx() const;
+private:
+	float m_fLR_MovingFactor{}, m_fLookout_MovingFactor{};
+	Fvector m_strafe_offset[3][2]{}, m_lookout_offset[3][2]{};
 
+protected:
+	virtual	u8				GetCurrentHudOffsetIdx	() override;
 	virtual void			UpdateHudAdditonal		(Fmatrix&);
 	IC		void			UpdateFireDependencies	()			{ if (dwFP_Frame==Device.dwFrame) return; UpdateFireDependencies_internal(); };
 
