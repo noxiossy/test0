@@ -265,9 +265,6 @@
       <Filter>OS</Filter>
     </ClCompile>
     <ClCompile Include="xrSyncronize.cpp" />
-    <ClCompile Include="Event.cpp">
-      <Filter>OS</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -559,9 +556,6 @@
       <Filter>Compression\lzo</Filter>
     </ClInclude>
     <ClInclude Include="os_clipboard.h">
-      <Filter>OS</Filter>
-    </ClInclude>
-    <ClInclude Include="Event.hpp">
       <Filter>OS</Filter>
     </ClInclude>
     <ClInclude Include="xrSyncronize.h" />
