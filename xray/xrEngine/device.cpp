@@ -262,6 +262,7 @@ void CRenderDevice::on_idle		()
 	}
 
 	syncFrameDone.WaitEx(66); // wait until secondary thread finish its job
+	syncFrameDone.WaitEx(66); // wait until secondary thread finish its job
 
 	if (!b_is_Active)
 		Sleep		(1);
@@ -324,24 +325,24 @@ void CRenderDevice::Run			()
 
 		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-		//auto& device = *static_cast<CRenderDevice*>(context);
+		auto& device = *static_cast<CRenderDevice*>(context);
 
 		while (true) {
-			Device.syncProcessFrame.Wait();
+			device.syncProcessFrame.Wait();
 
-			if (Device.mt_bMustExit) {
-				Device.syncThreadExit.Set();
+			if (device.mt_bMustExit) {
+				device.syncThreadExit.Set();
 				return;
 			}
 
 
-			for (const auto& Func : Device.seqParallel)
+			for (const auto& Func : device.seqParallel)
 				Func();
-			Device.seqParallel.clear_and_free();
-			Device.seqFrameMT.Process(rp_Frame);
+			device.seqParallel.clear_and_free();
+			device.seqFrameMT.Process(rp_Frame);
 
 
-			Device.syncFrameDone.Set();
+			device.syncFrameDone.Set();
 		}
 	}, this);
 
