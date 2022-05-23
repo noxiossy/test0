@@ -152,7 +152,9 @@ void CRenderDevice::End		(void)
 		if (load_finished && m_editor)
 			m_editor->on_load_finished	();
 #	endif // #ifdef INGAME_EDITOR
+
 }
+
 
 #include "igame_level.h"
 void CRenderDevice::PreCache	(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
@@ -325,7 +327,7 @@ void CRenderDevice::Run			()
 
 		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-		auto& device = *static_cast<CRenderDevice*>(context);
+		auto& device = *static_cast<IRenderDevice*>(context);
 
 		while (true) {
 			device.syncProcessFrame.Wait();
