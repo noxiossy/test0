@@ -1433,6 +1433,12 @@ float CWeapon::CurrentZoomFactor()
 	return IsScopeAttached() ? m_zoom_params.m_fScopeZoomFactor : m_zoom_params.m_fIronSightZoomFactor;
 };
 
+bool CWeapon::IsGrenadeMode() const
+{
+	const auto wpn_w_gl = smart_cast<const CWeaponMagazinedWGrenade*>(this);
+	return wpn_w_gl && wpn_w_gl->m_bGrenadeMode;
+}
+
 float CWeapon::GetHudFov()
 {
 	// Рассчитываем HUD FOV от бедра (с учётом упирания в стены)
