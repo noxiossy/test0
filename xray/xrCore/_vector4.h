@@ -1,5 +1,3 @@
-#ifndef _VECTOR4_H
-#define _VECTOR4_H
 #pragma once
 
 template <class T>
@@ -69,5 +67,3 @@ typedef							_vector4<s32>		Ivector4;
 
 template <class T>
 BOOL	_valid			(const _vector4<T>& v)	{ return _valid((T)v.x) && _valid((T)v.y) && _valid((T)v.z) && _valid((T)v.w);	}
-
-#endif

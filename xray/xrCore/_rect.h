@@ -1,5 +1,4 @@
-#ifndef __FRECT
-#define __FRECT
+#pragma once
 
 template <class T>
 struct _rect {
@@ -84,7 +83,5 @@ typedef _rect<int>		Irect;
 template <class T>
 BOOL	_valid			(const _rect<T>& m)		
 { 
-	return lt._valid() && rb._valid();
+	return m.lt._valid() && m.rb._valid();
 }
-
-#endif

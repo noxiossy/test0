@@ -17,6 +17,7 @@ public:
 	// access operators
 	ICF	T&			operator[] (int i)					{ return *((T*)this + i); }
 	ICF	T&			operator[] (int i)	const			{ return *((T*)this + i); }
+	ICF bool operator == (const Self& Cmp) const { return !!similar(Cmp); }
 
 	ICF	SelfRef	set(T _x, T _y, T _z)					{ x = _x;		y = _y;		z = _z;		return *this;	};
 	ICF SelfRef	set(const _vector3<float> &v)			{ x = T(v.x);	y = T(v.y);	z = T(v.z);	return *this;	};
@@ -80,7 +81,7 @@ public:
 	}
 
 	// Clamp vector3
-	IC	SelfRef	clamp(const Self &min, const Self max)
+	IC	SelfRef	clamp(const Self &min, const Self& max) // https://github.com/OpenXRay/xray-16/commit/e1cca82fbd1f94e93f0651e676cdcbbd70a04655
 	{
 		::clamp(x,min.x,max.x);
 		::clamp(y,min.y,max.y);
