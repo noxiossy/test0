@@ -395,19 +395,19 @@ void CWeapon::Load		(LPCSTR section)
 		m_iScopeX = pSettings->r_s32(section,"scope_x");
 		m_iScopeY = pSettings->r_s32(section,"scope_y");
 
-                m_allScopeNames.push_back( m_sScopeName );
-                if ( pSettings->line_exist( section, "scope_names" ) ) {
-                  LPCSTR S = pSettings->r_string( section, "scope_names" );
-                  if ( S && S[ 0 ] ) {
-                    string128 _scopeItem;
-                    int count = _GetItemCount( S );
-                    for ( int it = 0; it < count; ++it ) {
-                      _GetItem( S, it, _scopeItem );
-                      m_allScopeNames.push_back( _scopeItem );
-                      //m_highlightAddons.push_back( _scopeItem );
-                    }
-                  }
-                }
+		m_allScopeNames.push_back( m_sScopeName );
+		if ( pSettings->line_exist( section, "scope_names" ) ) {
+			LPCSTR S = pSettings->r_string( section, "scope_names" );
+			if ( S && S[ 0 ] ) {
+				string128 _scopeItem;
+				int count = _GetItemCount( S );
+				for ( int it = 0; it < count; ++it ) {
+					_GetItem( S, it, _scopeItem );
+					m_allScopeNames.push_back( _scopeItem );
+					//m_highlightAddons.push_back( _scopeItem );
+				}
+			}
+		}
 	}
 
 	if(m_eSilencerStatus == ALife::eAddonAttachable)
@@ -532,7 +532,7 @@ void CWeapon::Load		(LPCSTR section)
     m_zoom_params.m_ReloadEmptyDof = READ_IF_EXISTS(pSettings, r_fvector4, section, "reload_empty_dof", Fvector4().set(-1, -1, -1, -1));
     //-Swartz
 
-	m_bHasTracers			= READ_IF_EXISTS(pSettings, r_bool, section, "tracers", true);
+    m_bHasTracers = !!READ_IF_EXISTS(pSettings, r_bool, section, "tracers", true);
 	m_u8TracerColorID		= READ_IF_EXISTS(pSettings, r_u8, section, "tracers_color_ID", u8(-1));
 
 	string256						temp;

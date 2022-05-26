@@ -9,6 +9,9 @@
 #include <direct.h>
 #pragma warning(pop)
 #include <intrin.h>
+
+#define NO_BUG_TRAP
+
 #ifdef __BORLANDC__
     #	include "d3d9.h"
     #	include "d3dx9.h"
@@ -18,7 +21,9 @@
         static BOOL			bException	= TRUE;
     #   define USE_BUG_TRAP
 #else
-    #   define USE_BUG_TRAP
+	#ifndef NO_BUG_TRAP
+	    #   define USE_BUG_TRAP
+	#endif //-!NO_BUG_TRAP
     #	define DEBUG_INVOKE	__debugbreak()
         static BOOL			bException	= FALSE;
 #endif
@@ -36,7 +41,7 @@
 #include <signal.h>							// for signals
 #include <Shellapi.h>
 
-#ifdef DEBUG
+#ifdef NO_BUG_TRAP //DEBUG
 #	define USE_OWN_ERROR_MESSAGE_WINDOW
 #else // DEBUG
 #	define USE_OWN_MINI_DUMP
@@ -151,6 +156,45 @@ void xrDebug::do_exit	(const std::string &message)
 	TerminateProcess	(GetCurrentProcess(),1);
 }
 
+
+#ifdef NO_BUG_TRAP
+void xrDebug::backend	(const char *expression, const char *description, const char *argument0, const char *argument1, const char *file, int line, const char *function, bool &ignore_always)
+{
+	static xrCriticalSection CS
+#ifdef PROFILE_CRITICAL_SECTIONS
+	(MUTEX_PROFILE_ID(xrDebug::backend))
+#endif // PROFILE_CRITICAL_SECTIONS
+	;
+
+	CS.Enter			();
+
+    string4096 assertion_info;
+
+	gather_info			(expression, description, argument0, argument1, file, line, function, assertion_info);
+
+    LPCSTR endline = "\r\n";
+    LPSTR buffer = assertion_info + xr_strlen(assertion_info);
+    buffer += xr_sprintf(buffer, "%sPress OK to abort execution%s", endline, endline);
+
+    if (handler)
+        handler();
+
+    FlushLog();
+
+    ShowCursor(true);
+    ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
+    MessageBox(
+        GetTopWindow(NULL),
+        assertion_info,
+        "Fatal Error",
+        MB_OK | MB_ICONERROR | MB_SYSTEMMODAL
+        );
+
+    CS.Leave();
+
+    TerminateProcess(GetCurrentProcess(), 1);
+}
+#else
 void xrDebug::backend	(const char *expression, const char *description, const char *argument0, const char *argument1, const char *file, int line, const char *function, bool &ignore_always)
 {
 	static xrCriticalSection CS
@@ -240,6 +284,7 @@ void xrDebug::backend	(const char *expression, const char *description, const ch
 
 	CS.Leave			();
 }
+#endif
 
 LPCSTR xrDebug::error2string	(long code)
 {
@@ -586,6 +631,65 @@ void format_message	(LPSTR buffer, const u32 &buffer_size)
     LocalFree	(message);
 }
 
+#ifdef NO_BUG_TRAP
+LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
+{
+	Msg("\n%s", GetFaultReason(pExceptionInfo));
+
+	string256				error_message;
+	format_message			(error_message,sizeof(error_message));
+
+		CONTEXT				save = *pExceptionInfo->ContextRecord;
+		BuildStackTrace		(pExceptionInfo);
+		*pExceptionInfo->ContextRecord = save;
+
+		if (shared_str_initialized)
+			Msg				("stack trace:\n");
+
+		if (!IsDebuggerPresent())
+		{
+			os_clipboard::copy_to_clipboard	("stack trace:\r\n\r\n");
+		}
+		string4096			buffer;
+		for (int i=0; i<g_stackTraceCount; ++i) {
+			if (shared_str_initialized)
+				Msg			("%s",g_stackTrace[i]);
+			sprintf			(buffer,"%s\r\n",g_stackTrace[i]);
+#ifdef DEBUG
+			if (!IsDebuggerPresent())
+				os_clipboard::update_clipboard(buffer);
+#endif // #ifdef DEBUG
+		}
+
+		if (*error_message) {
+			if (shared_str_initialized)
+				Msg			("\n%s",error_message);
+
+			strcat			(error_message,"\r\n");
+#ifdef DEBUG
+			if (!IsDebuggerPresent())
+				os_clipboard::update_clipboard(buffer);
+#endif // #ifdef DEBUG
+		}
+
+		FlushLog			();
+
+#	ifdef USE_OWN_MINI_DUMP
+		save_mini_dump		(pExceptionInfo);
+#	endif // USE_OWN_MINI_DUMP
+    ShowCursor(true);
+    ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
+    MessageBox(
+        GetTopWindow(NULL),
+        "Unhandled exception occured. See log for details",
+        "Fatal Error",
+        MB_OK | MB_ICONERROR | MB_SYSTEMMODAL
+        );
+    TerminateProcess(GetCurrentProcess(), 1);
+
+    return (EXCEPTION_CONTINUE_SEARCH);
+}
+#else
 LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
 {
 	Msg("\n%s", GetFaultReason(pExceptionInfo));
@@ -663,7 +767,7 @@ LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
 
 	return					(EXCEPTION_CONTINUE_SEARCH) ;
 }
-#endif
+#endif //-NO_BUG_TRAP
 
 //////////////////////////////////////////////////////////////////////
 #ifdef M_BORLAND
@@ -685,6 +789,7 @@ LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
     }
 #else
 
+#ifdef LEGACY_CODE
 #ifndef USE_BUG_TRAP
 	void _terminate		()
 	{
@@ -729,6 +834,7 @@ LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
 	//	FATAL					("Unexpected application termination");
 	}
 #endif // USE_BUG_TRAP
+#endif //-LEGACY_CODE
 
 	static void handler_base				(LPCSTR reason_string)
 	{

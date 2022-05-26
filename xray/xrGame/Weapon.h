@@ -267,8 +267,6 @@ public:
     float m_nearwall_target_hud_fov;
     float m_nearwall_speed_mod;
 
-	bool m_nearwall_on;
-
     float GetHudFov(); //--#SM+#--
 
 	virtual	float			CurrentZoomFactor	();
