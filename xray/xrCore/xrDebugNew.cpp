@@ -174,7 +174,7 @@ void xrDebug::backend	(const char *expression, const char *description, const ch
 
     LPCSTR endline = "\r\n";
     LPSTR buffer = assertion_info + xr_strlen(assertion_info);
-    buffer += sprintf_s(buffer, "%sPress OK to abort execution%s", endline, endline);
+    buffer += sprintf(buffer, "%sPress OK to abort execution%s", endline, endline);
 
     if (handler)
         handler();
