@@ -14,8 +14,7 @@ class ENGINE_API CMotionDef;
 class CWeaponMagazined: public CWeapon
 {
 private:
-	using inherited = CWeapon;
-
+	typedef CWeapon inherited;
 protected:
 	//звук текущего выстрела
 	shared_str		m_sSndShotCurrent;

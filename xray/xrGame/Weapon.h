@@ -234,16 +234,14 @@ protected:
 		Fvector			m_ZoomDof;
 		Fvector4		m_ReloadDof;
         Fvector4		m_ReloadEmptyDof; //Swartz: reload when empty mag. DOF
-        BOOL			m_bUseDynamicZoom;
 	} m_zoom_params;
 	
-    float			m_fRTZoomFactor; //run-time zoom factor
 	CUIWindow*				m_UIScope;
 public:
 
 	IC bool					IsZoomEnabled		()	const		{return m_zoom_params.m_bZoomEnabled;}
-	virtual	void			ZoomInc				();
-	virtual	void			ZoomDec				();
+	virtual	void			ZoomInc				(){};
+	virtual	void			ZoomDec				(){};
 	virtual void			OnZoomIn			();
 	virtual void			OnZoomOut			();
 	IC		bool			IsZoomed			()	const		{return m_zoom_params.m_bIsZoomModeNow;};
