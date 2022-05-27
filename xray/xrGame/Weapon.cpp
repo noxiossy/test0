@@ -23,6 +23,7 @@
 #include "static_cast_checked.hpp"
 #include "clsid_game.h"
 #include "ui/UIWindow.h"
+#include "ui/UIXmlInit.h"
 #include "WeaponMagazinedWGrenade.h"
 
 #define WEAPON_REMOVE_TIME		60000
@@ -542,6 +543,7 @@ void CWeapon::Load		(LPCSTR section)
 		m_hit_probability[i]		= READ_IF_EXISTS(pSettings,r_float,section,temp,1.f);
 	}
 
+    m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, section, "scope_dynamic_zoom", FALSE);
 
 	// mmccxvii: FWR code
 	//*
@@ -609,6 +611,7 @@ void CWeapon::LoadFireParams		(LPCSTR section)
 
 BOOL CWeapon::net_Spawn		(CSE_Abstract* DC)
 {
+    m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
 	BOOL bResult					= inherited::net_Spawn(DC);
 	CSE_Abstract					*e	= (CSE_Abstract*)(DC);
 	CSE_ALifeItemWeapon			    *E	= smart_cast<CSE_ALifeItemWeapon*>(e);
@@ -1474,15 +1477,22 @@ float CWeapon::GetHudFov()
     }
 }
 
+
+void GetZoomData(const float scope_factor, float& delta, float& min_zoom_factor);
 void CWeapon::OnZoomIn()
 {
 	m_zoom_params.m_bIsZoomModeNow		= true;
-	m_zoom_params.m_fCurrentZoomFactor	= CurrentZoomFactor();
+    if (m_zoom_params.m_bUseDynamicZoom)
+        SetZoomFactor(m_fRTZoomFactor);
+    else
+        m_zoom_params.m_fCurrentZoomFactor = CurrentZoomFactor();
 	//EnableHudInertion					(FALSE);
 
-	
 	if(m_zoom_params.m_bZoomDofEnabled && !IsScopeAttached())
 		GamePersistent().SetEffectorDOF	(m_zoom_params.m_ZoomDof);
+
+    if (GetHUDmode())
+        GamePersistent().SetPickableEffectorDOF(true);
 }
 
 void CWeapon::OnZoomOut()
@@ -2173,7 +2183,29 @@ bool CWeapon::IsHudModeNow()
 {
 	return (HudItemData()!=NULL);
 }
+void CWeapon::ZoomInc()
+{
+    if (!IsScopeAttached())					return;
+    if (!m_zoom_params.m_bUseDynamicZoom)	return;
+    float delta, min_zoom_factor;
+    GetZoomData(m_zoom_params.m_fScopeZoomFactor, delta, min_zoom_factor);
 
+    float f = GetZoomFactor() - delta;
+    clamp(f, m_zoom_params.m_fScopeZoomFactor, min_zoom_factor);
+    SetZoomFactor(f);
+}
+
+void CWeapon::ZoomDec()
+{
+    if (!IsScopeAttached())					return;
+    if (!m_zoom_params.m_bUseDynamicZoom)	return;
+    float delta, min_zoom_factor;
+    GetZoomData(m_zoom_params.m_fScopeZoomFactor, delta, min_zoom_factor);
+
+    float f = GetZoomFactor() + delta;
+    clamp(f, m_zoom_params.m_fScopeZoomFactor, min_zoom_factor);
+    SetZoomFactor(f);
+}
 u32 CWeapon::Cost() const
 {
     u32 res = CInventoryItem::Cost();
