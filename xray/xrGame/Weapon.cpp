@@ -532,7 +532,7 @@ void CWeapon::Load		(LPCSTR section)
     m_zoom_params.m_ReloadEmptyDof = READ_IF_EXISTS(pSettings, r_fvector4, section, "reload_empty_dof", Fvector4().set(-1, -1, -1, -1));
     //-Swartz
 
-    m_bHasTracers = !!READ_IF_EXISTS(pSettings, r_bool, section, "tracers", true);
+    m_bHasTracers = READ_IF_EXISTS(pSettings, r_bool, section, "tracers", true);
 	m_u8TracerColorID		= READ_IF_EXISTS(pSettings, r_u8, section, "tracers_color_ID", u8(-1));
 
 	string256						temp;
