@@ -276,8 +276,8 @@ public:
 			bool			IsRotatingToZoom	() const		{	return (m_zoom_params.m_fZoomRotationFactor<1.f);}
 			bool			IsRotatingFromZoom	() const		{	return (m_zoom_params.m_fZoomRotationFactor > 0.f); }
 
-    virtual float				Weight	() const;
-    virtual	u32					Cost	() const;
+	virtual float				Weight			();		
+
 public:
     virtual EHandDependence		HandDependence		()	const		{	return eHandDependence;}
 			bool				IsSingleHanded		()	const		{	return m_bIsSingleHanded; }

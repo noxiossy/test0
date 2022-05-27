@@ -195,10 +195,6 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 			CObject*	Hitter = Level().Objects.net_Find(HDS.whoID);
 			CObject*	Weapon = Level().Objects.net_Find(HDS.weaponID);
 			HDS.who		= Hitter;
-			if (!HDS.who)
-			{
-				Msg("! ERROR: hitter object [%d] is NULL on client.", HDS.whoID);
-			}
 			//-------------------------------------------------------
 			switch (HDS.PACKET_TYPE)
 			{
