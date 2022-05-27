@@ -1026,8 +1026,6 @@ void CWeaponMagazined::InitAddons()
 			scope_tex_name						= pSettings->r_string(cNameSect(), "scope_texture");
 			m_zoom_params.m_fScopeZoomFactor	= pSettings->r_float( cNameSect(), "scope_zoom_factor");
 		}
-		m_zoom_params.m_bUseDynamicZoom		= READ_IF_EXISTS(pSettings,r_bool,GetScopeName(),"scope_dynamic_zoom",FALSE);
-
 		if ( m_UIScope )
 		{
 			xr_delete( m_UIScope );
