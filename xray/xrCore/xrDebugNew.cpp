@@ -486,7 +486,7 @@ please Submit Bug or save report and email it manually (button More...).\
 }
 #endif // USE_BUG_TRAP
 
-#if 1
+//#if 1
 extern void BuildStackTrace(struct _EXCEPTION_POINTERS *pExceptionInfo);
 typedef LONG WINAPI UnhandledExceptionFilterType(struct _EXCEPTION_POINTERS *pExceptionInfo);
 typedef LONG ( __stdcall *PFNCHFILTFN ) ( EXCEPTION_POINTERS * pExPtrs ) ;
@@ -767,6 +767,7 @@ LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
 
 	return					(EXCEPTION_CONTINUE_SEARCH) ;
 }
+//#endif
 #endif //-NO_BUG_TRAP
 
 //////////////////////////////////////////////////////////////////////
