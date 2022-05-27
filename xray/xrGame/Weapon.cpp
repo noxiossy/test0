@@ -2039,7 +2039,25 @@ LPCSTR	CWeapon::GetCurrentAmmo_ShortName	()
 	return *(l_cartridge.m_InvShortName);
 }
 
-float CWeapon::Weight()
+float CWeapon::GetMagazineWeight(const decltype(CWeapon::m_magazine)& mag) const
+{
+    float res = 0;
+    const char* last_type = nullptr;
+    float last_ammo_weight = 0;
+    for (auto& c : mag)
+    {
+        // Usually ammos in mag have same type, use this fact to improve performance
+        if (last_type != c.m_ammoSect.c_str())
+        {
+            last_type = c.m_ammoSect.c_str();
+            last_ammo_weight = c.Weight();
+        }
+        res += last_ammo_weight;
+    }
+    return res;
+}
+
+float CWeapon::Weight() const
 {
 	float res = CInventoryItemObject::Weight();
 	if(IsGrenadeLauncherAttached()&&GetGrenadeLauncherName().size()){
@@ -2051,14 +2069,8 @@ float CWeapon::Weight()
 	if(IsSilencerAttached()&&GetSilencerName().size()){
 		res += pSettings->r_float(GetSilencerName(),"inv_weight");
 	}
-	
-	if(iAmmoElapsed)
-	{
-		float w		= pSettings->r_float(*m_ammoTypes[m_ammoType],"inv_weight");
-		float bs	= pSettings->r_float(*m_ammoTypes[m_ammoType],"box_size");
+    res += GetMagazineWeight(m_magazine);
 
-		res			+= w*(iAmmoElapsed/bs);
-	}
 	return res;
 }
 
@@ -2171,7 +2183,6 @@ bool CWeapon::IsHudModeNow()
 {
 	return (HudItemData()!=NULL);
 }
-
 void CWeapon::ZoomInc()
 {
     if (!IsScopeAttached())					return;
