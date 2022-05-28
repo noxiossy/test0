@@ -7,6 +7,7 @@
 #include "level.h"
 #include "HUDManager.h"
 #include "UI.h"
+#include "UIGameCustom.h"
 #include "string_table.h"
 #include "actorcondition.h"
 #include "game_cl_base.h"
@@ -15,6 +16,7 @@
 #include "actoreffector.h"
 #include "static_cast_checked.hpp"
 #include "Artefact.h"
+#include "player_hud.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
@@ -37,8 +39,21 @@ IC static void generate_orthonormal_basis1(const Fvector& dir,Fvector& updir, Fv
 void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 {
 	// Lookout
-	if (mstate_wf&mcLookout)	mstate_real		|= mstate_wf&mcLookout;
-	else						mstate_real		&= ~mcLookout;
+	if ((mstate_wf & mcLLookout) && (mstate_wf & mcRLookout))
+	{
+		// It's impossible to perform right and left lookouts in the same time
+		mstate_real &= ~mcLookout;
+	}
+	else if (mstate_wf & mcLookout)
+	{		
+		// Activate one of lookouts
+		mstate_real |= mstate_wf & mcLookout;
+	}
+	else
+	{
+		// No lookouts needed
+		mstate_real &= ~mcLookout;
+	}
 	
 	if (mstate_real&(mcJump|mcFall|mcLanding|mcLanding2))
 		mstate_real		&= ~mcLookout;
@@ -286,7 +301,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 		}//(mstate_real&mcAnyMove)
 	}//peOnGround || peAtWall
 
-	if(IsGameTypeSingle() && cam_eff_factor>EPS)
+	if(cam_eff_factor>EPS)
 	{
 	LPCSTR state_anm				= NULL;
 
@@ -308,6 +323,8 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 		if(state_anm)
 		{ //play moving cam effect
 			CActor*	control_entity		= static_cast_checked<CActor*>(Level().CurrentControlEntity());
+			if (control_entity)
+			{
 			R_ASSERT2					(control_entity, "current control entity is NULL");
 			CEffectorCam* ec			= control_entity->Cameras().GetCamEffector(eCEActorMoving);
 			if(NULL==ec)
@@ -328,6 +345,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 					e->SetCyclic				(false);
 					e->Start					(anm_name);
 					control_entity->Cameras().AddCamEffector(e);
+					}
 				}
 			}
 		}
@@ -485,7 +503,7 @@ void CActor::g_cl_Orientate	(u32 mstate_rl, float dt)
 	} else {
 		// if camera rotated more than 45 degrees - align model with it
 		float ty = angle_normalize(r_torso.yaw);
-		if (_abs(r_model_yaw-ty)>PI_DIV_4)	{
+		if (_abs(r_model_yaw-ty)>PI_DIV_4-30)	{
 			r_model_yaw_dest = ty;
 			// 
 			mstate_real	|= mcTurn;
@@ -599,6 +617,11 @@ void CActor::StopAnyMove()
 {
 	mstate_wishful	&=		~mcAnyMove;
 	mstate_real		&=		~mcAnyMove;
+
+	if (this == Level().CurrentViewEntity())
+	{
+		g_player_hud->OnMovementChanged((EMoveCommand)0);
+	}
 }
 
 

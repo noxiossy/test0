@@ -142,16 +142,19 @@ void CActor::PickupModeUpdate()
 	frustum.CreateFromMatrix(Device.mFullTransform,FRUSTUM_P_LRTB|FRUSTUM_P_FAR);
 	//. slow (ray-query test)
 	for(xr_vector<CObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
-		if (CanPickItem(frustum,Device.vCameraPosition,*it)) PickupInfoDraw(*it);
+	{
+		if (CanPickItem(frustum, Device.vCameraPosition, *it)) 
+			PickupInfoDraw(*it);
+	}
 }
 
 #include "../xrEngine/CameraBase.h"
 BOOL	g_b_COD_PickUpMode = TRUE;
 void	CActor::PickupModeUpdate_COD	()
 {
-	if (Level().CurrentViewEntity() != this || !g_b_COD_PickUpMode) return;
+	if (Level().CurrentViewEntity() != this) return;
 		
-	if (!g_Alive() || eacFirstEye != cam_active) 
+	if (!g_Alive() || eacFirstEye != cam_active || !g_b_COD_PickUpMode) 
 	{
 		HUD().GetUI()->UIMainIngameWnd->SetPickUpItem(NULL);
 		return;
@@ -273,10 +276,6 @@ void CActor::feel_sound_new(CObject* who, int type, CSound_UserDataPtr user_data
 
 void CActor::Feel_Grenade_Update( float rad )
 {
-	if ( !IsGameTypeSingle() )
-	{
-		return;
-	}
 	// Find all nearest objects
 	Fvector pos_actor;
 	Center( pos_actor );
