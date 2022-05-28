@@ -30,6 +30,7 @@
 #define ROTATION_TIME			0.25f
 
 BOOL	b_toggle_weapon_aim		= FALSE;
+extern CUIXml*	pWpnScopeXml;
 
 CWeapon::CWeapon()
 {
@@ -410,6 +411,20 @@ void CWeapon::Load		(LPCSTR section)
 			}
 		}
 	}
+	else if( m_eScopeStatus == ALife::eAddonPermanent )
+	{
+		shared_str scope_tex_name			= pSettings->r_string(cNameSect(), "scope_texture");
+		m_zoom_params.m_fScopeZoomFactor	= pSettings->r_float( cNameSect(), "scope_zoom_factor");
+		{
+			m_UIScope				= xr_new<CUIWindow>();
+			if(!pWpnScopeXml)
+			{
+				pWpnScopeXml			= xr_new<CUIXml>();
+				pWpnScopeXml->Load		(CONFIG_PATH, UI_PATH, "scopes.xml");
+			}
+			CUIXmlInit::InitWindow	(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
+		}
+	}
 
 	if(m_eSilencerStatus == ALife::eAddonAttachable)
 	{
@@ -533,7 +548,7 @@ void CWeapon::Load		(LPCSTR section)
     m_zoom_params.m_ReloadEmptyDof = READ_IF_EXISTS(pSettings, r_fvector4, section, "reload_empty_dof", Fvector4().set(-1, -1, -1, -1));
     //-Swartz
 
-    m_bHasTracers = READ_IF_EXISTS(pSettings, r_bool, section, "tracers", true);
+	m_bHasTracers			= !!READ_IF_EXISTS(pSettings, r_bool, section, "tracers", true);
 	m_u8TracerColorID		= READ_IF_EXISTS(pSettings, r_u8, section, "tracers_color_ID", u8(-1));
 
 	string256						temp;
@@ -573,14 +588,14 @@ void CWeapon::Load		(LPCSTR section)
 	////////////////////////////////////////////
 
 	////////////////////////////////////////////
-	m_lookout_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_hud_offset_pos", (Fvector{ 0.045f, 0.f, 0.f }));
-	m_lookout_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_hud_offset_rot", (Fvector{ 0.f, 0.f, 10.f }));
+	m_lookout_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_hud_offset_pos", (Fvector{ 0.015f, 0.f, 0.f }));
+	m_lookout_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_hud_offset_rot", (Fvector{ 0.f, 0.f, 5.f }));
 
 	m_lookout_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_aim_hud_offset_pos", (Fvector{ 0.f, 0.f, 0.f }));
-	m_lookout_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_aim_hud_offset_rot", (Fvector{ 0.f, 0.f, 15.f }));
+	m_lookout_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_aim_hud_offset_rot", (Fvector{ 0.f, 0.f, 5.f }));
 
-	m_lookout_offset[2][0].set(READ_IF_EXISTS(pSettings, r_bool, section, "lookout_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "lookout_transition_time", 0.25f), 0.f); // normal
-	m_lookout_offset[2][1].set(READ_IF_EXISTS(pSettings, r_bool, section, "lookout_aim_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "lookout_aim_transition_time", 0.15f), 0.f); // aim-GL
+	m_lookout_offset[2][0].set(READ_IF_EXISTS(pSettings, r_bool, section, "lookout_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "lookout_transition_time", 0.12f), 0.f); // normal
+	m_lookout_offset[2][1].set(READ_IF_EXISTS(pSettings, r_bool, section, "lookout_aim_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "lookout_aim_transition_time", 0.07f), 0.f); // aim-GL
 	////////////////////////////////////////////
 
 }
