@@ -298,7 +298,8 @@ u32 CHudItem::PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem*  W, u32 
 		m_dwMotionCurrTm			= m_dwMotionStartTm;
 		m_dwMotionEndTm				= m_dwMotionStartTm + anim_time;
 		m_startedMotionState		= state;
-	}
+	}else
+		m_bStopAtEndAnimIsRunning	= false;
 
 	return anim_time;
 }
@@ -406,7 +407,7 @@ void CHudItem::PlayAnimIdleSprint()
 
 void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 {
-	if(GetState()==eIdle)
+	if(GetState()==eIdle && !m_bStopAtEndAnimIsRunning)
 	{
 		if( (cmd == ACTOR_DEFS::mcSprint) || (cmd == ACTOR_DEFS::mcAnyMove)  )
 		{
