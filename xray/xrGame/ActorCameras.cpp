@@ -351,7 +351,7 @@ void CActor::cam_Update(float dt, float fFOV)
 		collide_camera( *cameras[eacFirstEye], _viewport_near );
 
 	//if( psActorFlags.test(AF_PSP) )
-	{
+	//{
 		Cameras().UpdateFromCamera			(C);
 	//}else
 	//{
