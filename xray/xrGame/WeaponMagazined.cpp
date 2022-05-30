@@ -1019,13 +1019,13 @@ void CWeaponMagazined::InitAddons()
 	m_zoom_params.m_fIronSightZoomFactor = READ_IF_EXISTS( pSettings, r_float, cNameSect(), "ironsight_zoom_factor", 50.0f );
 	if ( IsScopeAttached() )
 	{
-		shared_str scope_tex_name = "none";
-		bScopeIsHasTexture = false;
 		if ( m_eScopeStatus == ALife::eAddonAttachable )
 		{
 			//m_sScopeName = pSettings->r_string(cNameSect(), "scope_name");
 			//m_iScopeX	 = pSettings->r_s32(cNameSect(),"scope_x");
 			//m_iScopeY	 = pSettings->r_s32(cNameSect(),"scope_y");
+			shared_str scope_tex_name = "none";
+			bScopeIsHasTexture = false;
 
 			VERIFY( *m_sScopeName );
 			if (pSettings->line_exist(*m_sScopeName, "scope_texture"))
