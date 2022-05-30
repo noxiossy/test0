@@ -14,7 +14,7 @@ class ENGINE_API CMotionDef;
 class CWeaponMagazined: public CWeapon
 {
 private:
-	using inherited = CWeapon;
+    typedef CWeapon inherited;
 
 protected:
 	//звук текущего выстрела
@@ -73,6 +73,7 @@ public:
 			void	LoadSilencerKoeffs();
 	virtual CWeaponMagazined*cast_weapon_magazined	()		 {return this;}
 
+	virtual bool    UseScopeTexture ();
 	virtual void	SetDefaults		();
 	virtual void	FireStart		();
 	virtual void	FireEnd			();

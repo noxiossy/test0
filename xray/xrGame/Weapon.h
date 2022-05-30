@@ -157,7 +157,10 @@ public:
 	ALife::EWeaponAddonStatus	get_ScopeStatus				() const { return m_eScopeStatus; }
 	ALife::EWeaponAddonStatus	get_SilencerStatus			() const { return m_eSilencerStatus; }
 
-	virtual bool UseScopeTexture();
+    virtual bool UseScopeTexture()
+    {
+        return bScopeIsHasTexture;
+    };
 
 	//обновление видимости для косточек аддонов
 			void UpdateAddonsVisibility();
