@@ -1520,10 +1520,6 @@ void CWeapon::OnZoomOut()
 	ResetSubStateTime					();
 }
 
-bool CWeapon::UseScopeTexture() {
-	return m_UIScope; // только если есть текстура прицела - для простого создания коллиматоров
-}
-
 CUIWindow* CWeapon::ZoomTexture()
 {
 	if (UseScopeTexture())
