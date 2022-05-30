@@ -14,7 +14,7 @@ class ENGINE_API CMotionDef;
 class CWeaponMagazined: public CWeapon
 {
 private:
-    typedef CWeapon inherited;
+	typedef CWeapon inherited;
 
 protected:
 	//звук текущего выстрела
@@ -29,6 +29,7 @@ protected:
 	ESoundTypes		m_eSoundShot;
 	ESoundTypes		m_eSoundEmptyClick;
 	ESoundTypes		m_eSoundReload;
+	ESoundTypes		m_eSoundFireModes;
     ESoundTypes		m_eSoundReloadEmpty;
     ESoundTypes		m_eSoundReloadMisfire;
 	bool			m_sounds_enabled;

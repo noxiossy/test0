@@ -42,8 +42,8 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
 	m_eSoundShot				= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
 	m_eSoundEmptyClick			= ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
 	m_eSoundReload				= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
-    m_eSoundReloadEmpty			= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
-    m_eSoundReloadMisfire		= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+	m_eSoundReloadEmpty			= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+	m_eSoundReloadMisfire		= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
 	m_eSoundFireModes			= ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
 
 	m_sounds_enabled			= true;
@@ -1028,7 +1028,7 @@ void CWeaponMagazined::InitAddons()
 			//m_iScopeY	 = pSettings->r_s32(cNameSect(),"scope_y");
 
 			VERIFY( *m_sScopeName );
-			if (pSettings->line_exist(section, "scope_texture"))
+			if (pSettings->line_exist(*m_sScopeName, "scope_texture"))
 			{
 				scope_tex_name						= pSettings->r_string(*m_sScopeName, "scope_texture");
 				if (xr_strcmp(scope_tex_name, "none") != 0)
