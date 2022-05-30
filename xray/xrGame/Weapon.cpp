@@ -413,6 +413,7 @@ void CWeapon::Load		(LPCSTR section)
 	}
 	else if( m_eScopeStatus == ALife::eAddonPermanent )
 	{
+		bScopeIsHasTexture = true;
 		shared_str scope_tex_name			= pSettings->r_string(cNameSect(), "scope_texture");
 		m_zoom_params.m_fScopeZoomFactor	= pSettings->r_float( cNameSect(), "scope_zoom_factor");
 		{
