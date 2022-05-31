@@ -3,16 +3,16 @@
 void CRenderTarget::ProcessSMAA()
 {
 	u32 Offset;
-	constexpr float d_Z = EPS_S;
-	constexpr float d_W = 1.0f;
-	constexpr u32 C = color_rgba(0, 0, 0, 255);
+	float d_Z = EPS_S;
+	float d_W = 1.0f;
+	u32 C = color_rgba(0, 0, 0, 255);
 
 	const float _w = float(Device.dwWidth);
 	const float _h = float(Device.dwHeight);
 
 	// Half-pixel offset (DX9 only)
 #if defined(USE_DX10) || defined(USE_DX11)
-	constexpr Fvector2 p0{ 0.0f, 0.0f }, p1{ 1.0f, 1.0f };
+	Fvector2 p0{ 0.0f, 0.0f }, p1{ 1.0f, 1.0f };
 #else
 	Fvector2 p0, p1;
 	p0.set(0.5f / _w, 0.5f / _h);
