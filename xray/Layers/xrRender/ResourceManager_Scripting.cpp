@@ -12,13 +12,6 @@
 
 #include	"dxRenderDeviceRender.h"
 
-using namespace				luabind;
-
-#ifdef	DEBUG
-#define MDB	Memory.dbg_check()
-#else
-#define MDB
-#endif
 
 // wrapper
 class	adopt_sampler
@@ -78,6 +71,54 @@ class	adopt_blend
 public:
 };
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+lua_State* LSVM = nullptr;
+constexpr const char* GlobalNamespace = "_G";
+constexpr const char* FILE_HEADER = "\
+local function script_name() \
+return '%s' \
+end; \
+local this; \
+module('%s', package.seeall, function(m) this = m end); \
+%s";
+
+static const char* get_lua_traceback(lua_State *L)
+{
+#if LUAJIT_VERSION_NUM < 20000
+	static char buffer[32768]; // global buffer
+	int top = lua_gettop(L);
+	// alpet: Lua traceback added
+	lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+	lua_getfield(L, -1, "traceback");
+	lua_pushstring(L, "\t");
+	lua_pushinteger(L, 1);
+
+	const char *traceback = "cannot get Lua traceback ";
+	strcpy_s(buffer, 32767, traceback);
+	__try
+	{
+		if (0 == lua_pcall(L, 2, 1, 0))
+		{
+			traceback = lua_tostring(L, -1);
+			strcpy_s(buffer, 32767, traceback);
+			lua_pop(L, 1);
+		}
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		Msg("!#EXCEPTION(get_lua_traceback): buffer = %s ", buffer);
+	}
+	lua_settop(L, top);
+	return buffer;
+#else
+	luaL_traceback(L, L, nullptr, 0);
+	auto tb = lua_tostring(L, -1);
+	lua_pop(L, 1);
+	return tb;
+#endif
+}
 
 bool print_output(const char* caScriptFileName, int errorCode)
 {
@@ -180,7 +221,7 @@ bool namespace_loaded(const char* name, bool remove_from_stack)
 	lua_pushstring(LSVM, GlobalNamespace);
 	lua_rawget(LSVM, LUA_GLOBALSINDEX);
 	string256 S2;
-	xr_strcpy(S2, name);
+	strcpy_s(S2, name);
 	auto S = S2;
 	for (;;)
 	{
@@ -268,86 +309,102 @@ bool OBJECT_2(const char* namespace_name, const char* identifier, int type)
 	return result;
 }
 
-
-
-
-
-
-
-void LuaLog(LPCSTR caMessage)
-{
-	MDB;	
-	Lua::LuaOut	(Lua::eLuaMessageTypeMessage,"%s",caMessage);
-}
+#ifdef LUABIND_NO_EXCEPTIONS
 void LuaError(lua_State* L)
 {
-	Debug.fatal(DEBUG_INFO,"LUA error: %s",lua_tostring(L,-1));
+	print_output("[ResourceManager.lua_error]", LUA_ERRRUN);
+	Debug.fatal(DEBUG_INFO, "[ResourceManager.lua_error]: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
 }
 
-#ifndef PURE_ALLOC
-#	ifndef USE_MEMORY_MONITOR
-#		define USE_DL_ALLOCATOR
-#	endif // USE_MEMORY_MONITOR
-#endif // PURE_ALLOC
+#ifdef LUABIND_09
+static void lua_cast_failed(lua_State *L, const luabind::type_id& info)
+#else
+static void lua_cast_failed(lua_State *L, LUABIND_TYPE_INFO info)
+#endif
+{
+	print_output("[ResourceManager.lua_cast_failed]", LUA_ERRRUN);
+#ifdef LUABIND_09
+	Msg("LUA error: cannot cast lua value to %s", info.name());
+	//Debug.fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info.name()); //KRodin: ??? ???????? ???????? ?? ????.
+#else
+	Msg("LUA error: cannot cast lua value to %s", info->name());
+	//Debug.fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info->name()); //KRodin: ??? ???????? ???????? ?? ????.
+#endif
+}
+#endif
 
-#ifndef USE_DL_ALLOCATOR
-	static void *lua_alloc	(void *ud, void *ptr, size_t osize, size_t nsize)
+int lua_pcall_failed(lua_State *L)
+{
+	print_output("[ResourceManager.lua_pcall_failed]", LUA_ERRRUN);
+	Debug.fatal(DEBUG_INFO, "[ResourceManager.lua_pcall_failed]: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
+	if (lua_isstring(L, -1))
+		lua_pop(L, 1);
+	return LUA_ERRRUN;
+}
+
+int lua_panic(lua_State *L)
+{
+	print_output("[ResourceManager.lua_panic]", LUA_ERRRUN);
+	Debug.fatal(DEBUG_INFO, "[ResourceManager.lua_panic]: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
+	return 0;
+}
+
+#ifndef LUABIND_09
+static void *__cdecl luabind_allocator(luabind::memory_allocation_function_parameter, const void *pointer, size_t const size) //?????? ????? ???????? ?????, ??????? ????? ????? ? ?????
+{
+	if (!size)
 	{
-		(void)ud;
-		(void)osize;
-		if (nsize == 0) {
-			xr_free	(ptr);
-			return	NULL;
-		}
-
-#		ifdef DEBUG_MEMORY_NAME
-			return Memory.mem_realloc	(ptr, nsize, "LUA:Render");
-#		else // DEBUG_MEMORY_MANAGER
-			return Memory.mem_realloc	(ptr, nsize);
-#		endif // DEBUG_MEMORY_MANAGER
+		void *non_const_pointer = const_cast<LPVOID>(pointer);
+		xr_free(non_const_pointer);
+		return nullptr;
 	}
-#else // USE_DL_ALLOCATOR
-#	include "doug_lea_memory_allocator.h"
 
-	static void *lua_alloc		(void *ud, void *ptr, size_t osize, size_t nsize)
-	{
-		(void)ud;
-		(void)osize;
-		if (nsize == 0)	{	dlfree			(ptr);	 return	NULL;  }
-		else				return dlrealloc	(ptr, nsize);
-	}
-#endif // USE_DL_ALLOCATOR
+	if (!pointer)
+		return Memory.mem_alloc(size);
+
+	void *non_const_pointer = const_cast<LPVOID>(pointer);
+	return Memory.mem_realloc(non_const_pointer, size);
+}
+#endif
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void LuaLog(const char* caMessage) { Log(caMessage); }
 
 // export
-void	CResourceManager::LS_Load			()
+void CResourceManager::LS_Load()
 {
-#ifndef _WIN64
-	LSVM			= lua_newstate(lua_alloc, NULL);
+//**************************************************************//
+	//Msg("[CResourceManager] Starting LuaJIT");
+	R_ASSERT2(!LSVM, "! LuaJIT is already running"); //?? ?????? ??????
+	//
+#ifdef LUABIND_09
+	luabind::disable_super_deprecation();
 #else
-	LSVM			= luaL_newstate();
+	luabind::allocator = &luabind_allocator; //????????? ???????? ?????? ????? ? ?????? ???? ???!
+	luabind::allocator_parameter = nullptr;
 #endif
-
-	if (!LSVM)		{
-		Msg			("! ERROR : Cannot initialize LUA VM!");
-		return;
-	}
-
-	// initialize lua standard library functions 
-	luaopen_base	(LSVM); 
-	luaopen_table	(LSVM);
-	luaopen_string	(LSVM);
-	luaopen_math	(LSVM);
-	luaopen_jit		(LSVM);
-
-	luabind::open						(LSVM);
-#if !XRAY_EXCEPTIONS
-	if (0==luabind::get_error_callback())
-		luabind::set_error_callback		(LuaError);
+	LSVM = luaL_newstate(); //????????? LuaJIT. ?????? ???? ?? ??????? ???.
+	luaL_openlibs(LSVM); //????????????? ??????? LuaJIT
+	R_ASSERT2(LSVM, "! ERROR : Cannot initialize LUA VM!"); //???? ?????????, ????????? ?? ?????.
+	luabind::open(LSVM); //?????? ????????
+	//
+	//--------------????????? ????????------------------//
+#ifdef LUABIND_NO_EXCEPTIONS
+	luabind::set_error_callback(LuaError); //?????? ?? ??????.
+	luabind::set_cast_failed_callback(lua_cast_failed);
 #endif
+	luabind::set_pcall_callback(lua_pcall_failed); //KRodin: ?? ???????????????? ?? ? ???? ??????!!!
+	lua_atpanic(LSVM, lua_panic);
+	//Msg("[CResourceManager] LuaJIT Started!");
+	//-----------------------------------------------------//
+//***************************************************************//
 
-	module			(LSVM)
+	using namespace luabind;
+
+	module(LSVM)
 	[
-		def("log", LuaLog),
+		def("log", &LuaLog),
 
 		class_<adopt_sampler>("_sampler")
 			.def(								constructor<const adopt_sampler&>())
@@ -415,12 +472,7 @@ void	CResourceManager::LS_Load			()
 		if		(0==namesp[0])			strcpy_s	(namesp,"_G");
 		strconcat						(sizeof(fn),fn,::Render->getShaderPath(),(*folder)[it]);
 		FS.update_path					(fn,"$game_shaders$",fn);
-		try {
-			Script::bfLoadFileIntoNamespace	(LSVM,fn,namesp,true);
-		} catch (...)
-		{
-			Log(lua_tostring(LSVM,-1));
-		}
+		do_file(fn, namesp);
 	}
 	FS.file_list_close			(folder);
 }
@@ -570,11 +622,16 @@ ShaderElement*		CBlender_Compile::_lua_Compile	(LPCSTR namesp, LPCSTR name)
 	LPCSTR				t_0		= *L_textures[0]			? *L_textures[0] : "null";
 	LPCSTR				t_1		= (L_textures.size() > 1)	? *L_textures[1] : "null";
 	LPCSTR				t_d		= detail_texture			? detail_texture : "null" ;
-	lua_State*			LSVM	= dxRenderDeviceRender::Instance().Resources->LSVM;
-	object				shader	= get_globals(LSVM)[namesp];
-	luabind::functor<void>	element = object_cast<functor<void>>(shader[name]);
+
+#ifdef LUABIND_09
+	luabind::object		shader = luabind::globals(LSVM)[namesp];
+#else
+	luabind::object		shader = luabind::get_globals(LSVM)[namesp];
+#endif
+	luabind::object		element = shader[name];
 	adopt_compiler		ac		= adopt_compiler(this);
 	element						(ac,t_0,t_1,t_d);
+
 	r_End				();
 	ShaderElement*	_r	= dxRenderDeviceRender::Instance().Resources->_CreateElement(E);
 	return			_r;
