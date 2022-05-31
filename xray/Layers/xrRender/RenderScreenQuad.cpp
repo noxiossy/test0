@@ -3,9 +3,9 @@
 void CRenderTarget::RenderScreenQuad(const u32 w, const u32 h, ID3DRenderTargetView* rt, ref_selement& sh, string_unordered_map<const char*, Fvector4*>* consts)
 {
 	u32 Offset = 0;
-	constexpr float d_Z = EPS_S;
-	constexpr float d_W = 1.0f;
-	constexpr u32 C = color_rgba(0, 0, 0, 255);
+	float d_Z = EPS_S;
+	float d_W = 1.0f;
+	u32 C = color_rgba(0, 0, 0, 255);
 
 	if (rt)
 		u_setrt(w, h, rt, nullptr, nullptr, HW.pBaseZB);
@@ -15,7 +15,7 @@ void CRenderTarget::RenderScreenQuad(const u32 w, const u32 h, ID3DRenderTargetV
 
 	// Half-pixel offset (DX9 only)
 #if defined(USE_DX10) || defined(USE_DX11)
-	constexpr Fvector2 p0{ 0.0f, 0.0f }, p1{ 1.0f, 1.0f };
+	Fvector2 p0{ 0.0f, 0.0f }, p1{ 1.0f, 1.0f };
 #else
 	Fvector2 p0, p1;
 	p0.set(0.5f / w, 0.5f / h);
