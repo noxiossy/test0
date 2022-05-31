@@ -78,6 +78,202 @@ class	adopt_blend
 public:
 };
 
+
+bool print_output(const char* caScriptFileName, int errorCode)
+{
+	auto Prefix = "";
+	if (errorCode) {
+		switch (errorCode) {
+		case LUA_ERRRUN: {
+			Prefix = "SCRIPT RUNTIME ERROR";
+			break;
+		}
+		case LUA_ERRMEM: {
+			Prefix = "SCRIPT ERROR (memory allocation)";
+			break;
+		}
+		case LUA_ERRERR: {
+			Prefix = "SCRIPT ERROR (while running the error handler function)";
+			break;
+		}
+		case LUA_ERRFILE: {
+			Prefix = "SCRIPT ERROR (while running file)";
+			break;
+		}
+		case LUA_ERRSYNTAX: {
+			Prefix = "SCRIPT SYNTAX ERROR";
+			break;
+		}
+		case LUA_YIELD: {
+			Prefix = "Thread is yielded";
+			break;
+		}
+		default: NODEFAULT;
+		}
+	}
+	auto traceback = get_lua_traceback(LSVM);
+	if (!lua_isstring(LSVM, -1)) //Ќ≈ ”ƒјЋя“№! »наче будут вылeты без лога!
+	{
+		Msg("*********************************************************************************");
+		Msg("[ResourceManager_Scripting.print_output(%s)] %s!\n%s", caScriptFileName, Prefix, traceback);
+		Msg("*********************************************************************************");
+		return false;
+	}
+	auto S = lua_tostring(LSVM, -1);
+	Msg("*********************************************************************************");
+	Msg("[ResourceManager_Scripting.print_output(%s)] %s:\n%s\n%s", caScriptFileName, Prefix, S, traceback);
+	Msg("*********************************************************************************");
+	return true;
+}
+
+bool load_buffer(const char* caBuffer, size_t tSize, const char* caScriptName, const char* caNameSpaceName)
+{
+	//KRodin: ѕеределал, т.к. в оригинале тут происходило нечто, на мой взгл€д, странное.
+	int buf_len = std::snprintf(nullptr, 0, FILE_HEADER, caNameSpaceName, caNameSpaceName, caBuffer);
+	auto strBuf = std::make_unique<char[]>(buf_len + 1);
+	std::snprintf(strBuf.get(), buf_len + 1, FILE_HEADER, caNameSpaceName, caNameSpaceName, caBuffer);
+	//Log("[CResourceManager::load_buffer] Loading buffer:");
+	//Log(strBuf.get());
+	int l_iErrorCode = luaL_loadbuffer(LSVM, strBuf.get(), buf_len /*+ 1 Ќуль-терминатор на конце мешает походу*/, caScriptName);
+	if (l_iErrorCode)
+	{
+		print_output(caScriptName, l_iErrorCode);
+		R_ASSERT(false); //Ќ≈ «ј ќћћ≈Ќ“»–ќ¬ј“№!
+		return false;
+	}
+	return true;
+}
+
+bool do_file(const char* caScriptName, const char* caNameSpaceName)
+{
+	string_path l_caLuaFileName;
+	auto l_tpFileReader = FS.r_open(caScriptName);
+	if (!l_tpFileReader) { //заменить на ассерт?
+		Msg("!![CResourceManager::do_file] Cannot open file [%s]", caScriptName);
+		return false;
+	}
+	strconcat(sizeof(l_caLuaFileName), l_caLuaFileName, "@", caScriptName); //KRodin: приводит путь к виду @f:\games\s.t.a.l.k.e.r\gamedata\scripts\class_registrator.script
+	//
+	//KRodin: исправлено. “еперь содержимое скрипта сразу читаетс€ нормально, без мусора на конце.
+	auto strBuf = std::make_unique<char[]>(l_tpFileReader->length() + 1);
+	strncpy(strBuf.get(), (const char*)l_tpFileReader->pointer(), l_tpFileReader->length());
+	strBuf.get()[l_tpFileReader->length()] = 0;
+	//
+	load_buffer(strBuf.get(), (size_t)l_tpFileReader->length(), l_caLuaFileName, caNameSpaceName);
+	FS.r_close(l_tpFileReader);
+
+	int	l_iErrorCode = lua_pcall(LSVM, 0, 0, 0); //KRodin: без этого скрипты не работают!
+	if (l_iErrorCode)
+	{
+		print_output(caScriptName, l_iErrorCode);
+		R_ASSERT(false); //Ќ≈ «ј ќћћ≈Ќ“»–ќ¬ј“№!
+		return false;
+	}
+	return true;
+}
+
+bool namespace_loaded(const char* name, bool remove_from_stack)
+{
+#ifdef DEBUG
+	int start = lua_gettop(LSVM);
+#endif
+	lua_pushstring(LSVM, GlobalNamespace);
+	lua_rawget(LSVM, LUA_GLOBALSINDEX);
+	string256 S2;
+	xr_strcpy(S2, name);
+	auto S = S2;
+	for (;;)
+	{
+		if (!xr_strlen(S))
+		{
+			VERIFY(lua_gettop(LSVM) >= 1);
+			lua_pop(LSVM, 1);
+			VERIFY(start == lua_gettop(LSVM));
+			return false;
+		}
+		auto S1 = strchr(S, '.');
+		if (S1)
+			*S1 = 0;
+		lua_pushstring(LSVM, S);
+		lua_rawget(LSVM, -2);
+		if (lua_isnil(LSVM, -1))
+		{
+			//lua_settop(LSVM,0);
+			VERIFY(lua_gettop(LSVM) >= 2);
+			lua_pop(LSVM, 2);
+			VERIFY(start == lua_gettop(LSVM));
+			return false; //there is no namespace!
+		}
+		else if (!lua_istable(LSVM, -1))
+		{
+			//lua_settop(LSVM, 0);
+			VERIFY(lua_gettop(LSVM) >= 1);
+			lua_pop(LSVM, 1);
+			VERIFY(start == lua_gettop(LSVM));
+			R_ASSERT3(false, "Error : the namespace is already being used by the non-table object! Name: ", S);
+			return false;
+		}
+		lua_remove(LSVM, -2);
+		if (S1)
+			S = ++S1;
+		else
+			break;
+	}
+	if (!remove_from_stack)
+		VERIFY(lua_gettop(LSVM) == start + 1);
+	else
+	{
+		VERIFY(lua_gettop(LSVM) >= 1);
+		lua_pop(LSVM, 1);
+		VERIFY(lua_gettop(LSVM) == start);
+	}
+	return true;
+}
+
+bool OBJECT_1(const char* identifier, int type)
+{
+#ifdef DEBUG
+	int start = lua_gettop(LSVM);
+#endif
+	lua_pushnil(LSVM);
+	while (lua_next(LSVM, -2))
+	{
+		if (lua_type(LSVM, -1) == type && !xr_strcmp(identifier, lua_tostring(LSVM, -2)))
+		{
+			VERIFY(lua_gettop(LSVM) >= 3);
+			lua_pop(LSVM, 3);
+			VERIFY(lua_gettop(LSVM) == start - 1);
+			return true;
+		}
+		lua_pop(LSVM, 1);
+	}
+	VERIFY(lua_gettop(LSVM) >= 1);
+	lua_pop(LSVM, 1);
+	VERIFY(lua_gettop(LSVM) == start - 1);
+	return false;
+}
+
+bool OBJECT_2(const char* namespace_name, const char* identifier, int type)
+{
+#ifdef DEBUG
+	int start = lua_gettop(LSVM);
+#endif
+	if (xr_strlen(namespace_name) && !namespace_loaded(namespace_name, false))
+	{
+		VERIFY(lua_gettop(LSVM) == start);
+		return false;
+	}
+	bool result = OBJECT_1(identifier, type);
+	VERIFY(lua_gettop(LSVM) == start);
+	return result;
+}
+
+
+
+
+
+
+
 void LuaLog(LPCSTR caMessage)
 {
 	MDB;	
