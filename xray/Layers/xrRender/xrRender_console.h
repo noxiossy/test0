@@ -1,9 +1,6 @@
 #pragma once
 
 // Common
-extern ECORE_API u32 ps_r_pp_aa_mode;
-extern ECORE_API	xr_token	pp_aa_mode_token[];
-
 extern ECORE_API	u32			ps_r_sun_shafts;	//=	0;
 extern ECORE_API	xr_token	qsun_shafts_token[];
 
@@ -201,11 +198,3 @@ extern void						xrRender_apply_tf		();
 
 // KD
 extern ECORE_API int			ps_r__detail_radius;
-
-// Postprocess anti-aliasing types
-enum
-{
-	NO_AA,
-	SMAA,
-};
-

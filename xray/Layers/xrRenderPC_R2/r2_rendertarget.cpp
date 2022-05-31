@@ -189,7 +189,7 @@ CRenderTarget::CRenderTarget		()
 	param_noise_fps		= 25.f;
 	param_noise_scale	= 1.f;
 
-	im_noise_time		= 1.f / 100.0f;
+	im_noise_time		= 1.0f/100.0f; //Alundaio ? should be float
 	im_noise_shift_w	= 0;
 	im_noise_shift_h	= 0;
 
@@ -414,18 +414,6 @@ CRenderTarget::CRenderTarget		()
 		t_envmap_0.create			(r2_T_envs0);
 		t_envmap_1.create			(r2_T_envs1);
 	}
-
-	u32	w = Device.dwWidth;
-	u32 h = Device.dwHeight;
-
-	// SMAA RTs
-	{
-		rt_smaa_edgetex.create(r2_RT_smaa_edgetex, w, h, D3DFMT_A8R8G8B8);
-		rt_smaa_blendtex.create(r2_RT_smaa_blendtex, w, h, D3DFMT_A8R8G8B8);
-
-		s_pp_antialiasing.create("effects_pp_antialiasing");
-	}
-
 
 	// Build textures
 	{
