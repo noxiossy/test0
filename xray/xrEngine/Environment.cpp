@@ -660,7 +660,7 @@ void CEnvironment::ForceReselectEnvs() {
 
 
 void CEnvironment::SetWeatherNext( shared_str name ) {
-  ASSERT_FMT( name.size(), "empty weather name" );
+  //R_ASSERT2( name.size(), "empty weather name" );
   EnvsMapIt it = WeatherCycles.find( name );
   if ( it == WeatherCycles.end() ) {
     Msg("! [%s]: Invalid weather name: %s", __FUNCTION__, name.c_str());
