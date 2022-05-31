@@ -1,6 +1,14 @@
 #include	"stdafx.h"
 #include	"xrRender_console.h"
 
+
+u32 ps_r_pp_aa_mode = SMAA;
+xr_token pp_aa_mode_token[] = {
+	{ "st_opt_off", NO_AA },
+	{ "st_opt_smaa", SMAA },
+	{ nullptr, 0 },
+};
+
 u32			ps_Preset				=	2	;
 xr_token							qpreset_token							[ ]={
 	{ "Minimum",					0											},
@@ -758,6 +766,8 @@ void		xrRender_initconsole	()
 	CMD3(CCC_Mask,		"r2_volumetric_lights",			&ps_r2_ls_flags,			R2FLAG_VOLUMETRIC_LIGHTS);
 //	CMD3(CCC_Mask,		"r2_sun_shafts",				&ps_r2_ls_flags,			R2FLAG_SUN_SHAFTS);
 	CMD3(CCC_Token,		"r2_sun_shafts",				&ps_r_sun_shafts,			qsun_shafts_token);
+
+	CMD3(CCC_SSAO_Mode,	"r2_ssao_mode",					&ps_r_ssao_mode,			qssao_mode_token);
 	CMD3(CCC_Token,		"r2_ssao",						&ps_r_ssao,					qssao_token);
 	CMD3(CCC_Mask,		"r2_ssao_blur",                 &ps_r2_ls_flags_ext,		R2FLAGEXT_SSAO_BLUR);//Need restart
 	CMD3(CCC_Mask,		"r2_ssao_opt_data",				&ps_r2_ls_flags_ext,		R2FLAGEXT_SSAO_OPT_DATA);//Need restart
