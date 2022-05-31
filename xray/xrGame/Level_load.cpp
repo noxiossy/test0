@@ -146,6 +146,9 @@ BOOL CLevel::Load_GameSpecific_After()
 	}
 	g_pGamePersistent->Environment().SetGameTime	(GetEnvironmentGameDayTimeSec(),game->GetEnvironmentGameTimeFactor());
 
+	if (g_pGamePersistent->pEnvironment)
+		g_pGamePersistent->pEnvironment->Invalidate();
+
 	return TRUE;
 }
 

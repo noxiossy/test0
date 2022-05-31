@@ -1,5 +1,5 @@
-#ifndef _RENDER_H_
-#define _RENDER_H_
+#pragma once
+
 
 #include "frustum.h"
 #include "vis_common.h"
@@ -108,6 +108,7 @@ public:
 	virtual	void						force_mode			(u32 mode)							= 0;
 	virtual float						get_luminocity		()									= 0;
 	virtual float						get_luminocity_hemi	()									= 0;
+	virtual float*						get_luminocity_hemi_cube		()									= 0;
 
 	virtual ~IRender_ObjectSpecific()	{};
 };
@@ -294,4 +295,3 @@ protected:
 
 //extern ENGINE_API	IRender_interface*	Render;
 
-#endif
