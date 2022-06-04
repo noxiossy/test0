@@ -47,7 +47,6 @@
 #include "file_transfer.h"
 #include "message_filter.h"
 #include "CustomZone.h"
-#include "ZoneList.h"
 #ifdef DEBUG
 #	include "level_debug.h"
 #	include "ai/stalker/ai_stalker.h"

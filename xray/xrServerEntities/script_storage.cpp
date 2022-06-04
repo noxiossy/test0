@@ -456,7 +456,7 @@ bool CScriptStorage::load_buffer	(lua_State *L, LPCSTR caBuffer, size_t tSize, L
 //		}
 	}
 
-	if (l_iErrorCode) && (Core.ParamFlags.test(Core.lr_fulllog)){
+	if ((l_iErrorCode) && (Core.ParamFlags.test(Core.lr_fulllog))){
 		print_output	(L,caScriptName,l_iErrorCode);
 		on_error		(L);
 		return			(false);
@@ -509,7 +509,7 @@ bool CScriptStorage::do_file	(LPCSTR caScriptName, LPCSTR caNameSpaceName)
 			ai().script_engine().debugger()->UnPrepareLua(lua(),errFuncId);
 #	endif // #ifndef USE_LUA_STUDIO
 #endif // #ifdef USE_DEBUGGER
-	if (l_iErrorCode) && (Core.ParamFlags.test(Core.lr_fulllog)){
+	if ((l_iErrorCode) && (Core.ParamFlags.test(Core.lr_fulllog))){
 		print_output(lua(),caScriptName,l_iErrorCode);
 		on_error	(lua());
 		lua_settop	(lua(),start);
