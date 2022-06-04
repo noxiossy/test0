@@ -170,7 +170,7 @@ float		ps_r2_tonemap_amount		= 0.5f;				// r2-only
 float		ps_r2_ls_bloom_kernel_g		= 3.3f;				// r2-only
 float		ps_r2_ls_bloom_kernel_b		= .7f;				// r2-only
 float		ps_r2_ls_bloom_speed		= 10.f;				// r2-only
-float		ps_r2_ls_bloom_kernel_scale	= 0.7f;				// r2-only	// gauss
+float		ps_r2_ls_bloom_kernel_scale	= 0.5f;				// r2-only	// gauss
 float		ps_r2_ls_dsm_kernel			= .7f;				// r2-only
 float		ps_r2_ls_psm_kernel			= .7f;				// r2-only
 float		ps_r2_ls_ssm_kernel			= .7f;				// r2-only
@@ -186,21 +186,21 @@ float		ps_r2_GI_refl				= .9f;				// .9f
 float		ps_r2_ls_depth_scale		= 1.00001f;			// 1.00001f
 float		ps_r2_ls_depth_bias			= -0.0001f;			// -0.0001f
 float		ps_r2_ls_squality			= 1.0f;				// 1.00f
-float		ps_r2_sun_tsm_projection	= 0.18f;			// 0.18f
-float		ps_r2_sun_tsm_bias			= -0.05f;			// 
-float		ps_r2_sun_near				= 12.f;				// 12.0f
+float		ps_r2_sun_tsm_projection	= 0.6f;			// 0.18f
+float		ps_r2_sun_tsm_bias			= -0.1f;			// 
+float		ps_r2_sun_near				= 16.f;				// 12.0f
 
 extern float OLES_SUN_LIMIT_27_01_07;	//	actually sun_far
 
 float		ps_r2_sun_near_border		= 0.75f;			// 1.0f
-float		ps_r2_sun_depth_far_scale	= 1.00000f;			// 1.00001f
-float		ps_r2_sun_depth_far_bias	= 0.00000f;			// -0.0000f
-float		ps_r2_sun_depth_near_scale	= 1.00001f;			// 1.00001f
-float		ps_r2_sun_depth_near_bias	= -0.00004f;		// -0.00005f
+float		ps_r2_sun_depth_far_scale	= 0.9996f;			// 1.00001f
+float		ps_r2_sun_depth_far_bias	= -0.000002F;			// -0.0000f
+float		ps_r2_sun_depth_near_scale	= 0.9999f;			// 1.00001f
+float		ps_r2_sun_depth_near_bias	= 0.00005f;		// -0.00005f
 float		ps_r2_sun_lumscale			= 1.0f;				// 1.0f
-float		ps_r2_sun_lumscale_hemi		= 1.0f;				// 1.0f
-float		ps_r2_sun_lumscale_amb		= 1.0f;
-float		ps_r2_gmaterial				= 0.f;				// 
+float		ps_r2_sun_lumscale_hemi		= 0.6f;				// 1.0f
+float		ps_r2_sun_lumscale_amb		= 0.0f;
+float		ps_r2_gmaterial				= 0.f;				// 0
 float		ps_r2_zfill					= 0.1f;				// .1f
 
 float		ps_r2_dhemi_sky_scale		= 0.08f;				// 1.5f
@@ -215,7 +215,7 @@ float		ps_r2_slight_fade			= 1.f;				// 1.f
 //	x - min (0), y - focus (1.4), z - max (100)
 Fvector3	ps_r2_dof					= Fvector3().set(-1.4f, 0.0f, 250.f);
 float		ps_r2_dof_sky				= 30;				//	distance to sky
-float		ps_r2_dof_kernel_size		= 7.0f;						//	7.0f
+float		ps_r2_dof_kernel_size		= 5.0f;						//	7.0f
 
 float		ps_r3_dyn_wet_surf_near		= 10.f;				// 10.0f
 float		ps_r3_dyn_wet_surf_far		= 30.f;				// 30.0f
