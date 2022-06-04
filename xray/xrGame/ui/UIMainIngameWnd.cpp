@@ -237,6 +237,7 @@ void CUIMainIngameWnd::Draw()
 	CActor* m_pActor		= smart_cast<CActor*>(Level().CurrentViewEntity());
 	if (Core.ParamFlags.test(Core.lr_weapon))
 		test_draw				();
+
 	// show IO icon
 	bool IOActive	= (FS.dwOpenCounter>0);
 	if	(IOActive)	UIStaticDiskIO_start_time = Device.fTimeGlobal;
@@ -446,6 +447,7 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 {
 	if (Core.ParamFlags.test(Core.lr_weapon))
 		test_key(dik);
+
 /*
 	if(Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT))
 	{
@@ -740,11 +742,8 @@ void CUIMainIngameWnd::reset_ui()
 void hud_adjust_mode_keyb(int dik);
 void hud_draw_adjust_mode();
 
-	if (Core.ParamFlags.test(Core.lr_weapon))
-	{
-		void attach_adjust_mode_keyb(int dik);
-		void attach_draw_adjust_mode();
-	}
+void attach_adjust_mode_keyb(int dik);
+void attach_draw_adjust_mode();
 
 struct TS{
 	ref_sound test_sound;
@@ -755,6 +754,7 @@ void test_key(int dik)
 	hud_adjust_mode_keyb	(dik);
 	if (Core.ParamFlags.test(Core.lr_weapon))
 		attach_adjust_mode_keyb	(dik);
+
 /*
 	if(dik==DIK_V)
 	{
@@ -790,6 +790,7 @@ void test_draw()
 	hud_draw_adjust_mode();
 	if (Core.ParamFlags.test(Core.lr_weapon))
 		attach_draw_adjust_mode();
+
 }
 
 CUICustomMap* CUIMainIngameWnd::MiniMap() {

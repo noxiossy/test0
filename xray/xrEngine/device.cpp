@@ -219,41 +219,44 @@ void CRenderDevice::PreCache	(u32 amount, bool b_draw_loadscreen, bool b_wait_us
 ENGINE_API xr_list<LOADING_EVENT>			g_loading_events;
 
 void ImGui_NewFrame()
-{
-	ImGuiIO& io = ImGui::GetIO();
+{	
+	if (Core.ParamFlags.test(Core.lr_weather))
+	{
+		ImGuiIO& io = ImGui::GetIO();
 
-	// Setup display size (every frame to accommodate for window resizing)
-	RECT rect;
-	GetClientRect(Device.m_hWnd, &rect);
-	io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+		// Setup display size (every frame to accommodate for window resizing)
+		RECT rect;
+		GetClientRect(Device.m_hWnd, &rect);
+		io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
 
-	if (g_TicksPerSecond == 0) {
-		QueryPerformanceFrequency((LARGE_INTEGER *)&g_TicksPerSecond);
-		QueryPerformanceCounter((LARGE_INTEGER *)&g_Time);
+		if (g_TicksPerSecond == 0) {
+			QueryPerformanceFrequency((LARGE_INTEGER *)&g_TicksPerSecond);
+			QueryPerformanceCounter((LARGE_INTEGER *)&g_Time);
+		}
+		// Setup time step
+		INT64 current_time;
+		QueryPerformanceCounter((LARGE_INTEGER *)&current_time);
+		io.DeltaTime = (float)(current_time - g_Time) / g_TicksPerSecond;
+		g_Time = current_time;
+
+		// Read keyboard modifiers inputs
+		//io.KeyCtrl = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+		//io.KeyShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+		//io.KeyAlt =  (GetKeyState(VK_MENU) & 0x8000) != 0;
+		//io.KeySuper = false;
+		// io.KeysDown : filled by WM_KEYDOWN/WM_KEYUP events
+		// io.MousePos : filled by WM_MOUSEMOVE events
+		// io.MouseDown : filled by WM_*BUTTON* events
+		// io.MouseWheel : filled by WM_MOUSEWHEEL events
+
+		// Hide OS mouse cursor if ImGui is drawing it
+		//if (io.MouseDrawCursor)
+		//	SetCursor(NULL);
+
+		// Start the frame
+		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
-	// Setup time step
-	INT64 current_time;
-	QueryPerformanceCounter((LARGE_INTEGER *)&current_time);
-	io.DeltaTime = (float)(current_time - g_Time) / g_TicksPerSecond;
-	g_Time = current_time;
-
-	// Read keyboard modifiers inputs
-	//io.KeyCtrl = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-	//io.KeyShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-	//io.KeyAlt =  (GetKeyState(VK_MENU) & 0x8000) != 0;
-	//io.KeySuper = false;
-	// io.KeysDown : filled by WM_KEYDOWN/WM_KEYUP events
-	// io.MousePos : filled by WM_MOUSEMOVE events
-	// io.MouseDown : filled by WM_*BUTTON* events
-	// io.MouseWheel : filled by WM_MOUSEWHEEL events
-
-	// Hide OS mouse cursor if ImGui is drawing it
-	//if (io.MouseDrawCursor)
-	//	SetCursor(NULL);
-
-	// Start the frame
-	ImGui::NewFrame();
-	ImGuizmo::BeginFrame();
 }
 
 void CRenderDevice::on_idle		()
@@ -276,12 +279,16 @@ void CRenderDevice::on_idle		()
 		pApp->LoadDraw				();
 		return;
 	}else 
-	{
-		FrameMove						( );
+	{	
+		if !(Core.ParamFlags.test(Core.lr_weather))
+			FrameMove						( );
 	}
 
 	if (Core.ParamFlags.test(Core.lr_weather))
+	{
 		ImGui_NewFrame();
+		FrameMove						( );
+	}
 	
 	// Precache
 	if (dwPrecacheFrame)
