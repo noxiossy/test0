@@ -56,6 +56,12 @@ void xrCore::_initialize	(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
 
 		if (strstr(GetCommandLine(), "-lr_dev"))
 			ParamFlags.set(ParamFlag::lr_dev, TRUE);
+			
+		if (strstr(GetCommandLine(), "-lr_weather"))
+			ParamFlags.set(ParamFlag::lr_weather, TRUE);
+			
+		if (strstr(GetCommandLine(), "-lr_weapon"))
+			ParamFlags.set(ParamFlag::lr_weapon, TRUE);
 									
 		string_path		fn,dr,di;
 

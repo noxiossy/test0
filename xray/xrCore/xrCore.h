@@ -287,6 +287,8 @@ public:
 		lr_fulllog		= (1 << 0),
 		lr_thmlog		= (1 << 1),
 		lr_dev			= (1 << 2),
+		lr_weather		= (1 << 3),
+		lr_weapon		= (1 << 4),
 	};
 	
 public:

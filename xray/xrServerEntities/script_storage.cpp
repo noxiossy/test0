@@ -64,35 +64,6 @@ LPCSTR	file_header = 0;
 #	endif // USE_MEMORY_MONITOR
 #endif // PURE_ALLOC
 
-#ifndef USE_DL_ALLOCATOR
-static void *lua_alloc_xr	(void *ud, void *ptr, size_t osize, size_t nsize) {
-  (void)ud;
-  (void)osize;
-  if (nsize == 0) {
-    xr_free	(ptr);
-    return	NULL;
-  }
-  else
-#ifdef DEBUG_MEMORY_NAME
-    return Memory.mem_realloc		(ptr, nsize, "LUA");
-#else // DEBUG_MEMORY_MANAGER
-    return Memory.mem_realloc		(ptr, nsize);
-#endif // DEBUG_MEMORY_MANAGER
-}
-#else // USE_DL_ALLOCATOR
-static void *lua_alloc_dl	(void *ud, void *ptr, size_t osize, size_t nsize) {
-  (void)ud;
-  (void)osize;
-  if (nsize == 0)	{	dlfree			(ptr);	 return	NULL;  }
-  else				return dlrealloc	(ptr, nsize);
-}
-
-u32 game_lua_memory_usage	()
-{
-	return					((u32)dlmallinfo().uordblks);
-}
-#endif // USE_DL_ALLOCATOR
-
 static LPVOID __cdecl luabind_allocator	(
 		luabind::memory_allocation_function_parameter const,
 		void const * const pointer,
@@ -240,15 +211,7 @@ void CScriptStorage::reinit	()
 	if (m_virtual_machine)
 		lua_close			(m_virtual_machine);
 
-#ifdef _WIN64
 	m_virtual_machine		= luaL_newstate();
-#else 
-#ifndef USE_DL_ALLOCATOR
-	m_virtual_machine		= lua_newstate(lua_alloc_xr, NULL);
-#else // USE_DL_ALLOCATOR
-	m_virtual_machine		= lua_newstate(lua_alloc_dl, NULL);
-#endif // USE_DL_ALLOCATOR
-#endif
 
 	if (!m_virtual_machine) {
 		Msg					("! ERROR : Cannot initialize script virtual machine!");
@@ -295,18 +258,18 @@ void CScriptStorage::reinit	()
 int CScriptStorage::vscript_log		(ScriptStorage::ELuaMessageType tLuaMessageType, LPCSTR caFormat, va_list marker)
 {
 #ifndef NO_XRGAME_SCRIPT_ENGINE
-#	ifdef DEBUG
-	if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
-		return(0);
-#	endif
+//#	ifdef DEBUG
+//	if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
+//		return(0);
+//#	endif
 #endif
 
 #ifndef PRINT_CALL_STACK
 	return		(0);
 #else // #ifdef PRINT_CALL_STACK
 #	ifndef NO_XRGAME_SCRIPT_ENGINE
-		if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
-			return(0);
+		//if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
+		//	return(0);
 #	endif // #ifndef NO_XRGAME_SCRIPT_ENGINE
 
 	LPCSTR		S = "", SS = "";
@@ -493,10 +456,8 @@ bool CScriptStorage::load_buffer	(lua_State *L, LPCSTR caBuffer, size_t tSize, L
 //		}
 	}
 
-	if (l_iErrorCode) {
-#ifdef DEBUG
+	if (l_iErrorCode) && (Core.ParamFlags.test(Core.lr_fulllog)){
 		print_output	(L,caScriptName,l_iErrorCode);
-#endif
 		on_error		(L);
 		return			(false);
 	}
@@ -548,10 +509,8 @@ bool CScriptStorage::do_file	(LPCSTR caScriptName, LPCSTR caNameSpaceName)
 			ai().script_engine().debugger()->UnPrepareLua(lua(),errFuncId);
 #	endif // #ifndef USE_LUA_STUDIO
 #endif // #ifdef USE_DEBUGGER
-	if (l_iErrorCode) {
-#ifdef DEBUG
+	if (l_iErrorCode) && (Core.ParamFlags.test(Core.lr_fulllog)){
 		print_output(lua(),caScriptName,l_iErrorCode);
-#endif
 		on_error	(lua());
 		lua_settop	(lua(),start);
 		return		(false);
