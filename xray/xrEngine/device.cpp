@@ -280,7 +280,7 @@ void CRenderDevice::on_idle		()
 		return;
 	}else 
 	{	
-		if !(Core.ParamFlags.test(Core.lr_weather))
+		if (!Core.ParamFlags.test(Core.lr_weather))
 			FrameMove						( );
 	}
 
