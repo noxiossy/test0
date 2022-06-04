@@ -46,7 +46,8 @@
 #include "UI/UIGameTutorial.h"
 #include "file_transfer.h"
 #include "message_filter.h"
-
+#include "CustomZone.h"
+#include "ZoneList.h"
 #ifdef DEBUG
 #	include "level_debug.h"
 #	include "ai/stalker/ai_stalker.h"
@@ -57,6 +58,9 @@
 // Lain:added
 #	include "debug_text_tree.h"
 #endif
+#include "embedded_editor/embedded_editor_main.h"
+#include "embedded_editor/render/editor_render.h"
+
 
 extern BOOL	g_bDebugDumpPhysicsStep;
 extern CUISequencer * g_tutorial;
@@ -653,6 +657,8 @@ void CLevel::OnFrame	()
 		pStatGraphR->AppendItem(float(m_dwRPC)*fRPC_Mult, 0xffff0000, 1);
 		pStatGraphR->AppendItem(float(m_dwRPS)*fRPS_Mult, 0xff00ff00, 0);
 	};
+	if (Core.ParamFlags.test(Core.lr_weather))
+		ShowEditor();
 }
 
 int		psLUA_GCSTEP					= 100			;
@@ -690,6 +696,9 @@ void CLevel::OnRender()
 	draw_wnds_rects();
 	ph_world->OnRender	();
 #endif // DEBUG
+
+	if (Core.ParamFlags.test(Core.lr_weather))
+		embedded_editor_render();
 
 #ifdef DEBUG
 	if (ai().get_level_graph())
@@ -1042,6 +1051,26 @@ void CLevel::SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTim
 //	Server->game->SetGameTimeFactor(fTimeFactor);
 }
 
+float CLevel::GetEnvironmentTimeFactor() const
+{
+	if (!game)
+		return 0.0f;
+	return game->GetEnvironmentGameTimeFactor(); 
+}
+
+void CLevel::SetEnvironmentTimeFactor(const float fTimeFactor)
+{
+	if (!game)
+		return;
+	game->SetEnvironmentGameTimeFactor(fTimeFactor);
+}
+
+u64 CLevel::GetEnvironmentGameTime() const
+{
+	if (!game)
+		return 0 ;
+	return game->GetEnvironmentGameTime();
+}
 bool CLevel::IsServer ()
 {
 //	return (!!Server);

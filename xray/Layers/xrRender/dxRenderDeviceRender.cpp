@@ -391,3 +391,8 @@ void  dxRenderDeviceRender::OnAssetsChanged()
 	Resources->m_textures_description.UnLoad();
 	Resources->m_textures_description.Load();
 }
+
+const xr_vector<Shader*>& dxRenderDeviceRender::GetShaders()
+{
+	return Resources->_GetShaders();
+}

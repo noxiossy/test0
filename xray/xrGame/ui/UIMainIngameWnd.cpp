@@ -795,3 +795,6 @@ void test_draw()
 #endif
 }
 
+CUICustomMap* CUIMainIngameWnd::MiniMap() {
+	return UIZoneMap->MiniMap();
+}

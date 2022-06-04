@@ -9,6 +9,8 @@
 #include "gamepersistent.h"
 #include "xrServer.h"
 #include "../xrEngine/x_ray.h"
+#include "../xrEngine/dedicated_server_only.h"
+#include "../xrEngine/no_single.h"
 
 game_sv_Single::game_sv_Single			()
 {
@@ -181,6 +183,14 @@ void game_sv_Single::SetGameTimeFactor		(const float fTimeFactor)
 {
 	if (ai().get_alife() && ai().alife().initialized())
 		return(alife().time_manager().set_time_factor(fTimeFactor));
+	else
+		return(inherited::SetGameTimeFactor(fTimeFactor));
+}
+
+void game_sv_Single::SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor)
+{
+	if (ai().get_alife() && ai().alife().initialized())
+		return(alife().time_manager().set_game_time_factor(GameTime, fTimeFactor));
 	else
 		return(inherited::SetGameTimeFactor(fTimeFactor));
 }

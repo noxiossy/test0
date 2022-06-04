@@ -144,7 +144,7 @@ void CRenderDevice::End		(void)
 	//	g_SASH.DisplayFrame(Device.fTimeGlobal);
 
 	extern BOOL g_appLoaded;
-	if (g_appLoaded) && (Core.ParamFlags.test(Core.lr_weather))
+	if ((g_appLoaded) && (Core.ParamFlags.test(Core.lr_weather)))
 		ImGui::Render();
 
 	m_pRender->End();

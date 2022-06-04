@@ -97,6 +97,9 @@ public:
 			void				feedback					(u16 s1, u16 s2, float time);
 
 			char				DikToChar					(int dik);
+
+			//!< @brief Преобразует сканкод в ascii-символы
+			int					scancodeToChar				(int scanCode, uint16_t ch[2]);
 };
 
 extern ENGINE_API CInput *		pInput;
