@@ -1285,6 +1285,7 @@ struct CCC_DbgBullets : public CCC_Integer {
 		CCC_Integer::Execute	(args);
 	}
 };
+#endif
 
 #include "attachable_item.h"
 #include "attachment_owner.h"
@@ -1317,6 +1318,7 @@ public		:
 	}
 };
 
+#ifdef DEBUG
 class CCC_Crash : public IConsole_Command {
 public:
 	CCC_Crash(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
