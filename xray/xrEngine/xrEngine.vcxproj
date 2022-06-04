@@ -147,7 +147,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>../../sdk/include/stlport;../../sdk/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>INGAME_EDITOR;DEBUG;MIXED;WIN32;_WINDOWS;ENGINE_BUILD;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;MIXED;WIN32;_WINDOWS;ENGINE_BUILD;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -405,7 +405,6 @@
     <ClCompile Include="ai_script_lua_debug.cpp" />
     <ClCompile Include="ai_script_lua_extension.cpp" />
     <ClCompile Include="bone.cpp" />
-    <ClCompile Include="BoneEditor.cpp" />
     <ClCompile Include="CameraBase.cpp" />
     <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="cf_dynamic_mesh.cpp" />
