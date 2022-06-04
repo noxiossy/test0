@@ -38,6 +38,10 @@ u32 g_dwFPSlimit = 60;
 BOOL		g_bLoaded = FALSE;
 //ref_light precache_light = 0;
 
+// need for imgui
+static INT64 g_Time = 0;
+static INT64 g_TicksPerSecond = 0;
+
 BOOL CRenderDevice::Begin	()
 {
 	switch (m_pRender->GetDeviceState())
