@@ -9,6 +9,8 @@
 #pragma warning(default:4995)
 #include "HW.h"
 #include "../../xrEngine/XR_IOConsole.h"
+#include <imgui.h>
+#include "../xrRenderDX9/imgui_impl_dx9.h"
 
 #ifndef _EDITOR
 	void	fill_vid_mode_list			(CHW* _hw);
@@ -47,6 +49,9 @@ CHW::~CHW()
 
 void CHW::Reset		(HWND hwnd)
 {
+	if (Core.ParamFlags.test(Core.lr_weather))
+		ImGui_ImplDX9_InvalidateDeviceObjects();
+
 #ifdef DEBUG
 	_RELEASE			(dwDebugSB);
 #endif
@@ -69,7 +74,7 @@ void CHW::Reset		(HWND hwnd)
 	}
 	else
 	{
-	DevPP.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
+		DevPP.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
 		DevPP.FullScreen_RefreshRateInHz	= D3DPRESENT_RATE_DEFAULT;
 	}
 #endif
@@ -88,6 +93,9 @@ void CHW::Reset		(HWND hwnd)
 #ifndef _EDITOR
 	updateWindowProps	(hwnd);
 #endif
+
+	if (Core.ParamFlags.test(Core.lr_weather))
+		ImGui_ImplDX9_CreateDeviceObjects();
 }
 
 //xr_token*				vid_mode_token = NULL;
@@ -147,6 +155,9 @@ D3DFORMAT CHW::selectDepthStencil	(D3DFORMAT fTarget)
 
 void	CHW::DestroyDevice	()
 {
+	if (Core.ParamFlags.test(Core.lr_weather))
+		ImGui_ImplDX9_Shutdown();
+
 	_SHOW_REF				("refCount:pBaseZB",pBaseZB);
 	_RELEASE				(pBaseZB);
 
@@ -334,7 +345,7 @@ void		CHW::CreateDevice		(HWND m_hWnd, bool move_window)
 	}
     else
 	{
-	P.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
+		P.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
 		P.FullScreen_RefreshRateInHz	= D3DPRESENT_RATE_DEFAULT;
 	}
 	
@@ -396,6 +407,9 @@ void		CHW::CreateDevice		(HWND m_hWnd, bool move_window)
 	updateWindowProps							(m_hWnd);
 	fill_vid_mode_list							(this);
 #endif
+
+	if (Core.ParamFlags.test(Core.lr_weather))
+		ImGui_ImplDX9_Init(m_hWnd, pDevice);
 }
 
 u32	CHW::selectPresentInterval	()
@@ -470,7 +484,14 @@ void	CHW::updateWindowProps	(HWND m_hWnd)
 	// Set window properties depending on what mode were in.
 	if (bWindowed)		{
 		if (m_move_window) {
-			if (strstr(Core.Params,"-no_dialog_header"))
+			RECT DesktopRect;
+			GetClientRect(GetDesktopWindow(), &DesktopRect);
+			bool fillDesktop = (DevPP.BackBufferWidth == DesktopRect.right - DesktopRect.left) &&
+				(DevPP.BackBufferHeight == DesktopRect.bottom - DesktopRect.top);
+
+			if (fillDesktop)
+				SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = (WS_POPUP | WS_VISIBLE));
+			else if (strstr(Core.Params,"-no_dialog_header"))
 				SetWindowLong	( m_hWnd, GWL_STYLE, dwWindowStyle=(WS_BORDER|WS_VISIBLE) );
 			else
 				SetWindowLong	( m_hWnd, GWL_STYLE, dwWindowStyle=(WS_BORDER|WS_DLGFRAME|WS_VISIBLE|WS_SYSMENU|WS_MINIMIZEBOX ) );
@@ -492,10 +513,6 @@ void	CHW::updateWindowProps	(HWND m_hWnd)
 #endif
 
 			if(bCenter){
-				RECT				DesktopRect;
-				
-				GetClientRect		(GetDesktopWindow(), &DesktopRect);
-
 				SetRect(			&m_rcWindowBounds, 
 									(DesktopRect.right-DevPP.BackBufferWidth)/2, 
 									(DesktopRect.bottom-DevPP.BackBufferHeight)/2, 

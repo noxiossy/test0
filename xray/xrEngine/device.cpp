@@ -27,6 +27,8 @@
 
 #include "xrSash.h"
 #include "igame_persistent.h"
+#include <imgui.h>
+#include <addons/ImGuizmo/ImGuizmo.h>
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -140,6 +142,11 @@ void CRenderDevice::End		(void)
 	//	Present goes here, so call OA Frame end.
 	//if (g_SASH.IsBenchmarkRunning())
 	//	g_SASH.DisplayFrame(Device.fTimeGlobal);
+
+	extern BOOL g_appLoaded;
+	if (g_appLoaded) && (Core.ParamFlags.test(Core.lr_weather))
+		ImGui::Render();
+
 	m_pRender->End();
 	//RCache.OnFrameEnd	();
 	//Memory.dbg_check		();
@@ -207,6 +214,44 @@ void CRenderDevice::PreCache	(u32 amount, bool b_draw_loadscreen, bool b_wait_us
 
 ENGINE_API xr_list<LOADING_EVENT>			g_loading_events;
 
+void ImGui_NewFrame()
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	// Setup display size (every frame to accommodate for window resizing)
+	RECT rect;
+	GetClientRect(Device.m_hWnd, &rect);
+	io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+
+	if (g_TicksPerSecond == 0) {
+		QueryPerformanceFrequency((LARGE_INTEGER *)&g_TicksPerSecond);
+		QueryPerformanceCounter((LARGE_INTEGER *)&g_Time);
+	}
+	// Setup time step
+	INT64 current_time;
+	QueryPerformanceCounter((LARGE_INTEGER *)&current_time);
+	io.DeltaTime = (float)(current_time - g_Time) / g_TicksPerSecond;
+	g_Time = current_time;
+
+	// Read keyboard modifiers inputs
+	//io.KeyCtrl = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+	//io.KeyShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+	//io.KeyAlt =  (GetKeyState(VK_MENU) & 0x8000) != 0;
+	//io.KeySuper = false;
+	// io.KeysDown : filled by WM_KEYDOWN/WM_KEYUP events
+	// io.MousePos : filled by WM_MOUSEMOVE events
+	// io.MouseDown : filled by WM_*BUTTON* events
+	// io.MouseWheel : filled by WM_MOUSEWHEEL events
+
+	// Hide OS mouse cursor if ImGui is drawing it
+	//if (io.MouseDrawCursor)
+	//	SetCursor(NULL);
+
+	// Start the frame
+	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
+}
+
 void CRenderDevice::on_idle		()
 {
 	if (!b_is_Ready) {
@@ -231,6 +276,9 @@ void CRenderDevice::on_idle		()
 		FrameMove						( );
 	}
 
+	if (Core.ParamFlags.test(Core.lr_weather))
+		ImGui_NewFrame();
+	
 	// Precache
 	if (dwPrecacheFrame)
 	{
@@ -297,6 +345,9 @@ void CRenderDevice::on_idle		()
 	// Release end point - allow thread to wait for startup point
 	mt_csEnter.Enter						();
 	mt_csLeave.Leave						();
+	
+	if (Core.ParamFlags.test(Core.lr_weather))
+		ImGui::EndFrame();
 
 	// Ensure, that second thread gets chance to execute anyway
 	if (dwFrame!=mt_Thread_marker)			{

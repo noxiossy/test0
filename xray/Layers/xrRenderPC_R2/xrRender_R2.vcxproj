@@ -103,7 +103,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rd party/luajit/src;$(SolutionDir)3rd party/luabind/include;$(SolutionDir)3rd party/imdexlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rd party\WildMagic;pch;$(SolutionDir)3rd party\imgui;$(SolutionDir)3rd party/luajit/src;$(SolutionDir)3rd party/luabind/include;$(SolutionDir)3rd party/imdexlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi.lib;$(TargetDir)xrEngine.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -139,7 +139,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rd party/luajit/src;$(SolutionDir)3rd party/luabind/include;$(SolutionDir)3rd party/imdexlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rd party\WildMagic;pch;$(SolutionDir)3rd party\imgui;$(SolutionDir)3rd party/luabind/include;$(SolutionDir)3rd party/imdexlib;$(SolutionDir)3rd party/luajit/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi.lib;$(TargetDir)xrEngine.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -178,7 +178,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rd party/luajit/src;$(SolutionDir)3rd party/luabind/include;$(SolutionDir)3rd party/imdexlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rd party\WildMagic;pch;$(SolutionDir)3rd party\imgui;$(SolutionDir)3rd party/luabind/include;$(SolutionDir)3rd party/imdexlib;$(SolutionDir)3rd party/luajit/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi64.lib;$(TargetDir)xrEngine.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -200,7 +200,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>../../../sdk/include/stlport;../../../sdk/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../sdk/include/stlport;../../../sdk/include/;$(SolutionDir)3rd party\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MIXED;WIN32;DEBUG;_WINDOWS;_USRDLL;XRRENDER_R2_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -258,8 +258,14 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
+    <ClInclude Include="..\Editor\EditMesh.h" />
+    <ClInclude Include="..\Editor\EditObject.h" />
+    <ClInclude Include="..\Editor\ExportObjectOGF.h" />
+    <ClInclude Include="..\Editor\ExportSkeleton.h" />
+    <ClInclude Include="..\Editor\itterate_adjacents_dynamic.h" />
     <ClInclude Include="..\xrRenderDX9\dx9R_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderDX9\dx9r_constants_cache.h" />
+    <ClInclude Include="..\xrRenderDX9\imgui_impl_dx9.h" />
     <ClInclude Include="..\xrRender\Animation.h" />
     <ClInclude Include="..\xrRender\AnimationKeyCalculate.h" />
     <ClInclude Include="..\xrRender\blenders\Blender.h" />
@@ -391,7 +397,25 @@
   <ItemGroup>
     <ClCompile Include="..\..\xrEngine\ai_script_lua_debug.cpp" />
     <ClCompile Include="..\..\xrEngine\ai_script_lua_extension.cpp" />
+    <ClCompile Include="..\Editor\EditMesh.cpp" />
+    <ClCompile Include="..\Editor\EditMeshIO.cpp" />
+    <ClCompile Include="..\Editor\EditMeshModify.cpp" />
+    <ClCompile Include="..\Editor\EditObject.cpp" />
+    <ClCompile Include="..\Editor\EditObjectEditor.cpp" />
+    <ClCompile Include="..\Editor\EditObjectIO.cpp" />
+    <ClCompile Include="..\Editor\EditObjectMotions.cpp" />
+    <ClCompile Include="..\Editor\ExportObjectOGF.cpp" />
+    <ClCompile Include="..\Editor\ExportObjectOGFCalculateTB.cpp" />
+    <ClCompile Include="..\Editor\ExportSkeleton.cpp" />
+    <ClCompile Include="..\Editor\ExportSkeletonCalculateTB.cpp" />
+    <ClCompile Include="..\Editor\RAPIDMinBox.cpp" />
     <ClCompile Include="..\xrRenderDX9\dx9r_constants_cache.cpp" />
+    <ClCompile Include="..\xrRenderDX9\imgui_impl_dx9.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Palette.cpp" />
@@ -417,10 +441,16 @@
     <ClCompile Include="..\xrRender\doug_lea_memory_allocator.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level2</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Level2</WarningLevel>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+      </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Level2</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">Level2</WarningLevel>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -434,9 +464,13 @@
     <ClCompile Include="..\xrRender\du_sphere.cpp" />
     <ClCompile Include="..\xrRender\du_sphere_part.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
@@ -591,8 +625,14 @@
     <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\3rd party\imgui\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\3rd party\luabind\luabind.vcxproj">
       <Project>{cc52e0b3-cc35-4934-9302-035b748f3f2c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\3rd party\WildMagic\WildMagic.vcxproj">
+      <Project>{6c275c8f-0e14-4f64-bb86-55bfc649b900}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\3rd party\luajit\src\luajit.vcxproj">
       <Project>{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}</Project>

@@ -157,6 +157,9 @@
     <Filter Include="Interfase implementations\UI\UISequenceVideoItem">
       <UniqueIdentifier>{d0d4e01d-bcff-41cc-8754-71b4df279b10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imgui_render">
+      <UniqueIdentifier>{088049fb-4e3b-4540-ae7f-0473e8063084}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cl_intersect.h">
@@ -629,6 +632,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h">
       <Filter>Interfase implementations\UI\UISequenceVideoItem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX9\imgui_impl_dx9.h">
+      <Filter>imgui_render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1132,6 +1138,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\RenderTargetPhaseAA.cpp">
       <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\imgui_impl_dx9.cpp">
+      <Filter>imgui_render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
