@@ -133,6 +133,9 @@ void ShowEditor()
 bool isRControl = false, isLControl = false, isRShift = false, isLShift = false;
 bool Editor_KeyPress(int key)
 {
+	if (!Core.ParamFlags.test(Core.lr_weather))
+		return false;
+
     if (key == DIK_F10)
         stage = static_cast<EditorStage>((static_cast<int>(stage) + 1) % static_cast<int>(EditorStage::Count));
     else if (key == DIK_RALT || key == DIK_LALT)
@@ -206,9 +209,15 @@ bool Editor_KeyPress(int key)
 
 bool Editor_KeyRelease(int key)
 {
+	if (!Core.ParamFlags.test(Core.lr_weather))
+		return false;
+
     if (key == DIK_RALT || key == DIK_LALT)
         isAlt = false;
     bool active = IsEditorActive();
+
+    if (!IsEditorActive())
+        return false;
 
     ImGuiIO& io = ImGui::GetIO();
     if (!active)
@@ -249,13 +258,19 @@ bool Editor_KeyRelease(int key)
 
 bool Editor_KeyHold(int key)
 {
+	if (!Core.ParamFlags.test(Core.lr_weather))
+		return false;
+
     if (!IsEditorActive())
         return false;
     return true;
 }
 
 bool Editor_MouseMove(int dx, int dy)
-{
+{	
+	if (!Core.ParamFlags.test(Core.lr_weather))
+		return false;
+		
     if (!IsEditorActive())
         return false;
 
@@ -269,6 +284,9 @@ bool Editor_MouseMove(int dx, int dy)
 
 bool Editor_MouseWheel(int direction)
 {
+	if (!Core.ParamFlags.test(Core.lr_weather))
+		return false;
+
     if (!IsEditorActive())
         return false;
 
