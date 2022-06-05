@@ -116,6 +116,7 @@ void CUIActorMenu::Construct()
 	m_pTradePartnerBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_bag", this);
 	m_pTradePartnerList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_trade", this);
 	m_pDeadBodyActorBagList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_actor_bag", this);
+	m_pDeadBodyActorBagListUpd	= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_actor_bag_upd", this);
 	m_pDeadBodyBagList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_bag", this);	
 	m_pQuickSlot				= UIHelper::CreateDragDropReferenceList(uiXml, "dragdrop_quick_slots", this);
 	m_pQuickSlot->Initialize	();
@@ -221,6 +222,7 @@ void CUIActorMenu::Construct()
 	BindDragDropListEvents				(m_pTradePartnerBagList);
 	BindDragDropListEvents				(m_pTradePartnerList);
 	BindDragDropListEvents				(m_pDeadBodyActorBagList);
+	BindDragDropListEvents				(m_pDeadBodyActorBagListUpd);
 	BindDragDropListEvents				(m_pDeadBodyBagList);
 	BindDragDropListEvents				(m_pQuickSlot);
 

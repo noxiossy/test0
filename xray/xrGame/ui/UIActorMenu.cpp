@@ -304,6 +304,7 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pTradePartnerList)			return iPartnerTrade;
 	if(l==m_pDeadBodyBagList)			return iDeadBodyBag;
 	if(l==m_pDeadBodyActorBagList)		return iActorBag;
+	if(l==m_pDeadBodyActorBagListUpd)	return iActorBag;
 
 	if(l==m_pQuickSlot)					return iQuickSlot;
 	if(l==m_pTrashList)					return iTrashSlot;
@@ -323,6 +324,8 @@ CUIDragDropListEx* CUIActorMenu::GetListByType(EDDListType t)
 					return m_pTradeActorBagList;
 				else if(m_currMenuMode==mmDeadBodySearch)
 					return m_pDeadBodyActorBagList;
+				else if(m_currMenuMode==mmUpgrade)
+					return m_pDeadBodyActorBagListUpd;
 				else
 					return m_pInventoryBagList;
 			}break;
@@ -554,7 +557,7 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 			ToBag( itm, false );
 			break;
 		}
-	case iQuickSlot:
+		case iQuickSlot:
 		{
 			ToQuickSlot(itm);
 		}break;
@@ -658,6 +661,7 @@ void CUIActorMenu::ClearAllLists()
 	m_pTradePartnerBagList->ClearAll			(true);
 	m_pTradePartnerList->ClearAll				(true);
 	m_pDeadBodyActorBagList->ClearAll			(true);
+	m_pDeadBodyActorBagListUpd->ClearAll		(true);
 	m_pDeadBodyBagList->ClearAll				(true);
 }
 

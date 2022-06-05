@@ -21,19 +21,16 @@
 
 void CUIActorMenu::InitUpgradeMode()
 {
-	m_pDeadBodyActorBagList->Show	(true);
+	m_pDeadBodyActorBagListUpd->Show(true);
 	m_PartnerCharacterInfo->Show	(true);
 	m_PartnerMoney->Show			(false);
 	m_pUpgradeWnd->Show				(true);
 	m_pQuickSlot->Show				(true);
-	m_ActorBottomInfo->Show			(false);
-	m_ActorWeight->Show				(false);
-	m_ActorWeightMax->Show			(false);
 	m_ActorBottomInfoT->Show		(true);
 	m_ActorWeightT->Show			(true);
 	m_ActorWeightMaxT->Show			(true);
 	
-	InitInventoryContents( m_pDeadBodyActorBagList );
+	InitInventoryContents( m_pDeadBodyActorBagListUpd );
 	VERIFY( m_pPartnerInvOwner );
 	m_pPartnerInvOwner->StartTrading();
 //-	UpdateUpgradeItem();
@@ -41,18 +38,15 @@ void CUIActorMenu::InitUpgradeMode()
 
 void CUIActorMenu::DeInitUpgradeMode()
 {
-	m_pDeadBodyActorBagList->Show	(false);
-	m_PartnerCharacterInfo->Show( false );
-	m_pUpgradeWnd->Show( false );
-	m_pUpgradeWnd->set_info_cur_upgrade( NULL );
-	m_pUpgradeWnd->m_btn_repair->Enable( false );
+	m_pDeadBodyActorBagListUpd->Show	(false);
+	m_PartnerCharacterInfo->Show		(false);
+	m_pUpgradeWnd->Show					(false);
+	m_pUpgradeWnd->set_info_cur_upgrade	(NULL);
+	m_pUpgradeWnd->m_btn_repair->Enable	(false);
 
-	m_ActorBottomInfo->Show			(true);
-	m_ActorWeight->Show				(true);
-	m_ActorWeightMax->Show			(true);
-	m_ActorBottomInfoT->Show		(false);
-	m_ActorWeightT->Show			(false);
-	m_ActorWeightMaxT->Show			(false);
+	m_ActorBottomInfoT->Show			(false);
+	m_ActorWeightT->Show				(false);
+	m_ActorWeightMaxT->Show				(false);
 	
 	if ( m_upgrade_selected )
 	{

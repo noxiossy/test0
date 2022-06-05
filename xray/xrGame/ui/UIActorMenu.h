@@ -98,6 +98,7 @@ protected:
 	CUIDragDropListEx*			m_pTradePartnerBagList;
 	CUIDragDropListEx*			m_pTradePartnerList;
 	CUIDragDropListEx*			m_pDeadBodyActorBagList;
+	CUIDragDropListEx*			m_pDeadBodyActorBagListUpd;
 	CUIDragDropListEx*			m_pDeadBodyBagList;
 	CUIDragDropListEx*			m_pTrashList;
 	enum						{e_af_count = 5};

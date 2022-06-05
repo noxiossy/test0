@@ -246,6 +246,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 		m_pInventoryBagList,
 		m_pTradeActorBagList,
 		m_pDeadBodyActorBagList,
+		m_pDeadBodyActorBagListUpd,
 		m_pTradeActorList,
 		NULL
 	};
