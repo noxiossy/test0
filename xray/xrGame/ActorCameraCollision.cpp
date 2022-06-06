@@ -21,8 +21,8 @@ static bool cam_collided = false;
 static bool cam_step	= false;
 extern dJointGroupID ContactGroup;
 static const float	camera_collision_sckin_depth = 0.04f;
-float	camera_collision_character_skin_depth = 0.4f;
-float	camera_collision_character_shift_z = 0.3f;
+float	camera_collision_character_skin_depth = 0.3f;
+float	camera_collision_character_shift_z = 0.2f;
 static const float	camera_collision_character_gl_shift_y = 0.4f;
 static void	cammera_shell_collide_callback_common( bool& do_collide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2 )
 {

@@ -213,6 +213,8 @@ bool CWeapon::install_upgrade_addon( LPCSTR section, bool test )
 		}
 
 	}
+	result |= process_if_exists_set( section, "scope_dynamic_zoom", &CInifile::r_bool, m_zoom_params.m_bUseDynamicZoom, test );
+
 	result |= result2;
 
 	temp_int = (int)m_eSilencerStatus;

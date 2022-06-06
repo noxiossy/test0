@@ -162,6 +162,8 @@ bool CWeaponMagazinedWGrenade::SwitchMode()
 	if(!IsGrenadeLauncherAttached()) 
 		return false;
 
+    OnZoomOut();
+
 	SetPending				(TRUE);
 
 	PerformSwitchGL			();

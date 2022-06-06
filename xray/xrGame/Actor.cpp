@@ -104,15 +104,15 @@ CActor::CActor() : CEntityAlive()
 	else
 		psActorFlags.set(AF_PSP, FALSE);
 
-	if( psActorFlags.test(AF_PSP) )
-	{
+	//if( psActorFlags.test(AF_PSP) )
+	//{
 		cameras[eacLookAt]		= xr_new<CCameraLook2>				(this);
 		cameras[eacLookAt]->Load("actor_look_cam_psp");
-	}else
+	/*}else
 	{
 		cameras[eacLookAt]		= xr_new<CCameraLook>				(this);
 		cameras[eacLookAt]->Load("actor_look_cam");
-	}
+	}*/
 	cameras[eacFreeLook]	= xr_new<CCameraLook>					(this);
 	cameras[eacFreeLook]->Load("actor_free_cam");
 
@@ -368,9 +368,9 @@ void CActor::Load	(LPCSTR section )
 		m_DangerSnd.create		(pSettings->r_string(section,"heavy_danger_snd"), st_Effect,SOUND_TYPE_MONSTER_INJURING);
 	}
 }
-	if( psActorFlags.test(AF_PSP) )
-		cam_Set					(eacLookAt);
-	else
+	//if( psActorFlags.test(AF_PSP) )
+	//	cam_Set					(eacLookAt);
+	//else
 		cam_Set					(eacFirstEye);
 
 	// sheduler
@@ -1949,74 +1949,74 @@ void CActor::On_LostEntity()
 	psCamInert = prev_cam_inert_value;
 }
 
-class remove_predikat
+bool CActor::unlimited_ammo()
 {
-	shared_str sect;
-public:
-	remove_predikat(shared_str _s) :sect(_s){};
-	IC bool operator() (CWeaponAmmo* a)
-	{
-		return a->cNameSect() == sect;
-	}
-};
+    return !!psActorFlags.test(AF_UNLIMITEDAMMO);
+}
 
-void CActor::RepackAmmo()
+
+// mmccxvii: FWR code
+//*
+void CActor::PlayAnm(LPCSTR Section)
 {
-	xr_vector<CWeaponAmmo*>  _ammo;
-	TIItemContainer ruck = inventory().m_ruck;
-	TIItemContainer::iterator it = ruck.begin();
+	if (!is_alive())
+		return;
 
-	for (; it != ruck.end(); ++it)
+	string_path StringPath, AnmName;
+
+	strconcat(sizeof(AnmName), AnmName, "camera_effects\\", Section, ".anm");
+
+	if (FS.exist(StringPath, "$game_anims$", AnmName))
 	{
-		PIItem _pIItem = *it;
-		CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(_pIItem);
-		if (pAmmo && pAmmo->m_boxCurr < pAmmo->m_boxSize) _ammo.push_back(pAmmo);
+		CAnimatorCamEffector* Effector = xr_new<CAnimatorCamEffector>();
+		Effector->SetType(eCEWeaponAction);
+		Effector->SetHudAffect(false);
+		Effector->SetCyclic(false);
+		Effector->Start(AnmName);
+		Cameras().AddCamEffector(Effector);
 	}
+}
+//* 
 
-	while (!_ammo.empty())
-	{
-
-		shared_str asect = _ammo[0]->cNameSect();
-		u16 box_size = _ammo[0]->m_boxSize;
-
-		u32 cnt = 0;
-		u16 cart_cnt = 0;
-		xr_vector<CWeaponAmmo*>::iterator  it_ammo = _ammo.begin();
-
-		for (; it_ammo != _ammo.end(); ++it_ammo)
-		{
-			if (asect == (*it_ammo)->cNameSect())
-			{
-				cnt = cnt + (*it_ammo)->m_boxCurr;
+void CActor::RepackAmmo() {
+	xr_vector<CWeaponAmmo*> _ammo;
+	// заполняем массив неполными пачками
+	for ( PIItem& _pIItem : inventory().m_ruck ) {
+		CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>( _pIItem );
+		if ( pAmmo && pAmmo->m_boxCurr < pAmmo->m_boxSize )
+			_ammo.push_back( pAmmo );
+  	}
+	while ( !_ammo.empty() ) {
+		shared_str asect = _ammo[ 0 ]->cNameSect(); // текущая секция
+		u16 box_size     = _ammo[ 0 ]->m_boxSize; // размер пачки
+		u32 cnt          = 0;
+		u16 cart_cnt     = 0;
+		// считаем кол=во патронов текущей секции
+		for ( CWeaponAmmo* ammo : _ammo ) {
+			if ( asect == ammo->cNameSect() ) {
+				cnt = cnt + ammo->m_boxCurr;
 				cart_cnt++;
 			}
-		}//for	
-
-		if (cart_cnt > 1)
-			for (it_ammo = _ammo.begin(); it_ammo != _ammo.end(); ++it_ammo)
-			{
-				if (asect == (*it_ammo)->cNameSect())
-				{
-					if (cnt > 0)
-					{
-						if (cnt > box_size)
-						{
-							(*it_ammo)->m_boxCurr = box_size;
-							cnt = cnt - box_size;
+		}
+		// если больше одной неполной пачки, то перепаковываем
+		if ( cart_cnt > 1 ) {
+			for ( CWeaponAmmo* ammo : _ammo ) {
+				if ( asect == ammo->cNameSect() ) {
+					if ( cnt > 0 ) {
+						if ( cnt > box_size ) {
+							ammo->m_boxCurr = box_size;
+							cnt             = cnt - box_size;
+						} else {
+							ammo->m_boxCurr = ( u16 )cnt;
+							cnt             = 0;
 						}
-						else
-						{
-							(*it_ammo)->m_boxCurr = (u16)cnt;
-							cnt = 0;
-						}
-					}
-					else
-					{
-						(*it_ammo)->DestroyObject();
+					} else {
+						ammo->DestroyObject();
 					}
 				}
-			}//for
-
-			_ammo.erase(std::remove_if(_ammo.begin(), _ammo.end(), remove_predikat(asect)), _ammo.end());
-	}// while
-}  
+			}
+		}
+		//чистим массив от обработанных пачек
+		_ammo.erase( std::remove_if( _ammo.begin(), _ammo.end(), [asect]( CWeaponAmmo* a ) { return a->cNameSect() == asect; } ), _ammo.end() );
+	}
+}

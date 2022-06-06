@@ -1519,10 +1519,15 @@ void CWeapon::OnZoomIn()
 void CWeapon::OnZoomOut()
 {
 	m_zoom_params.m_bIsZoomModeNow		= false;
+    m_fRTZoomFactor = GetZoomFactor();//store current
 	m_zoom_params.m_fCurrentZoomFactor	= g_fov;
 	//EnableHudInertion					(TRUE);
 
  	GamePersistent().RestoreEffectorDOF	();
+
+    if (GetHUDmode())
+        GamePersistent().SetPickableEffectorDOF(false);
+
 	ResetSubStateTime					();
 }
 

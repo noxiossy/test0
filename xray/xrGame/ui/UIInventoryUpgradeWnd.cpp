@@ -82,7 +82,7 @@ void CUIInventoryUpgradeWnd::Init()
 	m_item_info = xr_new<CUIItemInfo>();
 	m_item_info->SetAutoDelete( true );
 	AttachChild( m_item_info );
-	m_item_info->InitItemInfo( "inventory_upgrade_info.xml" );
+	m_item_info->InitItemInfo( "a_inventory_upgrade_info.xml" );
 //	m_info_orig_pos.set( m_item_info->GetWndPos() );
 	
 	m_btn_repair = UIHelper::Create3tButtonEx( uiXml, "repair_button", this );

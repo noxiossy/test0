@@ -190,6 +190,7 @@ public:
 	virtual	bool						use_default_throw_force	();
 	virtual	float						missile_throw_force		(); 
 
+    virtual bool						unlimited_ammo			();
 
 	virtual bool						NeedToDestroyObject()  const;
 	virtual ALife::_TIME_ID				TimePassedAfterDeath() const;
@@ -747,6 +748,7 @@ private:
 public:
 	virtual void			On_SetEntity();
 	virtual void			On_LostEntity();
+			void 			PlayAnm(LPCSTR Section);
 
 static CPhysicsShell		*actor_camera_shell;
 

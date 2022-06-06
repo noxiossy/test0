@@ -92,13 +92,14 @@ void CWeaponPistol::PlayAnimAim()
 
 void CWeaponPistol::PlayAnimReload()
 {	
-	VERIFY(GetState()==eReload);
+	/*VERIFY(GetState()==eReload);
 	if(iAmmoElapsed==0)
 	{
 		PlayHUDMotion("anm_reload_empty", TRUE, this, GetState());
 	}else{
 		PlayHUDMotion("anm_reload", TRUE, this, GetState());
-	}
+	}*/
+    inherited::PlayAnimReload(); //AVO: refactored to use grand-parent (CWeaponMagazined) function
 }
 
 
@@ -140,7 +141,7 @@ void CWeaponPistol::OnAnimationEnd(u32 state)
 
 void CWeaponPistol::OnShot		()
 {
-	PlaySound		(m_sSndShotCurrent.c_str(),get_LastFP());
+	/*PlaySound		(m_sSndShotCurrent.c_str(),get_LastFP());
 
 	AddShotEffector	();
 	
@@ -158,7 +159,9 @@ void CWeaponPistol::OnShot		()
 			  "can't set looped particles system for shoting with pistol");
 	
 	//дым из ствола
-	StartSmokeParticles	(get_LastFP(), vel);
+	StartSmokeParticles	(get_LastFP(), vel);*/
+	
+	inherited::OnShot(); //Alundaio: not changed from inherited, so instead of copying changes from weaponmagazined, we just do this
 }
 
 void CWeaponPistol::UpdateSounds()
