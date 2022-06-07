@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FSkinned.h"
-#include "../../xrCPU_Pipe/xrCPU_Pipe.h"
 #include "../../xrEngine/EnnumerateVertices.h"
 #include "../../xrEngine/fmesh.h"
 #include "../xrRenderDX10/dx10BufferUtils.h"

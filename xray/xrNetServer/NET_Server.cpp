@@ -119,16 +119,16 @@ void gen_auth_code()
 //.		test.push_back			(xr_string(FS.update_path(config, "$game_scripts$", "")));
 		test.push_back			(xr_string(FS.update_path(config, "$game_shaders$", "")));
 
-		test.push_back			(xr_string("xrd3d9-null.dll"));
+//		test.push_back			(xr_string("xrd3d9-null.dll"));
 		test.push_back			(xr_string("ode.dll"));
 		test.push_back			(xr_string("xrcdb.dll"));
 		test.push_back			(xr_string("xrcore.dll"));
 //		test.push_back			(xr_string("xrcpu_pipe.dll"));
 //		test.push_back			(xr_string("xrgame.dll"));
-		test.push_back			(xr_string("xrlua.dll"));
+//		test.push_back			(xr_string("xrlua.dll"));
 		test.push_back			(xr_string("xrnetserver.dll"));
 		test.push_back			(xr_string("xrparticles.dll"));
-		test.push_back			(xr_string("xrrender_r1.dll"));
+//		test.push_back			(xr_string("xrrender_r1.dll"));
 		test.push_back			(xr_string("xrrender_r2.dll"));
 		test.push_back			(xr_string("xrsound.dll"));
 		test.push_back			(xr_string("xrxmlparser.dll"));

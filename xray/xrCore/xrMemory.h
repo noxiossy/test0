@@ -1,5 +1,3 @@
-#ifndef xrMemoryH
-#define xrMemoryH
 #pragma once
 
 #include "memory_monitor.h"
@@ -144,4 +142,3 @@ XRCORE_API void vminfo			(size_t *_free, size_t *reserved, size_t *committed);
 XRCORE_API void log_vminfo		();
 XRCORE_API u32	mem_usage_impl	(HANDLE heap_handle, u32* pBlocksUsed, u32* pBlocksFree);
 
-#endif // xrMemoryH

@@ -296,3 +296,5 @@ public:
 	void		_destroy	();
 };
 extern XRCORE_API xrCore Core;
+
+#include "Utils/thread_pool.hpp"
