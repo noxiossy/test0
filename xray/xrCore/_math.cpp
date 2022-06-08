@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-
+#include <VersionHelpers.h>
 #include <process.h>
 
 // mmsystem.h
