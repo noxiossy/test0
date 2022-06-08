@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "cpuid.h"
+#include "../xrCore/cpuid.h"
 #include "Engine.h"
 
 CEngine				Engine;
