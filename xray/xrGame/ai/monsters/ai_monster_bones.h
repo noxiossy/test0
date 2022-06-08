@@ -1,19 +1,19 @@
 
 #pragma once
-
+#include "../../../xrCore/xrSkinXW.hpp"
 #define AXIS_X	(1 << 0)
 #define AXIS_Y	(1 << 1)
 #define AXIS_Z	(1 << 2)
 
-// параметры движения характерные для конкретной оси в боне
+// ГЇГ Г°Г Г¬ГҐГІГ°Г» Г¤ГўГЁГ¦ГҐГ­ГЁГї ГµГ Г°Г ГЄГІГҐГ°Г­Г»ГҐ Г¤Г«Гї ГЄГ®Г­ГЄГ°ГҐГІГ­Г®Г© Г®Г±ГЁ Гў ГЎГ®Г­ГҐ
 struct bonesAxis {
 	float			cur_yaw;
 	float			target_yaw;
 	float			r_speed;
-	float			dist_yaw;		// необходимо лишь для определения текущей скорости по оси
+	float			dist_yaw;		// Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г® Г«ГЁГёГј Г¤Г«Гї Г®ГЇГ°ГҐГ¤ГҐГ«ГҐГ­ГЁГї ГІГҐГЄГіГ№ГҐГ© Г±ГЄГ®Г°Г®Г±ГІГЁ ГЇГ® Г®Г±ГЁ
 };
 
-// бона с параметрами движения по осям
+// ГЎГ®Г­Г  Г± ГЇГ Г°Г Г¬ГҐГІГ°Г Г¬ГЁ Г¤ГўГЁГ¦ГҐГ­ГЁГї ГЇГ® Г®Г±ГїГ¬
 struct bonesBone {
 	CBoneInstance	*bone;
 	bonesAxis		params;
@@ -21,19 +21,19 @@ struct bonesBone {
 
 	bonesBone	() {bone = 0;}
 	void	Set			(CBoneInstance *b, u8 a, float ty, float cy, float r_s);
-	bool	NeedTurn	();					// необходим поворот по оси p_axis?
-	void	Turn		(u32 dt);			// выполнить поворот по оси p_axis
-	void	Apply		();								// установить углы у боны
+	bool	NeedTurn	();					// Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬ ГЇГ®ГўГ®Г°Г®ГІ ГЇГ® Г®Г±ГЁ p_axis?
+	void	Turn		(u32 dt);			// ГўГ»ГЇГ®Г«Г­ГЁГІГј ГЇГ®ГўГ®Г°Г®ГІ ГЇГ® Г®Г±ГЁ p_axis
+	void	Apply		();								// ГіГ±ГІГ Г­Г®ГўГЁГІГј ГіГЈГ«Г» Гі ГЎГ®Г­Г»
 
 };
 
 
-// управление движениями костей
+// ГіГЇГ°Г ГўГ«ГҐГ­ГЁГҐ Г¤ГўГЁГ¦ГҐГ­ГЁГїГ¬ГЁ ГЄГ®Г±ГІГҐГ©
 class bonesManipulation {
 	xr_vector<bonesBone>	m_Bones;
 	u32		freeze_time;
 
-	bool	in_return_state;				// если идёт возврат к исходному положению
+	bool	in_return_state;				// ГҐГ±Г«ГЁ ГЁГ¤ВёГІ ГўГ®Г§ГўГ°Г ГІ ГЄ ГЁГ±ГµГ®Г¤Г­Г®Г¬Гі ГЇГ®Г«Г®Г¦ГҐГ­ГЁГѕ
 	u32		time_started;
 	u32		time_last_update;
 	u32		time_last_delta;
