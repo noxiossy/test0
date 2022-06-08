@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <thread>
 #include "cpuid.h"
 
 namespace FPU {
