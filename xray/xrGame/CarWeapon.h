@@ -1,6 +1,7 @@
 #pragma once
 #include "ShootingObject.h"
 #include "HudSound.h"
+#include "../xrEngine/xrSkinXW.hpp"
 
 class CPhysicsShellHolder;
 
