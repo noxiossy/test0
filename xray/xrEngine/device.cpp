@@ -309,9 +309,7 @@ void CRenderDevice::on_idle		()
 	// *** Resume threads
 	// Capture end point - thread must run only ONE cycle
 	// Release start point - allow thread to run
-	mt_csLeave.Enter			();
-	mt_csEnter.Leave			();
-	Sleep						(0);
+	syncProcessFrame.Set(); // allow secondary thread to do its job
 
 	Statistic->RenderTOTAL_Real.FrameStart	();
 	Statistic->RenderTOTAL_Real.Begin		();
@@ -348,22 +346,10 @@ void CRenderDevice::on_idle		()
 		}
 	}
 
-	// *** Suspend threads
-	// Capture startup point
-	// Release end point - allow thread to wait for startup point
-	mt_csEnter.Enter						();
-	mt_csLeave.Leave						();
+	syncFrameDone.WaitEx(66); // wait until secondary thread finish its job
 	
 	if (Core.ParamFlags.test(Core.lr_weather))
 		ImGui::EndFrame();
-
-	// Ensure, that second thread gets chance to execute anyway
-	if (dwFrame!=mt_Thread_marker)			{
-		for (u32 pit=0; pit<Device.seqParallel.size(); pit++)
-			Device.seqParallel[pit]			();
-		Device.seqParallel.clear_not_free	();
-		seqFrameMT.Process					(rp_Frame);
-	}
 
 	if (!b_is_Active)
 		Sleep		(1);
@@ -419,11 +405,31 @@ void CRenderDevice::Run			()
 	}
 
 	// Start all threads
-//	InitializeCriticalSection	(&mt_csEnter);
-//	InitializeCriticalSection	(&mt_csLeave);
-	mt_csEnter.Enter			();
-	mt_bMustExit				= FALSE;
-	std::thread second_thread(mt_Thread);
+	mt_bMustExit = false;
+	// KRodin: TODO: Use C++20 std::jthread
+	std::thread second_thread([] (void* context) {
+		set_current_thread_name("X-RAY Secondary thread");
+
+		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+		auto& device = *static_cast<CRenderDevice*>(context);
+
+		while (true) {
+			device.syncProcessFrame.Wait();
+
+			if (device.mt_bMustExit) {
+				device.syncThreadExit.Set();
+				return;
+			}
+
+			for (const auto& Func : device.seqParallel)
+				Func();
+			device.seqParallel.clear_and_free();
+			device.seqFrameMT.Process(rp_Frame);
+
+			device.syncFrameDone.Set();
+		}
+	}, this);
 
 	// Message cycle
 	seqAppStart.Process			(rp_AppStart);
@@ -436,8 +442,9 @@ void CRenderDevice::Run			()
 	seqAppEnd.Process		(rp_AppEnd);
 
 	// Stop Balance-Thread
-	mt_bMustExit			= TRUE;
-	mt_csEnter.Leave		();
+	mt_bMustExit = true;
+	syncProcessFrame.Set();
+	syncThreadExit.Wait();
 	second_thread.join();
 }
 

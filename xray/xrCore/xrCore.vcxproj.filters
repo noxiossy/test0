@@ -264,6 +264,9 @@
     <ClCompile Include="os_clipboard.cpp">
       <Filter>OS</Filter>
     </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>OS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -496,6 +499,9 @@
     </ClInclude>
     <ClInclude Include="intrusive_ptr_inline.h">
       <Filter>intrusive_ptr</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.hpp">
+      <Filter>OS</Filter>
     </ClInclude>
     <ClInclude Include="memory_monitor.h">
       <Filter>memory_monitor</Filter>
