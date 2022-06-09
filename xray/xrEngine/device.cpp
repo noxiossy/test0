@@ -162,35 +162,6 @@ void CRenderDevice::End		(void)
 }
 
 
-volatile u32	mt_Thread_marker		= 0x12345678;
-void 			mt_Thread	()	{
-	set_current_thread_name("X-RAY Secondary thread");
-	while (true) {
-		// waiting for Device permission to execute
-		Device.mt_csEnter.Enter	();
-
-		if (Device.mt_bMustExit) {
-			Device.mt_bMustExit = FALSE;				// Important!!!
-			Device.mt_csEnter.Leave();					// Important!!!
-			return;
-		}
-		// we has granted permission to execute
-		mt_Thread_marker			= Device.dwFrame;
- 
-		for (u32 pit=0; pit<Device.seqParallel.size(); pit++)
-			Device.seqParallel[pit]	();
-		Device.seqParallel.clear_not_free	();
-		Device.seqFrameMT.Process	(rp_Frame);
-
-		// now we give control to device - signals that we are ended our work
-		Device.mt_csEnter.Leave	();
-		// waits for device signal to continue - to start again
-		Device.mt_csLeave.Enter	();
-		// returns sync signal to device
-		Device.mt_csLeave.Leave	();
-	}
-}
-
 #include "igame_level.h"
 void CRenderDevice::PreCache	(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
 {
