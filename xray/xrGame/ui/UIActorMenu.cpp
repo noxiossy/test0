@@ -55,8 +55,7 @@ void CUIActorMenu::SetPartner(CInventoryOwner* io)
 			if ( monster )
 			{
 				shared_str monster_tex_name = pSettings->r_string( monster->cNameSect(), "icon" );
-				m_PartnerCharacterInfo->UIIcon().InitTexture( monster_tex_name.c_str() );
-				m_PartnerCharacterInfo->UIIcon().SetStretchTexture( true );
+				m_PartnerCharacterInfo->InitMonsterCharacter(monster_tex_name);
 			}
 		}
 		else 

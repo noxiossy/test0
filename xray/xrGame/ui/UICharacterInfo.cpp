@@ -22,6 +22,8 @@
 #include "../xrServer.h"
 #include "../../xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 
+u32 const full_clr = color_argb(255, 255, 255, 255);
+
 using namespace InventoryUtilities;
 
 CSE_ALifeTraderAbstract* ch_info_get_from_id (u16 id)
@@ -52,7 +54,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 	inherited::SetWndSize(size);
 
 	Init_IconInfoItem( *xml_doc, "icon",                eIcon         );
-	Init_IconInfoItem( *xml_doc, "icon_over",           eIconOver     );
+	/*Init_IconInfoItem( *xml_doc, "icon_over",           eIconOver     );
 
 	Init_IconInfoItem( *xml_doc, "rank_icon",           eRankIcon     );
 	Init_IconInfoItem( *xml_doc, "rank_icon_over",      eRankIconOver );
@@ -62,7 +64,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 
 	Init_IconInfoItem( *xml_doc, "commumity_big_icon",      eCommunityBigIcon     );
 	Init_IconInfoItem( *xml_doc, "commumity_big_icon_over", eCommunityBigIconOver );
-
+	*/
 	VERIFY( m_icons[eIcon] );
 	m_deadbody_color = color_argb(160,160,160,160);
 	if ( xml_doc->NavigateToNode( "icon:deadbody", 0 ) )
@@ -191,8 +193,13 @@ void CUICharacterInfo::InitCharacter(u16 id)
 
 	//	m_icons[eIcon]->SetStretchTexture		(true);
 	m_texture_name._set( chInfo.IconName() );
-	if ( m_icons[eIcon            ] ) { m_icons[eIcon            ]->InitTexture( m_texture_name.c_str()     ); }
-	if ( m_icons[eRankIcon        ] ) { m_icons[eRankIcon        ]->InitTexture( chInfo.Rank().id().c_str() ); }
+
+	if ( m_icons[eIcon            ] )
+	{
+		m_icons[eIcon             ]->InitTexture( m_texture_name.c_str()     );
+		m_icons[eIcon		  	  ]->SetColor(full_clr);
+	}
+	/*if ( m_icons[eRankIcon        ] ) { m_icons[eRankIcon        ]->InitTexture( chInfo.Rank().id().c_str() ); }
 	
 	if ( Actor()->ID() != m_ownerID && !ignore_community( comm_id ) )
 	{
@@ -222,7 +229,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
 	if ( m_icons[eCommunityBigIcon]     ) { m_icons[eCommunityBigIcon]->Show( false ); }
 	if ( m_icons[eCommunityIconOver   ] ) { m_icons[eCommunityIconOver]->Show( false ); }
 	if ( m_icons[eCommunityBigIconOver] ) { m_icons[eCommunityBigIconOver]->Show( false ); }
-
+	*/
 }
 
 void CUICharacterInfo::InitCharacterMP( LPCSTR player_name, LPCSTR player_icon )
@@ -240,10 +247,10 @@ void CUICharacterInfo::InitCharacterMP( LPCSTR player_name, LPCSTR player_icon )
 		m_icons[eIcon]->InitTexture( player_icon );
 		m_icons[eIcon]->Show( true );
 	}
-	if ( m_icons[eIconOver] )
+	/*if ( m_icons[eIconOver] )
 	{
 		m_icons[eIconOver]->Show( true );
-	}
+	}*/
 }
 
 void  CUICharacterInfo::SetRelation( ALife::ERelationType relation, CHARACTER_GOODWILL goodwill )
@@ -321,7 +328,7 @@ void CUICharacterInfo::Update()
 			CSE_ALifeCreatureAbstract*		pCreature = smart_cast<CSE_ALifeCreatureAbstract*>(T);
 			if ( pCreature && !pCreature->g_Alive() )
 			{
-				m_icons[eIcon]->SetColor	(color_argb(255,255,160,160));
+				m_icons[eIcon]->SetColor(full_clr); //(color_argb(255,255,160,160));
 			}
 		}
 	}
@@ -392,4 +399,21 @@ bool CUICharacterInfo::ignore_community( shared_str const& check_community )
 		}
 	}
 	return false;
+}
+
+// call from using dead monster
+void CUICharacterInfo::InitMonsterCharacter(shared_str monster_tex_name)
+{
+	if(m_icons[eName])			m_icons[eName]->SetText			("");
+	if(m_icons[eRank])			m_icons[eRank]->SetText			("");
+	if(m_icons[eCommunity])		m_icons[eCommunity]->SetText	("");
+	if(m_icons[eReputation])	m_icons[eReputation]->SetText	("");
+	if(m_icons[eRelation])		m_icons[eRelation]->SetText		("");
+	if(m_icons[eIcon])
+	{
+		m_icons[eIcon]->InitTexture(monster_tex_name.c_str());
+		//m_icons[eIcon]->SetStretchTexture(true);
+		//m_icons[eIcon]->SetColor(full_clr); // (color_argb(255, 255, 160, 160));
+		m_icons[eIcon]->Show(true);
+	}
 }
