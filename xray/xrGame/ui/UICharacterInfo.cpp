@@ -404,9 +404,9 @@ bool CUICharacterInfo::ignore_community( shared_str const& check_community )
 // call from using dead monster
 void CUICharacterInfo::InitMonsterCharacter(shared_str monster_tex_name)
 {
-	if(m_icons[eName])			m_icons[eName]->SetText			("");
+	if(m_icons[eName])			m_icons[eName]->SetText			(CStringTable().translate("a_icon_name_unknown").c_str());
 	if(m_icons[eRank])			m_icons[eRank]->SetText			("");
-	if(m_icons[eCommunity])		m_icons[eCommunity]->SetText	("");
+	if(m_icons[eCommunity])		m_icons[eCommunity]->SetText	(CStringTable().translate("a_icon_name_unknown_c").c_str());
 	if(m_icons[eReputation])	m_icons[eReputation]->SetText	("");
 	if(m_icons[eRelation])		m_icons[eRelation]->SetText		("");
 	if(m_icons[eIcon])
