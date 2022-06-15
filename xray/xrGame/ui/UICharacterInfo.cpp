@@ -419,7 +419,7 @@ void CUICharacterInfo::InitMonsterCharacter(shared_str monster_tex_name)
 	if(m_icons[eRank])			m_icons[eRank]->SetTextST		("");
 	if(m_icons[eReputation])	m_icons[eReputation]->SetTextST	("");
 	if(m_icons[eRelation])		m_icons[eRelation]->SetTextST	("");
-	ы
+
 	if(m_icons[eIcon])
 	{
 		m_icons[eIcon]->InitTexture(monster_tex_name.c_str());
