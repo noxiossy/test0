@@ -404,11 +404,22 @@ bool CUICharacterInfo::ignore_community( shared_str const& check_community )
 // call from using dead monster
 void CUICharacterInfo::InitMonsterCharacter(shared_str monster_tex_name)
 {
-	if(m_icons[eName])			m_icons[eName]->SetText			(CStringTable().translate("a_icon_name_unknown").c_str());
-	if(m_icons[eRank])			m_icons[eRank]->SetText			("");
-	if(m_icons[eCommunity])		m_icons[eCommunity]->SetText	(CStringTable().translate("a_icon_name_unknown_c").c_str());
-	if(m_icons[eReputation])	m_icons[eReputation]->SetText	("");
-	if(m_icons[eRelation])		m_icons[eRelation]->SetText		("");
+	if(m_icons[eName])
+	{
+		m_icons[eName]->SetTextST		(monster_tex_name.c_str());
+		m_icons[eName]->Show( true );
+	}		
+	
+	if(m_icons[eCommunity])
+	{
+		m_icons[eCommunity]->SetTextST	(CStringTable().translate("a_icon_name_unknown_c").c_str());
+		m_icons[eCommunity]->Show( true );
+	}		
+	
+	if(m_icons[eRank])			m_icons[eRank]->SetTextST		("");
+	if(m_icons[eReputation])	m_icons[eReputation]->SetTextST	("");
+	if(m_icons[eRelation])		m_icons[eRelation]->SetTextST	("");
+	ы
 	if(m_icons[eIcon])
 	{
 		m_icons[eIcon]->InitTexture(monster_tex_name.c_str());
