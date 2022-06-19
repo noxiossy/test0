@@ -58,6 +58,7 @@ void CPolterSpecialAbility::on_show()
 
 	if (m_particles_object)			CParticlesObject::Destroy(m_particles_object);
 	if (m_particles_object_electro) CParticlesObject::Destroy(m_particles_object_electro);
+	m_sound_base.stop();
 }
 
 void CPolterSpecialAbility::update_frame()
@@ -76,7 +77,7 @@ void CPolterSpecialAbility::on_die()
 
 	CParticlesObject::Destroy		(m_particles_object_electro);
 	CParticlesObject::Destroy		(m_particles_object);
-	m_sound_base.destroy			();
+	m_sound_base.stop();
 }
 
 void CPolterSpecialAbility::on_hit(SHit* pHDS)
@@ -113,12 +114,12 @@ void CPolterSpecialAbility::on_hit(SHit* pHDS)
 
 void CPoltergeist::PhysicalImpulse	(const Fvector &position)
 {
-	m_nearest.clear_not_free		();
+	m_nearest.clear		();
 	Level().ObjectSpace.GetNearest	(m_nearest,position, IMPULSE_RADIUS, NULL); 
 	//xr_vector<CObject*> &m_nearest = Level().ObjectSpace.q_nearest;
 	if (m_nearest.empty())			return;
 	
-	u32 index = Random.randI		(m_nearest.size());
+	u32 index = Random.randI		((u32)m_nearest.size());
 	
 	CPhysicsShellHolder  *obj = smart_cast<CPhysicsShellHolder *>(m_nearest[index]);
 	if (!obj || !obj->m_pPhysicsShell) return;
@@ -132,6 +133,8 @@ void CPoltergeist::PhysicalImpulse	(const Fvector &position)
 	E->applyImpulse(dir,IMPULSE * E->getMass());
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4267)
 void CPoltergeist::StrangeSounds(const Fvector &position)
 {
 	if (m_strange_sound._feedback()) return;
@@ -161,4 +164,4 @@ void CPoltergeist::StrangeSounds(const Fvector &position)
 		}
 	}
 }
-
+#pragma warning(pop)

@@ -1165,3 +1165,8 @@ BOOL	CAI_Stalker::AlwaysTheCrow	()
 	VERIFY					( character_physics_support	()	);
 	return					(character_physics_support()->interactive_motion());
 }
+
+bool CAI_Stalker::unlimited_ammo()
+{
+	return infinite_ammo() && CObjectHandler::planner().object().g_Alive();
+}

@@ -177,6 +177,9 @@ void CPoltergeist::Hide()
 	character_physics_support()->movement()->DestroyCharacter();
 
 	ability()->on_hide	();
+
+	if ( pSettings->line_exist( cNameSect().c_str(), "visible_immunities_sect" ) )
+	  conditions().LoadImmunities( pSettings->r_string( cNameSect().c_str(), "immunities_sect" ), pSettings );
 }
 
 void CPoltergeist::Show()
@@ -194,6 +197,9 @@ void CPoltergeist::Show()
 	character_physics_support()->movement()->CreateCharacter();
 	
 	ability()->on_show	();
+
+	if ( pSettings->line_exist( cNameSect().c_str(), "visible_immunities_sect" ) )
+	  conditions().LoadImmunities( pSettings->r_string( cNameSect().c_str(), "visible_immunities_sect" ), pSettings );
 }
 
 void CPoltergeist::UpdateCL()
@@ -227,13 +233,15 @@ void CPoltergeist::shedule_Update(u32 dt)
 
 BOOL CPoltergeist::net_Spawn (CSE_Abstract* DC) 
 {
-	if (!inherited::net_Spawn(DC)) return(FALSE);
-
+	if (!inherited::net_Spawn(DC)) 
+		return(FALSE);
+	VERIFY(character_physics_support());
+	VERIFY(character_physics_support()->movement());
+	character_physics_support()->movement()->DestroyCharacter();
 	// спаунится нивидимым
 	setVisible		(false);
 	ability()->on_hide();
 	
-
 	return			(TRUE);
 }
 
@@ -276,9 +284,11 @@ void CPoltergeist::Die(CObject* who)
 
 void CPoltergeist::Hit(SHit* pHDS)
 {
-	// ZergO: пули пролетаеют сквозь него, когда полтергейст в состоянии энергии
 	if (state_invisible)
+	{
 		ability()->on_hit(pHDS);
+		inherited::Hit(pHDS);
+	}
 	else
 	{
 		m_sound_player->play(EPolterSounds::eSndHit);
