@@ -142,7 +142,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)3rd party\WildMagic;pch;$(SolutionDir)3rd party\imgui;$(SolutionDir)3rd party/luabind/include;$(SolutionDir)3rd party/imdexlib;$(SolutionDir)3rd party/luajit/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>nvapi.lib;$(TargetDir)xrEngine.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3dx9.lib;nvapi.lib;$(TargetDir)xrEngine.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <MapFileName />
       <SubSystem>NotSet</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -181,7 +181,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)3rd party\WildMagic;pch;$(SolutionDir)3rd party\imgui;$(SolutionDir)3rd party/luabind/include;$(SolutionDir)3rd party/imdexlib;$(SolutionDir)3rd party/luajit/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>nvapi64.lib;$(TargetDir)xrEngine.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3dx9.lib;nvapi64.lib;$(TargetDir)xrEngine.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <MapFileName>
       </MapFileName>
       <SubSystem>NotSet</SubSystem>
