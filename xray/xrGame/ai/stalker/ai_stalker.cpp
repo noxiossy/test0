@@ -1168,5 +1168,5 @@ BOOL	CAI_Stalker::AlwaysTheCrow	()
 
 bool CAI_Stalker::unlimited_ammo()
 {
-	return infinite_ammo() && CObjectHandler::planner().object().g_Alive();
+	return inifinite_ammo() && CObjectHandler::planner().object().g_Alive();
 }
