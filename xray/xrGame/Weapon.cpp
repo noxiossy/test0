@@ -2047,7 +2047,7 @@ void CWeapon::render_item_ui()
 
 bool CWeapon::unlimited_ammo() 
 { 
-	if (m_pCurrentInventory)
+	if (m_pInventory)
 		return inventory_owner().unlimited_ammo() && m_DefaultCartridge.m_flags.test(CCartridge::cfCanBeUnlimited);
 	else
 		return false;
