@@ -325,6 +325,7 @@ void					CRender::destroy				()
 	r_dsgraph_destroy			();
 }
 
+extern u32 reset_frame;
 void CRender::reset_begin()
 {
 	// Update incremental shadowmap-visibility solver
@@ -343,6 +344,7 @@ void CRender::reset_begin()
 		Lights_LastFrame.clear	();
 	}
 
+	reset_frame = Device.dwFrame;
 	//AVO: let's reload details while changed details options on vid_restart
 	if (b_loaded && ((dm_current_size != dm_size) || (ps_r__Detail_density != ps_current_detail_density)))
 	{
@@ -378,6 +380,10 @@ void CRender::reset_end()
 	//-AVO
 
 	xrRender_apply_tf			();
+
+	// Set this flag true to skip the first render frame,
+	// that some data is not ready in the first frame (for example device camera position)
+	m_bFirstFrameAfterReset = true;
 }
 /*
 void CRender::OnFrame()
@@ -550,6 +556,7 @@ void					CRender::rmNormal			()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 CRender::CRender()
+:m_bFirstFrameAfterReset(false)
 {
 	init_cascades();
 }
@@ -581,7 +588,7 @@ void	CRender::Statistics	(CGameFont* _F)
 }
 
 /////////
-#pragma comment(lib,"d3dx9.lib")
+
 /*
 extern "C"
 {
