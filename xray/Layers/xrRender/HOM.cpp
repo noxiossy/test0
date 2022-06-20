@@ -74,7 +74,9 @@ void CHOM::Load			()
 		Msg		(" WARNING: Occlusion map '%s' not found.",fName);
 		return;
 	}
-	Msg	("* Loading HOM: %s",fName);
+
+	if (Core.ParamFlags.test(Core.lr_fulllog))
+		Msg	("* Loading HOM: %s",fName);
 	
 	IReader* fs				= FS.r_open(fName);
 	IReader* S				= fs->open_chunk(1);
