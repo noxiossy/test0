@@ -563,7 +563,6 @@ public:
 	CCC_DumpResources(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args) {
 		RImplementation.Models->dump();
-		dxRenderDeviceRender::Instance().Resources->Dump(false);
 	}
 };
 
