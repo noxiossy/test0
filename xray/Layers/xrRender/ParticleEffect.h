@@ -19,8 +19,6 @@ namespace PS
 	{
 		friend class CPEDef;
 	protected:
-		CPEDef*				m_Def;
-
 		float				m_fElapsedLimit;
 
 		int					m_HandleEffect;
@@ -30,6 +28,7 @@ namespace PS
 
 		Fvector				m_InitialPosition;
 	public:
+		CPEDef*				m_Def;
         Fmatrix				m_XFORM;
     protected:
     	DestroyCallback		m_DestroyCallback;

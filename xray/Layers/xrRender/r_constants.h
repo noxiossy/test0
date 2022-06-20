@@ -40,22 +40,31 @@ enum
 	RC_dest_vertex					= (1<<1),
 	RC_dest_sampler					= (1<<2),	//	For DX10 it's either sampler or texture
 	RC_dest_geometry				= (1<<3),	//	DX10 only
-	RC_dest_pixel_cb_index_mask		= 0xF000,	//	Buffer index == 0..14
-	RC_dest_pixel_cb_index_shift	= 12,
-	RC_dest_vertex_cb_index_mask	= 0x0F00,	//	Buffer index == 0..14
-	RC_dest_vertex_cb_index_shift	= 8,
-	RC_dest_geometry_cb_index_mask	= 0x00F0,	//	Buffer index == 0..14
-	RC_dest_geometry_cb_index_shift	= 4,
+	RC_dest_compute_cb_index_mask	= 0xF0000000,	//	Buffer index == 0..14
+	RC_dest_compute_cb_index_shift	= 28,
+	RC_dest_domain_cb_index_mask	= 0x0F000000,	//	Buffer index == 0..14
+	RC_dest_domain_cb_index_shift	= 24,
+	RC_dest_hull_cb_index_mask		= 0x00F00000,	//	Buffer index == 0..14
+	RC_dest_hull_cb_index_shift		= 20,
+	RC_dest_pixel_cb_index_mask		= 0x000F0000,	//	Buffer index == 0..14
+	RC_dest_pixel_cb_index_shift	= 16,
+	RC_dest_vertex_cb_index_mask	= 0x0000F000,	//	Buffer index == 0..14
+	RC_dest_vertex_cb_index_shift	= 12,
+	RC_dest_geometry_cb_index_mask	= 0x00000F00,	//	Buffer index == 0..14
+	RC_dest_geometry_cb_index_shift	= 8,
 };
 
 enum	//	Constant buffer index masks
 {
 	CB_BufferIndexMask		= 0xF,	//	Buffer index == 0..14
 
-	CB_BufferTypeMask		= 0x30,
+	CB_BufferTypeMask		= 0x70,
 	CB_BufferPixelShader	= 0x10,
 	CB_BufferVertexShader	= 0x20,
-	CB_BufferGeometryShader	= 0x30
+	CB_BufferGeometryShader	= 0x30,
+	CB_BufferHullShader		= 0x40,
+	CB_BufferDomainShader	= 0x50,
+	CB_BufferComputeShader	= 0x60,
 };
 
 struct ECORE_API	R_constant_load
@@ -75,7 +84,7 @@ struct ECORE_API	R_constant			:public xr_resource
 {
 	shared_str				name;		// HLSL-name
 	u16						type;		// float=0/integer=1/boolean=2
-	u16						destination;// pixel/vertex/(or both)/sampler
+	u32						destination;// pixel/vertex/(or both)/sampler
 
 	R_constant_load			ps;
 	R_constant_load			vs;
@@ -128,7 +137,7 @@ public:
 	~R_constant_table					();
 
 	void					clear		();
-	BOOL					parse		(void* desc, u16 destination);
+	BOOL					parse		(void* desc, u32 destination);
 	void					merge		(R_constant_table* C);
 	ref_constant			get			(LPCSTR		name);		// slow search
 	ref_constant			get			(shared_str&	name);		// fast search
