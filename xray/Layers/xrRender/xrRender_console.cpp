@@ -141,8 +141,8 @@ int			ps_r1_GlowsPerFrame			= 16	;					// r1-only
 float		ps_r1_fog_luminance			= 1.f	;					// r1-only
 
 // R2
-float		ps_r2_ssaLOD_A				= 48.f	;
-float		ps_r2_ssaLOD_B				= 32.f	;
+float		ps_r2_ssaLOD_A				= 64.f	;
+float		ps_r2_ssaLOD_B				= 48.f	;
 float		ps_r2_tf_Mipbias			= 0.0f	;
 
 // R2-specific
@@ -155,6 +155,15 @@ Flags32		ps_r2_ls_flags				= { R2FLAG_SUN
 	//| R3FLAG_MSAA 
 	//| R3FLAG_MSAA_OPT
 	| R3FLAG_GBUFFER_OPT
+	|R2FLAG_DETAIL_BUMP
+	|R2FLAG_DOF
+	|R2FLAG_SOFT_PARTICLES
+	|R2FLAG_SOFT_WATER
+	|R2FLAG_STEEP_PARALLAX
+	|R2FLAG_SUN_FOCUS
+	|R2FLAG_SUN_TSM
+	|R2FLAG_TONEMAP
+	|R2FLAG_VOLUMETRIC_LIGHTS
 	};	// r2-only
 
 Flags32		ps_r2_ls_flags_ext			= {
@@ -236,7 +245,7 @@ float		ps_current_detail_density = 0.6f;
 float		ps_current_detail_scale = 1.f;
 
 //- Mad Max
-float		ps_r2_gloss_factor			= 3.0f;
+float		ps_r2_gloss_factor			= 1.0f;
 //- Mad Max
 #ifndef _EDITOR
 #include	"../../xrEngine/xr_ioconsole.h"
@@ -311,7 +320,7 @@ public:
 #endif	//	USE_DX10
 	}
 
-	CCC_tf_MipBias(LPCSTR N, float*	v) : CCC_Float(N, v, -0.5f, +0.5f)	{ };
+	CCC_tf_MipBias(LPCSTR N, float*	v) : CCC_Float(N, v, -3.f, +3.f)	{ };
 	virtual void Execute(LPCSTR args)
 	{
 		CCC_Float::Execute	(args);
@@ -554,6 +563,7 @@ public:
 	CCC_DumpResources(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args) {
 		RImplementation.Models->dump();
+		dxRenderDeviceRender::Instance().Resources->Dump(false);
 	}
 };
 
@@ -697,11 +707,11 @@ void		xrRender_initconsole	()
 	CMD3(CCC_Mask,		"r2_sun_tsm",			&ps_r2_ls_flags,			R2FLAG_SUN_TSM	);
 	CMD4(CCC_Float,		"r2_sun_tsm_proj",		&ps_r2_sun_tsm_projection,	.001f,	0.8f	);
 	CMD4(CCC_Float,		"r2_sun_tsm_bias",		&ps_r2_sun_tsm_bias,		-0.5,	+0.5	);
-	CMD4(CCC_Float,		"r2_sun_near",			&ps_r2_sun_near,			1.f,	50.f	);
+	CMD4(CCC_Float,		"r2_sun_near",			&ps_r2_sun_near,			1.f,	150.f	);
 #if RENDER!=R_R1
 	CMD4(CCC_Float,		"r2_sun_far",			&OLES_SUN_LIMIT_27_01_07,	51.f,	180.f	);
 #endif
-	CMD4(CCC_Float,		"r2_sun_near_border",	&ps_r2_sun_near_border,		.5f,	1.0f	);
+	CMD4(CCC_Float,		"r2_sun_near_border",	&ps_r2_sun_near_border,		.5f,	3.0f	);
 	CMD4(CCC_Float,		"r2_sun_depth_far_scale",&ps_r2_sun_depth_far_scale,0.5,	1.5		);
 	CMD4(CCC_Float,		"r2_sun_depth_far_bias",&ps_r2_sun_depth_far_bias,	-0.5,	+0.5	);
 	CMD4(CCC_Float,		"r2_sun_depth_near_scale",&ps_r2_sun_depth_near_scale,0.5,	1.5		);
@@ -741,7 +751,7 @@ void		xrRender_initconsole	()
 	CMD4(CCC_Float,		"r2_parallax_h",		&ps_r2_df_parallax_h,		.0f,	.5f		);
 //	CMD4(CCC_Float,		"r2_parallax_range",	&ps_r2_df_parallax_range,	5.0f,	175.0f	);
 
-	CMD4(CCC_Float,		"r2_slight_fade",		&ps_r2_slight_fade,			.2f,	1.f		);
+	CMD4(CCC_Float,		"r2_slight_fade",		&ps_r2_slight_fade,			.2f,	2.f		);
 
 	tw_min.set			(0,0,0);	tw_max.set	(1,1,1);
 	CMD4(CCC_Vector3,	"r2_aa_break",			&ps_r2_aa_barier,			tw_min, tw_max	);

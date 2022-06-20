@@ -49,10 +49,22 @@ void CStateManagerPoltergeist::execute()
 
 	const CEntityAlive* enemy	= object->EnemyMan.get_enemy();
 
+	bool b_almost_dead_polter = object->conditions().GetHealth() < 0.5f;
+
 	if (enemy) 
 	{
 		if (object->is_hidden()) 
-			state_id = eStateAttack_AttackHidden;
+		{
+			if (b_almost_dead_polter) 
+			{
+				object->CEnergyHolder::deactivate();
+				object->DisableHide();
+			}
+			else
+			{
+				state_id = eStateAttack_AttackHidden;
+			}
+		}
 		else 
 		{
 			switch (object->EnemyMan.get_danger_type()) 
@@ -60,11 +72,18 @@ void CStateManagerPoltergeist::execute()
 				case eStrong:	state_id = eStatePanic; break;
 				case eWeak:		state_id = eStateAttack; break;
 			}
+			if (!b_almost_dead_polter) 
+			{
+				object->EnableHide();
+			}
 		}
 	} 
 	else if (object->HitMemory.is_hit() && !object->is_hidden()) 
 	{
-		state_id = eStateHitted;
+		// only inform squad of new hit (made not later then after 1 sec)
+		if ( current_substate != eStateHitted && 
+			 time() < object->HitMemory.get_last_hit_time()+1000 ){
+			state_id = eStateHitted;
 	} 
 	else if (object->hear_dangerous_sound) 
 	{
