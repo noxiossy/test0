@@ -81,9 +81,10 @@ void CStateManagerPoltergeist::execute()
 	else if (object->HitMemory.is_hit() && !object->is_hidden()) 
 	{
 		// only inform squad of new hit (made not later then after 1 sec)
-		if ( current_substate != eStateHitted && 
-			 time() < object->HitMemory.get_last_hit_time()+1000 ){
+		if ( current_substate != eStateHitted && time() < object->HitMemory.get_last_hit_time()+1000 )
+		{
 			state_id = eStateHitted;
+		}
 	} 
 	else if (object->hear_dangerous_sound) 
 	{
