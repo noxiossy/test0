@@ -18,7 +18,8 @@ enum
 	RC_int			= 1,
 	RC_bool			= 2,
 	RC_sampler		= 99,	//	DX9 shares index for sampler and texture
-	RC_dx10texture	= 100	//	For DX10 sampler and texture are different resources
+	RC_dx10texture	= 100,	//	For DX10 sampler and texture are different resources
+	RC_dx11UAV		= 101
 };
 enum
 {
@@ -40,6 +41,9 @@ enum
 	RC_dest_vertex					= (1<<1),
 	RC_dest_sampler					= (1<<2),	//	For DX10 it's either sampler or texture
 	RC_dest_geometry				= (1<<3),	//	DX10 only
+	RC_dest_hull					= (1<<4),	//	DX11 only
+	RC_dest_domain					= (1<<5),	//	DX11 only
+	RC_dest_compute					= (1<<6),	//	DX11 only
 	RC_dest_compute_cb_index_mask	= 0xF0000000,	//	Buffer index == 0..14
 	RC_dest_compute_cb_index_shift	= 28,
 	RC_dest_domain_cb_index_mask	= 0x0F000000,	//	Buffer index == 0..14
@@ -95,6 +99,25 @@ struct ECORE_API	R_constant			:public xr_resource
 	R_constant_setup*		handler;
 
 	R_constant() : type(u16(-1)), destination(0), handler(NULL) { };
+	
+	IC R_constant_load& get_load(u32 destination)
+	{
+		static R_constant_load	fake;
+		switch (destination&0xFF)
+		{
+		case RC_dest_vertex:
+			return vs;
+		case RC_dest_pixel:
+			return ps;
+#if defined(USE_DX10)
+		case RC_dest_geometry:
+			return gs;
+#endif
+		default:
+			FATAL("invalid enumeration for shader");
+		}
+		return fake;
+	}
 
 	IC BOOL					equal		(R_constant& C)
 	{
