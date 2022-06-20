@@ -401,7 +401,7 @@ void __stdcall	CDetailManager::MT_CALC		()
 	if (!RImplementation.Details) return;	// possibly deleted
 	if (!dtFS) return;
 	if (!psDeviceFlags.is(rsDetails)) return;
-	if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive()) return;
+	//if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive()) return;
 #endif    
 
 	MT.Enter					();
