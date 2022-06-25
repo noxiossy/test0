@@ -152,18 +152,11 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 		C.r_Sampler		("s_dt_b",	oB_Name,	false,	D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC,D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC);
 		C.r_Sampler		("s_dt_a",	oA_Name,	false,	D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC,D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC);
 
-		if !(::Render->is_simple_static()){
-			C.r_Sampler		("s_dn_r",	strconcat(sizeof(mask),mask,oR_Name,"_bump")	);
-			C.r_Sampler		("s_dn_g",	strconcat(sizeof(mask),mask,oG_Name,"_bump") );
-			C.r_Sampler		("s_dn_b",	strconcat(sizeof(mask),mask,oB_Name,"_bump") );
-			C.r_Sampler		("s_dn_a",	strconcat(sizeof(mask),mask,oA_Name,"_bump") );
+		C.r_Sampler		("s_dn_r",	strconcat(sizeof(mask),mask,oR_Name,"_bump")	);
+		C.r_Sampler		("s_dn_g",	strconcat(sizeof(mask),mask,oG_Name,"_bump") );
+		C.r_Sampler		("s_dn_b",	strconcat(sizeof(mask),mask,oB_Name,"_bump") );
+		C.r_Sampler		("s_dn_a",	strconcat(sizeof(mask),mask,oA_Name,"_bump") );
 
-			C.r_Sampler		("s_dnE_r", strconcat(sizeof(mask), mask, oR_Name, "_bump#"));
-			C.r_Sampler		("s_dnE_g", strconcat(sizeof(mask), mask, oG_Name, "_bump#"));
-			C.r_Sampler		("s_dnE_b", strconcat(sizeof(mask), mask, oB_Name, "_bump#"));
-			C.r_Sampler		("s_dnE_a", strconcat(sizeof(mask), mask, oA_Name, "_bump#"));
-		}
-		
 		C.r_End			();
 		break;
 	case SE_R2_NORMAL_LQ: 		// deffer
@@ -216,18 +209,11 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 		C.r_dx10Texture		("s_dt_b",	oB_Name);
 		C.r_dx10Texture		("s_dt_a",	oA_Name);
 
-		if !(::Render->is_simple_static()){
-			C.r_dx10Texture		("s_dn_r",	strconcat(sizeof(mask),mask,oR_Name,"_bump") );
-			C.r_dx10Texture		("s_dn_g",	strconcat(sizeof(mask),mask,oG_Name,"_bump") );
-			C.r_dx10Texture		("s_dn_b",	strconcat(sizeof(mask),mask,oB_Name,"_bump") );
-			C.r_dx10Texture		("s_dn_a",	strconcat(sizeof(mask),mask,oA_Name,"_bump") );
+		C.r_dx10Texture		("s_dn_r",	strconcat(sizeof(mask),mask,oR_Name,"_bump") );
+		C.r_dx10Texture		("s_dn_g",	strconcat(sizeof(mask),mask,oG_Name,"_bump") );
+		C.r_dx10Texture		("s_dn_b",	strconcat(sizeof(mask),mask,oB_Name,"_bump") );
+		C.r_dx10Texture		("s_dn_a",	strconcat(sizeof(mask),mask,oA_Name,"_bump") );
 
-			C.r_dx10Texture		("s_dnE_r", strconcat(sizeof(mask), mask, oR_Name, "_bump#"));
-			C.r_dx10Texture		("s_dnE_g", strconcat(sizeof(mask), mask, oG_Name, "_bump#"));
-			C.r_dx10Texture		("s_dnE_b", strconcat(sizeof(mask), mask, oB_Name, "_bump#"));
-			C.r_dx10Texture		("s_dnE_a", strconcat(sizeof(mask), mask, oA_Name, "_bump#"));
-		}
-		
 		C.r_dx10Sampler		("smp_base");
 		C.r_dx10Sampler		("smp_linear");
 
