@@ -273,13 +273,13 @@ void CRenderDevice::on_idle		()
 	// Matrices
 	mFullTransform.mul			( mProject,mView	);
 	m_pRender->SetCacheXform(mView, mProject);
-	//RCache.set_xform_view		( mView				);
-	//RCache.set_xform_project	( mProject			);
-	D3DXMatrixInverse			( (D3DXMATRIX*)&mInvFullTransform, 0, (D3DXMATRIX*)&mFullTransform);
+	mInvFullTransform.invert_44(mFullTransform);
 
-	// *** Resume threads
-	// Capture end point - thread must run only ONE cycle
-	// Release start point - allow thread to run
+	vCameraPosition_saved	= vCameraPosition;
+	mFullTransform_saved	= mFullTransform;
+	mView_saved				= mView;
+	mProject_saved			= mProject;
+
 	syncProcessFrame.Set(); // allow secondary thread to do its job
 
 	Statistic->RenderTOTAL_Real.FrameStart	();
@@ -422,7 +422,6 @@ void CRenderDevice::Run			()
 u32 app_inactive_time		= 0;
 u32 app_inactive_time_start = 0;
 
-void ProcessLoading(RP_FUNC *f);
 void CRenderDevice::FrameMove()
 {
 	dwFrame			++;
@@ -459,19 +458,12 @@ void CRenderDevice::FrameMove()
 	// Frame move
 	Statistic->EngineTOTAL.Begin	();
 
-	//	TODO: HACK to test loading screen.
-	//if(!g_bLoaded) 
-		ProcessLoading				(rp_Frame);
-	//else
-	//	seqFrame.Process			(rp_Frame);
+	Device.seqFrame.Process				(rp_Frame);
+	g_bLoaded							= TRUE;
+
 	Statistic->EngineTOTAL.End	();
 }
 
-void ProcessLoading				(RP_FUNC *f)
-{
-	Device.seqFrame.Process				(rp_Frame);
-	g_bLoaded							= TRUE;
-}
 
 ENGINE_API BOOL bShowPauseString = TRUE;
 #include "IGame_Persistent.h"

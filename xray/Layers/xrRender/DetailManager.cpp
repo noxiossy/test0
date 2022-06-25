@@ -255,10 +255,10 @@ void CDetailManager::UpdateVisibleM()
 		for (auto& vis : vec)
 			vis.clear_not_free();
 
-	Fvector		EYE				= Device.vCameraPosition;
+	Fvector		EYE				= Device.vCameraPosition_saved;
 	
 	CFrustum	View;
-	View.CreateFromMatrix		(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+	View.CreateFromMatrix		(Device.mFullTransform_saved, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
 	float fade_limit = dm_fade;
 	fade_limit = fade_limit * fade_limit;
@@ -365,23 +365,18 @@ void CDetailManager::UpdateVisibleM()
 
 void CDetailManager::Render	()
 {
-#ifndef _EDITOR
 	if (!RImplementation.Details) return;	// possibly deleted
 	if (!dtFS) return;
 	if (!psDeviceFlags.is(rsDetails)) return;
 	//if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive()) return;
-#endif
 
 	// MT
 	MT_SYNC					();
 
 	Device.Statistic->RenderDUMP_DT_Render.Begin	();
 
-#ifndef _EDITOR
 	float factor			= g_pGamePersistent->Environment().wind_strength_factor;
-#else
-	float factor			= 0.3f;
-#endif
+
 	swing_current.lerp		(swing_desc[0],swing_desc[1],factor);
 
 	RCache.set_CullMode		(CULL_NONE);
@@ -394,21 +389,19 @@ void CDetailManager::Render	()
 }
 
 u32 reset_frame = 0;
-void __stdcall	CDetailManager::MT_CALC		()
+void CDetailManager::MT_CALC()
 {
-#ifndef _EDITOR
 	if (reset_frame == Device.dwFrame) return;
 	if (!RImplementation.Details) return;	// possibly deleted
 	if (!dtFS) return;
 	if (!psDeviceFlags.is(rsDetails)) return;
 	//if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive()) return;
-#endif    
 
 	MT.Enter					();
 	if (m_frame_calc!=Device.dwFrame)	
 		if ((m_frame_rendered+1)==Device.dwFrame) //already rendered
 		{
-			Fvector		EYE				= Device.vCameraPosition;
+			Fvector		EYE				= Device.vCameraPosition_saved;
 			int s_x	= iFloor			(EYE.x/dm_slot_size+.5f);
 			int s_z	= iFloor			(EYE.z/dm_slot_size+.5f);
 
