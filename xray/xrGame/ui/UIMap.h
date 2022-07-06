@@ -14,7 +14,9 @@ protected:
 	Flags16			m_flags;
 	enum EFlags{	eLocked	=(1<<0),};
 	float			m_pointer_dist;
+	Frect			m_workingArea;
 public:
+	Frect&			WorkingArea						() {return m_workingArea;}
 	Frect			m_prevRect;
 	shared_str		m_texture;
 	shared_str		m_shader_name;
