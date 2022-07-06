@@ -163,7 +163,6 @@ void xrCore::_destroy		()
 			xr_delete		(trained_model);
 		}
 #endif
-        xr_free(Params);
 		Memory._destroy		();
 	}
 }
