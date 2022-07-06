@@ -12,7 +12,23 @@ class IUIShader;
 
 class CUIStaticItem: public IUISimpleTextureControl, public CUICustomItem
 {
+protected:
+public:
+	enum {
+		flValidSize				=(1<<0),
+		flValidTextureRect		=(1<<1),
+		flValidHeadingPivot		=(1<<2),
+		flFixedLTWhileHeading	=(1<<3),
+	};
+
+	Frect			TextureRect;
+	Fvector2		vHeadingPivot;
+	Fvector2		vHeadingOffset;
+	Flags8			uFlags;
+
 	ui_shader		hShader;
+	Fvector2		vSize;
+
 
 	Fvector2		iPos;
 	u32				dwColor;
@@ -65,6 +81,13 @@ public:
 	IC u32			GetColor		() const					{return dwColor;}
 	IC u32&			GetColorRef		()							{return dwColor;}
 	ui_shader&		GetShader		()							{return hShader;}
+
+public:
+	
+	   void			SetHeadingPivot			(const Fvector2& p, const Fvector2& offset, bool fixedLT);
+	   void			ResetHeadingPivot		();
+	   IC bool		GetFixedLTWhileHeading	() const								{return !!uFlags.test(flFixedLTWhileHeading);}
+	   Fvector2		GetHeadingPivot			()										{return vHeadingPivot;}
 };
 
 extern ENGINE_API BOOL g_bRendering; 

@@ -17,6 +17,13 @@ void DestroyUIGeom()
 
 CUIStaticItem::CUIStaticItem()
 {    
+	uFlags.zero			();
+	vSize.set			(0,0);
+	TextureRect.set	(0,0,0,0);
+	vHeadingPivot.set	(0,0); 
+	vHeadingOffset.set	(0,0);
+	
+
 	dwColor			= 0xffffffff;
 	iTile.set		(1, 1);
 	iRem.set		(0.0f,0.0f);
@@ -26,20 +33,27 @@ CUIStaticItem::CUIStaticItem()
 #endif
 }
 
+void CUIStaticItem::ResetHeadingPivot()
+{
+	uFlags.set(flValidHeadingPivot, FALSE); 
+	uFlags.set(flFixedLTWhileHeading,FALSE);
+}
+
+void CUIStaticItem::SetHeadingPivot(const Fvector2& p, const Fvector2& offset, bool fixedLT)		
+{
+	vHeadingPivot=p; 
+	vHeadingOffset=offset; 
+	uFlags.set(flValidHeadingPivot, TRUE); 
+	if(fixedLT)
+		uFlags.set(flFixedLTWhileHeading,TRUE);
+	else
+		uFlags.set(flFixedLTWhileHeading,FALSE);
+}
+
 CUIStaticItem::~CUIStaticItem()
 {
 }
 
-void CUIStaticItem::CreateShader(LPCSTR tex, LPCSTR sh)
-{
-	hShader->create(sh,tex);
-
-#ifdef DEBUG
-	dbg_tex_name = tex;
-#endif
-	uFlags.set(flValidRect, FALSE);
-	uFlags.set(flValidOriginalRect, FALSE);
-}
 
 void CUIStaticItem::SetShader(const ui_shader& sh)
 {
@@ -125,4 +139,16 @@ void CUIStaticItem::Render(float angle)
 
 	if(alpha_ref!=-1)
 		UIRender->SetAlphaRef(alpha_ref);
+}
+
+
+void CUIStaticItem::CreateShader(LPCSTR tex, LPCSTR sh)
+{
+	hShader->create(sh,tex);
+
+#ifdef DEBUG
+	dbg_tex_name = tex;
+#endif
+	uFlags.set(flValidRect, FALSE);
+	uFlags.set(flValidOriginalRect, FALSE);
 }
