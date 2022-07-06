@@ -12,6 +12,20 @@ class IUIShader;
 
 class CUIStaticItem: public IUISimpleTextureControl, public CUICustomItem
 {
+protected:
+public:
+	enum {
+		flValidSize				=(1<<0),
+		flValidTextureRect		=(1<<1),
+		flValidHeadingPivot		=(1<<2),
+		flFixedLTWhileHeading	=(1<<3),
+	};
+
+	Frect			TextureRect;
+	Fvector2		vHeadingPivot;
+	Fvector2		vHeadingOffset;
+	Flags8			uFlags;
+
 	ui_shader		hShader;
 
 	Fvector2		iPos;
