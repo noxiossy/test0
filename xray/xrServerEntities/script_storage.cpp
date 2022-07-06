@@ -523,6 +523,7 @@ bool CScriptStorage::load_file_into_namespace(LPCSTR caScriptName, LPCSTR caName
 {
 	int				start = lua_gettop(lua());
 	if (!do_file(caScriptName,caNamespaceName)) {
+        Msg("! [ERROR] --- Failed to load script %s", caNamespaceName);
 		lua_settop	(lua(),start);
 		return		(false);
 	}

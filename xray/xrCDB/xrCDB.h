@@ -76,7 +76,9 @@ namespace CDB
 		~MODEL();
 
 		IC Fvector*				get_verts		()			{ return verts;		}
+		IC const Fvector*		get_verts		()	const	{ return verts;		}
 		IC int					get_verts_count	()	const	{ return verts_count;}
+		IC const TRI*			get_tris		()	const 	{ return tris;		}
 		IC TRI*					get_tris		()			{ return tris;		}
 		IC int					get_tris_count	()	const	{ return tris_count;}
 		IC void					syncronize		()	const

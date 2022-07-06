@@ -189,6 +189,7 @@ void ui_actor_state_wnd::UpdateActorInfo( CInventoryOwner* owner )
 	}
 //wound protection progress bar
 	{
+		woun_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeWound);
 		float max_power = actor->conditions().GetMaxWoundProtection();
 		woun_value = floor(woun_value / max_power * 31) / 31; // number of sticks in progress bar
 		m_state[stt_wound]->set_progress(woun_value);//0..1
@@ -202,6 +203,7 @@ void ui_actor_state_wnd::UpdateActorInfo( CInventoryOwner* owner )
 	}
 //fire wound protection progress bar
 	{
+		fwou_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeFireWound);
 		float max_power = actor->conditions().GetMaxFireWoundProtection();
 		fwou_value = floor(fwou_value / max_power * 31) / 31; // number of sticks in progress bar
 		m_state[stt_fire_wound]->set_progress(fwou_value);

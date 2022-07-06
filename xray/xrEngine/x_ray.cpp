@@ -732,11 +732,13 @@ void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
 	LPCSTR font_tex_name = _GetFontTexName(section);
 	R_ASSERT(font_tex_name);
 
-	if(!F){
-		F = xr_new<CGameFont> ("font", font_tex_name, flags);
+    LPCSTR sh_name = pSettings->r_string(section, "shader");
+    if (!F)
+    {
+        F = xr_new<CGameFont>(sh_name, font_tex_name, flags);
 		Device.seqRender.Add( F, REG_PRIORITY_LOW-1000 );
 	}else
-		F->Initialize("font",font_tex_name);
+        F->Initialize(sh_name, font_tex_name);
 
 	if (pSettings->line_exist(section,"size")){
 		float sz = pSettings->r_float(section,"size");
