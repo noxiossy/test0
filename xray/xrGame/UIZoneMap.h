@@ -5,6 +5,7 @@
 
 class CActor;
 class CUICustomMap;
+class CUIMiniMap;
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -14,7 +15,7 @@ public:
 	bool						visible;
 
 private:
-	CUICustomMap*				m_activeMap;
+	CUIMiniMap*				m_activeMap;
 //	float						m_fScale;
 
 	CUIStatic					m_background;
