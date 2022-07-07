@@ -549,25 +549,18 @@ void CUIMiniMap::UpdateSpots()
 void  CUIMiniMap::Draw()
 {
 	u32	segments_count			= 20;
-
 	UIRender->SetShader			(*m_UIStaticItem.GetShader());
 	UIRender->StartPrimitive	(segments_count*3, IUIRender::ptTriList, UI()->m_currentPointType);
-
 	u32 color					= m_UIStaticItem.GetTextureColor();
 	float angle					= GetHeading();
-	Frect working_area			= GetClipperRect();
-
-
 	float kx =	UI()->get_current_kx();
-
 	// clip poly
 	sPoly2D					S;
 	S.resize				(segments_count);
 	float segment_ang		= PI_MUL_2/segments_count;
-	float pt_radius			= working_area.width()/2.0f;
+	float pt_radius			= WorkingArea().width()/2.0f;
 	Fvector2				center;
-	working_area.getcenter	(center);
-
+	WorkingArea().getcenter	(center);
 	float tt_radius			= pt_radius/GetWidth();
 	float k_tt_height		= GetWidth()/GetHeight();
 							
@@ -604,40 +597,31 @@ void  CUIMiniMap::Draw()
 }
 bool CUIMiniMap::GetPointerTo(const Fvector2& src, float item_radius, Fvector2& pos, float& heading)
 {
-	Frect working_area = GetClipperRect();
 	Fvector2 clip_center = GetStaticItem()->GetHeadingPivot();
-	float map_radius	= working_area.width()/2.0f;
+	float map_radius	= WorkingArea().width()/2.0f;
 	Fvector2			direction;
-
 	direction.sub		(clip_center, src);
 	heading				= -direction.getH();
-
 	float kx			= UI()->get_current_kx();
 	float cosPT			= _cos(heading);
 	float sinPT			= _sin(heading);
 	pos.set				(-map_radius*sinPT*kx,		-map_radius*cosPT);
 	pos.add				(clip_center);
-
 	return				true;
 }
-
 bool CUIMiniMap::NeedShowPointer(Frect r)
 {
-	Frect working_area = GetClipperRect();
 	Fvector2 clip_center = GetStaticItem()->GetHeadingPivot();
-
 	Fvector2			spot_pos;
 	r.getcenter			(spot_pos);
 	float dist			=clip_center.distance_to(spot_pos);
 	float spot_radius	= r.width() / 2.0f;
-	return				(dist+spot_radius > working_area.width()/2.0f);
+	return				(dist+spot_radius > WorkingArea().width()/2.0f);
 }
-
 bool CUIMiniMap::IsRectVisible(Frect r)
 {
-	Frect working_area = GetClipperRect();
 	Fvector2 clip_center	= GetStaticItem()->GetHeadingPivot();
-	float vis_radius		= working_area.width() / 2.0f;
+	float vis_radius		= WorkingArea().width() / 2.0f;
 	Fvector2				rect_center;
 	r.getcenter				(rect_center);
 	float spot_radius		= r.width() / 2.0f;
