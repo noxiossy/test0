@@ -21,7 +21,8 @@ enum EPolterSounds
 
 class CPoltergeist :	public CBaseMonster ,
 						public CTelekinesis,
-						public CEnergyHolder {
+						public CEnergyHolder,
+						public CExplosive {
 	
 	typedef		CBaseMonster	inherited;
 	typedef		CEnergyHolder	Energy;
@@ -78,6 +79,7 @@ public:
 	virtual	void	on_deactivate		();
 	virtual	void	Hit					(SHit* pHDS);
 
+	u32		last_hit_frame;
 	LPCSTR	particle_fire_shield;
 
 	IC		CPolterSpecialAbility		*ability() {return (m_flame ? m_flame : m_tele);}

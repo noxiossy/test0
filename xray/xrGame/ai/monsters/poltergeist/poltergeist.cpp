@@ -14,6 +14,8 @@
 #include "../control_movement_base.h"
 #include "../control_path_builder_base.h"
 #include "../../../PhysicsShell.h"
+#include "../../../GamePersistent.h"
+#include "../../../../Include/xrRender/KinematicsAnimated.h"
 
 #include "sound_player.h"
 
@@ -127,6 +129,8 @@ void CPoltergeist::Load(LPCSTR section)
 	m_sound_player->add("Sound_Hidden_Hit",	  count, SOUND_TYPE_MONSTER_INJURING,	MonsterSound::eHighPriority,		u32(MonsterSound::eCaptureAllChannels),	EPolterSounds::eSndHitHidden, bone);
 
 	particle_fire_shield			= pSettings->r_string(section,"Particle_Shield");
+	
+	CExplosive::Load(section);
 
 	// рандомные звуки и прочее запугивание игрока
 	m_scare_delay.min		= READ_IF_EXISTS(pSettings, r_u32, section, "Delay_Scare_Min", 15000);
@@ -211,6 +215,8 @@ void CPoltergeist::UpdateCL()
 	def_lerp(m_height, target_height, m_height_change_velocity, client_update_fdelta());
 	
 	ability()->update_frame	();
+	
+	CExplosive::UpdateCL();
 }
 
 void CPoltergeist::ForceFinalAnimation()
@@ -253,6 +259,8 @@ void CPoltergeist::net_Destroy()
 	Energy::disable();
 
 	ability()->on_destroy();
+	
+	CExplosive::net_Destroy();
 }
 
 void CPoltergeist::Die(CObject* who)
@@ -362,6 +370,8 @@ void CPoltergeist::net_Relcase(CObject *O)
 {
 	inherited::net_Relcase		(O);
 	CTelekinesis::remove_links	(O);
+
+	CExplosive::net_Relcase(O);
 }
 
 
