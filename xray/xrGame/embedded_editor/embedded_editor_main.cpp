@@ -7,6 +7,7 @@
 #include "embedded_editor_hud.h"
 #include "embedded_editor_le.h"
 #include "embedded_editor_logic.h"
+#include "embedded_editor_map.h"
 #include "embedded_editor_prop.h"
 #include "embedded_editor_se.h"
 #include "embedded_editor_stats.h"
@@ -27,6 +28,7 @@ bool show_occ_window = false;
 bool show_node_editor = false;
 bool show_ae_window = false;
 bool show_ui_editor = false;
+bool show_map_editor = false;
 bool show_hud_editor = false;
 bool show_le_editor = false;
 bool show_se_editor = false;
@@ -78,6 +80,8 @@ void ShowMain()
     ImGui::Button("PP Editor");
     if (ImGui::Button("UI Editor"))
         show_ui_editor = !show_ui_editor;
+    if (ImGui::Button("Map Editor"))
+        show_map_editor = !show_map_editor;
     if (ImGui::Button("HUD Editor"))
         show_hud_editor = !show_hud_editor;
 
@@ -116,6 +120,8 @@ void ShowEditor()
         ShowAeWindow(show_ae_window);
     if (show_ui_editor)
         showUiEditor(show_ui_editor);
+    if (show_map_editor)
+        ShowMapEditor(show_map_editor);
     if (show_hud_editor)
         ShowHudEditor(show_hud_editor);
     if (show_le_editor)
