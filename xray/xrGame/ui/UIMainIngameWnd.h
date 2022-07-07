@@ -59,7 +59,7 @@ public:
 	CUIHudStatesWnd*	get_hud_states() { return m_ui_hud_states; } //temp
 	void				OnSectorChanged			(int sector);
 
-	CUIMiniMap*		MiniMap();
+	//CUIMiniMap*		MiniMap();
 
 protected:
 
