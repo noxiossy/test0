@@ -7413,9 +7413,6 @@
     <ClInclude Include="embedded_editor\embedded_editor_ui.h">
       <Filter>Embedded editor</Filter>
     </ClInclude>
-    <ClInclude Include="embedded_editor\embedded_editor_map.h">
-      <Filter>Embedded editor</Filter>
-    </ClInclude>
     <ClInclude Include="embedded_editor\embedded_editor_hud.h">
       <Filter>Embedded editor</Filter>
     </ClInclude>
@@ -11040,9 +11037,6 @@
       <Filter>Embedded editor</Filter>
     </ClCompile>
     <ClCompile Include="embedded_editor\embedded_editor_ui.cpp">
-      <Filter>Embedded editor</Filter>
-    </ClCompile>
-    <ClCompile Include="embedded_editor\embedded_editor_map.cpp">
       <Filter>Embedded editor</Filter>
     </ClCompile>
     <ClCompile Include="embedded_editor\embedded_editor_hud.cpp">
