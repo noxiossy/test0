@@ -47,7 +47,7 @@ public:
 	void						SetupCurrentMap	();
 	void						OnSectorChanged	(int sector);
 	void						Counter_ResetClrAnimation();
-	CUICustomMap*				MiniMap()											{ return m_activeMap; }
+	CUIMiniMap*				MiniMap()											{ return m_activeMap; }
 
 private:
 	void						SetHeading		(float angle);
