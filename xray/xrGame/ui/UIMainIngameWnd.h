@@ -20,7 +20,6 @@ class	CMissile;
 class	CInventoryItem;
 class CUIHudStatesWnd;
 class CUICustomMap;
-class CUIMiniMap;
 
 class CUIMainIngameWnd: public CUIWindow  
 {
@@ -59,7 +58,7 @@ public:
 	CUIHudStatesWnd*	get_hud_states() { return m_ui_hud_states; } //temp
 	void				OnSectorChanged			(int sector);
 
-	CUIMiniMap*		MiniMap();
+	CUICustomMap*		MiniMap();
 
 protected:
 
