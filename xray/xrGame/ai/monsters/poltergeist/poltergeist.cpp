@@ -126,6 +126,8 @@ void CPoltergeist::Load(LPCSTR section)
 	m_sound_player->add("Sound_Hit",		  count, SOUND_TYPE_MONSTER_INJURING,	MonsterSound::eHighPriority,		u32(MonsterSound::eCaptureAllChannels),	EPolterSounds::eSndHit, bone);
 	m_sound_player->add("Sound_Hidden_Hit",	  count, SOUND_TYPE_MONSTER_INJURING,	MonsterSound::eHighPriority,		u32(MonsterSound::eCaptureAllChannels),	EPolterSounds::eSndHitHidden, bone);
 
+	particle_fire_shield			= pSettings->r_string(section,"Particle_Shield");
+
 	// рандомные звуки и прочее запугивание игрока
 	m_scare_delay.min		= READ_IF_EXISTS(pSettings, r_u32, section, "Delay_Scare_Min", 15000);
 	m_scare_delay.normal	= READ_IF_EXISTS(pSettings, r_u32, section, "Delay_Scare_Normal", 40000);
@@ -271,6 +273,10 @@ void CPoltergeist::Die(CObject* who)
 			else 
 				Position() = m_current_position;
 		}
+		else if (m_flame)
+		{
+			CExplosive::GenExplodeEvent(Position(),Fvector().set(0.f,1.f,0.f));
+		}
 	}
 	else
 		m_sound_player->play(EPolterSounds::eSndDeath);
@@ -287,13 +293,27 @@ void CPoltergeist::Hit(SHit* pHDS)
 	if (state_invisible)
 	{
 		ability()->on_hit(pHDS);
-		inherited::Hit(pHDS);
+		if ( (pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != last_hit_frame) )
+		{
+			// вычислить позицию и направленность партикла
+			Fmatrix pos; 
+			//CParticlesPlayer::MakeXFORM(this,element,Fvector().set(0.f,0.f,1.f),p_in_object_space,pos);
+			CParticlesPlayer::MakeXFORM(this,pHDS->bone(),pHDS->dir,pHDS->p_in_bone_space,pos);
+
+			// установить particles
+			CParticlesObject* ps = CParticlesObject::Create(particle_fire_shield,TRUE);
+			
+			ps->UpdateParent(pos,Fvector().set(0.f,0.f,0.f));
+			GamePersistent().ps_needtoplay.push_back(ps);
+		}
 	}
 	else
 	{
 		m_sound_player->play(EPolterSounds::eSndHit);
 		inherited::Hit(pHDS);
 	}
+	
+	last_hit_frame = Device.dwFrame;
 }
 
 

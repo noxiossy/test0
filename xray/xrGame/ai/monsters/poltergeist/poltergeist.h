@@ -3,6 +3,7 @@
 #include "../telekinesis.h"
 #include "../energy_holder.h"
 #include "../../../../xrServerEntities/script_export_space.h"
+#include "../../../Explosive.h"
 
 class CPhysicsShellHolder;
 class CStateManagerPoltergeist;
@@ -77,6 +78,7 @@ public:
 	virtual	void	on_deactivate		();
 	virtual	void	Hit					(SHit* pHDS);
 
+	LPCSTR	particle_fire_shield;
 
 	IC		CPolterSpecialAbility		*ability() {return (m_flame ? m_flame : m_tele);}
 	
