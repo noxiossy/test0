@@ -21,8 +21,7 @@ enum EPolterSounds
 
 class CPoltergeist :	public CBaseMonster ,
 						public CTelekinesis,
-						public CEnergyHolder,
-						public CExplosive {
+						public CEnergyHolder{
 	
 	typedef		CBaseMonster	inherited;
 	typedef		CEnergyHolder	Energy;
