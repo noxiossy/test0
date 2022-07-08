@@ -44,6 +44,8 @@ namespace bloodsucker
 } // namespace bloodsucker
 } // namespace detail
 
+u32		CAI_Bloodsucker::m_time_last_vampire	=	0;
+
 CAI_Bloodsucker::CAI_Bloodsucker()
 {
 	StateMan			= xr_new<CStateManagerBloodsucker>	(this);
@@ -203,6 +205,7 @@ void CAI_Bloodsucker::Load(LPCSTR section)
 	anim().LinkAction(ACT_LOOK_AROUND,	eAnimLookAround); 
 
 
+	m_hits_before_vampire		=	0;
 
 	#ifdef DEBUG	
 		anim().accel_chain_test		();
@@ -219,7 +222,10 @@ void CAI_Bloodsucker::Load(LPCSTR section)
 
 	m_vampire_want_speed			= pSettings->r_float(section,"Vampire_Want_Speed");
 	m_vampire_wound					= pSettings->r_float(section,"Vampire_Wound");
-
+	m_vampire_gain_health			= pSettings->r_float(section,"Vampire_GainHealth");
+	m_vampire_distance				= pSettings->r_float(section,"Vampire_Distance");
+	m_sufficient_hits_before_vampire	=	pSettings->r_u32(section,"Vampire_Sufficient_Hits");
+	m_sufficient_hits_before_vampire_random	=	-1 + (rand()%3);
 
 	invisible_particle_name			= pSettings->r_string(section,"Particle_Invisible");
 
@@ -249,7 +255,7 @@ void CAI_Bloodsucker::reinit()
 
 	Bones.Reset					();
 
-	com_man().ta_fill_data(anim_triple_vampire, "vampire_0", "vampire_1", "vampire_2", TA_EXECUTE_LOOPED, TA_DONT_SKIP_PREPARE, ControlCom::eCapturePath | ControlCom::eCaptureMovement);
+	com_man().ta_fill_data(anim_triple_vampire, "vampire_0", "vampire_1", "vampire_2", TA_EXECUTE_LOOPED, TA_DONT_SKIP_PREPARE, 0);//ControlCom::eCapturePath | ControlCom::eCaptureMovement);
 	
 
 	m_alien_control.reinit();
@@ -368,6 +374,21 @@ void CAI_Bloodsucker::ActivateVampireEffector()
 	Actor()->Cameras().AddPPEffector(xr_new<CVampirePPEffector>(pp_vampire_effector, 6.0f));
 }
 
+bool CAI_Bloodsucker::WantVampire()
+{
+	return							!!fsimilar(m_vampire_want_value,1.f);
+}
+
+void CAI_Bloodsucker::SatisfyVampire ()
+{
+	m_vampire_want_value		=	0.f;
+
+	float health				=	conditions().GetHealth();
+	health						+=	m_vampire_gain_health;
+
+	health						=	_min(health, conditions().GetMaxHealth());
+	conditions().SetHealth			(health);
+}
 
 void CAI_Bloodsucker::CheckSpecParams(u32 spec_params)
 {
@@ -707,6 +728,12 @@ void CAI_Bloodsucker::manual_deactivate()
 {
 	state_invisible = false;
 	setVisible		(TRUE);
+}
+
+
+bool   CAI_Bloodsucker::done_enough_hits_before_vampire ()
+{
+	return (int)m_hits_before_vampire >= (int)m_sufficient_hits_before_vampire + m_sufficient_hits_before_vampire_random;
 }
 
 #ifdef DEBUG

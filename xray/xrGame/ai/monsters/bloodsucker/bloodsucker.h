@@ -89,8 +89,8 @@ public:
 
 			
 			void			ActivateVampireEffector	();
-	IC		bool			WantVampire				() {return (fsimilar(m_vampire_want_value,1.f) == TRUE);}
-	IC		void			SatisfyVampire			() {m_vampire_want_value = 0.f;}
+			bool			WantVampire				(); 
+			void			SatisfyVampire			();
 
 			u32             get_last_critical_hit_tick () { return m_last_critical_hit_tick; }
 			void            clear_last_critical_hit_tick () { m_last_critical_hit_tick = 0; }
@@ -102,6 +102,8 @@ private:
 	float					m_vampire_want_value;
 	float					m_vampire_want_speed;		// load from ltx
 	float					m_vampire_wound;
+	float					m_vampire_gain_health;
+	float					m_vampire_distance;
 	float					m_vis_state;
 	bool					m_drag_anim_jump;
 	bool					m_animated;
@@ -172,6 +174,7 @@ public:
 
 			u32     get_invisibility_activate_delay () { return m_invisibility_activate_delay; }
 
+			float	get_vampire_distance () const { return m_vampire_distance; }
 
 #ifdef DEBUG
 	virtual CBaseMonster::SDebugInfo show_debug_info();
@@ -195,6 +198,12 @@ public:
 	float   m_camera_effector_ver_angle;
 
 	u32     m_invisibility_activate_delay;
+
+public:
+	u32				m_hits_before_vampire;
+	u32				m_sufficient_hits_before_vampire;
+	int				m_sufficient_hits_before_vampire_random;
+	bool			done_enough_hits_before_vampire ();
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

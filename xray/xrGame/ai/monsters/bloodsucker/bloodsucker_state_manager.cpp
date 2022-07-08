@@ -29,7 +29,7 @@ CStateManagerBloodsucker::CStateManagerBloodsucker(CAI_Bloodsucker *monster) : i
 	add_state(eStateEat,				xr_new<CStateMonsterEat<CAI_Bloodsucker> >					(monster));
 	add_state(eStateHearInterestingSound,	xr_new<CStateMonsterHearInterestingSound<CAI_Bloodsucker> >	(monster));
 	add_state(eStateHitted,				xr_new<CStateMonsterHitted<CAI_Bloodsucker> >				(monster));
-	add_state(eStateCustom_Vampire,		xr_new<CStateBloodsuckerVampire<CAI_Bloodsucker> >			(monster));	
+	add_state(eStateVampire_Execute,	xr_new<CStateBloodsuckerVampireExecute<CAI_Bloodsucker> >	(monster));
 }
 
 void CStateManagerBloodsucker::drag_object()
@@ -70,6 +70,19 @@ void CStateManagerBloodsucker::update ()
 	inherited::update();
 }
 
+bool CStateManagerBloodsucker::check_vampire()
+{
+	if ( prev_substate != eStateVampire_Execute )
+	{
+		if (get_state(eStateVampire_Execute)->check_start_conditions())	return true;
+	} 
+	else
+	{
+		if (!get_state(eStateVampire_Execute)->check_completion())		return true;
+	}
+	return false;
+}
+
 void CStateManagerBloodsucker::execute ()
 {
 	u32 state_id = u32(-1);
@@ -80,9 +93,9 @@ void CStateManagerBloodsucker::execute ()
 	{
 		if ( enemy ) 
 		{
-			 if ( check_state(eStateCustom_Vampire) ) 
+			 if ( check_vampire() ) 
 			 {
-				state_id = eStateCustom_Vampire;
+				state_id = eStateVampire_Execute;
 			 } 
 			 else 
 			 {

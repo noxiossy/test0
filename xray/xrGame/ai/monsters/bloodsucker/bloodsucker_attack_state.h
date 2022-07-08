@@ -24,6 +24,7 @@ public:
 private:
 			void	update_invisibility			();
 			bool	check_hiding				();
+			bool	check_vampire				();
 };
 
 template<typename _Object>

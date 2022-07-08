@@ -12,9 +12,10 @@
 TEMPLATE_SPECIALIZATION
 CBloodsuckerStateAttackAbstract::CBloodsuckerStateAttack(_Object *obj) : inherited_attack(obj)
 {
-	//add_state(eStateAttack_Hide,	xr_new<CBloodsuckerStateAttackHide<_Object> > (obj));
+	//add_state	(eStateAttack_Hide,	xr_new<CBloodsuckerStateAttackHide<_Object> > (obj));
 	//add_state	(eStateAttack_Hide,	xr_new<CStateMonsterMoveToPointEx<_Object> >(obj));
 	add_state	(eStateAttack_Hide,	xr_new<CStateMonsterBackstubEnemy<_Object> >(obj));
+	add_state	(eStateVampire_Execute,	xr_new<CStateBloodsuckerVampireExecute<_Object> >(obj));
 }
 
 TEMPLATE_SPECIALIZATION
@@ -65,6 +66,7 @@ void CBloodsuckerStateAttackAbstract::execute()
 	{
 		select_state(eStateAttack_MoveToHomePoint);
 	}
+	else if ( check_vampire() )				select_state(eStateVampire_Execute);
 	else if ( check_steal_state() ) 
 	{
 		select_state(eStateAttack_Steal);
@@ -145,6 +147,20 @@ void CBloodsuckerStateAttackAbstract::execute()
 
 		squad->UpdateGoal(object, goal);
 	}
+}
+
+TEMPLATE_SPECIALIZATION
+bool CBloodsuckerStateAttackAbstract::check_vampire()
+{
+	if ( prev_substate != eStateVampire_Execute )
+	{
+		if (get_state(eStateVampire_Execute)->check_start_conditions())	return true;
+	} 
+	else
+	{
+		if (!get_state(eStateVampire_Execute)->check_completion())		return true;
+	}
+	return false;
 }
 
 TEMPLATE_SPECIALIZATION
