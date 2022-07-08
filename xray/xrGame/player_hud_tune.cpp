@@ -27,7 +27,7 @@ bool is_attachable_item_tuning_mode()
 
 void tune_remap(const Ivector& in_values, Ivector& out_values)
 {
-	if( pInput->iGetAsyncKeyState(DIK_LSHIFT) )
+	if( pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT) )
 	{
 		out_values = in_values;
 	}else
@@ -106,7 +106,6 @@ void calc_cam_diff_rot(Fmatrix item_transform, Fvector diff, Fvector& res)
 
 void attachable_hud_item::tune(Ivector values)
 {
-#ifndef MASTER_GOLD
 	if(!is_attachable_item_tuning_mode() )
 		return;
 
@@ -177,12 +176,10 @@ void attachable_hud_item::tune(Ivector values)
 			Log("-----------");
 		}
 	}
-#endif // #ifndef MASTER_GOLD
 }
 
 void attachable_hud_item::debug_draw_firedeps()
 {
-#ifdef DEBUG
 	bool bForce = (hud_adj_mode==3||hud_adj_mode==4);
 
 	if(hud_adj_mode==5||hud_adj_mode==6||hud_adj_mode==7 ||bForce)
@@ -201,13 +198,14 @@ void attachable_hud_item::debug_draw_firedeps()
 		if(hud_adj_mode==7)
 			render.draw_aabb(fd.vLastSP,0.005f,0.005f,0.005f,D3DCOLOR_XRGB(0,255,0));
 	}
-#endif // DEBUG
 }
 
 
 void player_hud::tune(Ivector _values)
 {
-#ifndef MASTER_GOLD
+	attachable_hud_item* hi = m_attached_items[hud_adj_item_idx];
+	if (!hi)	return;//fixed call not existed hi
+
 	Ivector				values;
 	tune_remap			(_values,values);
 
@@ -282,7 +280,6 @@ void player_hud::tune(Ivector _values)
 		if(!hi)	return;
 		hi->tune(values);
 	}
-#endif // #ifndef MASTER_GOLD
 }
 
 void hud_draw_adjust_mode()
