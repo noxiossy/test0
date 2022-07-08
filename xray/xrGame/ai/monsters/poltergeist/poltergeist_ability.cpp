@@ -37,7 +37,7 @@ void CPolterSpecialAbility::load(LPCSTR section)
 
 void CPolterSpecialAbility::update_schedule()
 {
-	if (m_object->g_Alive()) {
+	if ( m_object->g_Alive() && m_object->is_hidden() ) {
 		if (!m_sound_base._feedback()) m_sound_base.play_at_pos(m_object, m_object->Position());
 		else m_sound_base.set_position(m_object->Position());
 	}

@@ -308,14 +308,15 @@ void CPoltergeist::Hit(SHit* pHDS)
 			ps->UpdateParent(pos,Fvector().set(0.f,0.f,0.f));
 			GamePersistent().ps_needtoplay.push_back(ps);
 		}
+		
+		last_hit_frame = Device.dwFrame;
+		return;
 	}
 	else
 	{
 		m_sound_player->play(EPolterSounds::eSndHit);
 		inherited::Hit(pHDS);
 	}
-	
-	last_hit_frame = Device.dwFrame;
 }
 
 
