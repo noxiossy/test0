@@ -86,19 +86,24 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
 		{
 			if ( MainInputReceiver() == m_ActorMenu )
 				HideActorMenu();
-			ShowPdaMenu();
+			if ( !pActor->inventory_disabled() )
+				ShowPdaMenu();
 			break;
 		}
 
 	case kINVENTORY:
 		{
 			if ( MainInputReceiver() == m_PdaMenu )
-				HidePdaMenu();
-			ShowActorMenu();
+				HidePdaMenu();			
+
+			if ( !pActor->inventory_disabled() )
+				ShowActorMenu();
+
 			break;
 		}
 
 	case kSCORES:
+		if ( !pActor->inventory_disabled() )
 		{
 			CActor *pActor = smart_cast<CActor*>(pInvOwner);
 			if( !pActor ) return false;

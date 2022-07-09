@@ -35,6 +35,14 @@ void CStateZombieVampireExecuteAbstract::initialize()
 	object->m_hits_before_vampire	= 0;
 	object->m_sufficient_hits_before_vampire_random	=	-1 + (rand()%3);
 	
+	HUD().SetRenderable				(false);
+	NET_Packet			P;
+	Actor()->u_EventGen	(P, GEG_PLAYER_WEAPON_HIDE_STATE, Actor()->ID());
+	P.w_u16				(INV_STATE_BLOCK_ALL);
+	P.w_u8				(u8(true));
+	Actor()->u_EventSend(P);
+
+	Actor()->set_inventory_disabled	(true);
 
 	m_effector_activated			= false;
 }
@@ -115,12 +123,15 @@ void CStateZombieVampireExecuteAbstract::show_hud()
 TEMPLATE_SPECIALIZATION
 void CStateZombieVampireExecuteAbstract::cleanup()
 {
+	Actor()->set_inventory_disabled	(false);
 	
 	if ( object->com_man().ta_is_active() )
 		object->com_man().ta_deactivate();
 
 	if (object->CControlledActor::is_controlling())
 		object->CControlledActor::release		();
+
+	show_hud();
 
 	object->update_vampire_pause_time();
 }

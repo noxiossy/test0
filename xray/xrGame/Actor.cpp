@@ -195,6 +195,8 @@ CActor::CActor() : CEntityAlive()
 
 	m_location_manager		= xr_new<CLocationManager>(this);
 	m_block_sprint_counter	= 0;
+
+    m_inventory_disabled = false;
 }
 
 

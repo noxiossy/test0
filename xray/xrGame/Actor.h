@@ -742,6 +742,9 @@ public:
 	virtual	bool				is_ai_obstacle					() const;
 	
 			float				GetRestoreSpeed					(ALife::EConditionRestoreType const& type);
+
+            void			set_inventory_disabled (bool is_disabled) { m_inventory_disabled = is_disabled; }
+            bool			inventory_disabled () const { return m_inventory_disabled; }
 private:
 	static const float		cam_inert_value;
 	float					prev_cam_inert_value;
