@@ -99,8 +99,6 @@ void CZombie::Load(LPCSTR section)
 	m_vampire_distance				= pSettings->r_float(section,"Vampire_Distance");
 	m_sufficient_hits_before_vampire	=	pSettings->r_u32(section,"Vampire_Sufficient_Hits");
     m_sufficient_hits_before_vampire_random = -1 + (rand() % 3);
-
-    PostLoad(section);
 }
 
 void CZombie::update_vampire_pause_time()
@@ -180,10 +178,10 @@ void CZombie::BoneCallback(CBoneInstance *B)
 
 void CZombie::vfAssignBones()
 {
-	// Установка callback на кости
+	// Г“Г±ГІГ Г­Г®ГўГЄГ  callback Г­Г  ГЄГ®Г±ГІГЁ
 	bone_spine =	&smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine"));
 	bone_head =		&smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head"));
-	//if(!PPhysicsShell())//нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
+	//if(!PPhysicsShell())//Г­ГҐГ«ГјГ§Гї Г±ГІГ ГўГЁГІГј ГЄГ®Г«ГЎГҐГЄГЁ, ГҐГ±Г«ГЁ Г±Г®Г§Г¤Г Г­ ГґГЁГ§ ГёГҐГ« - Гі Г­ГҐГЈГ® Г±ГІГ®ГїГІ Г±ГўГ®ГЁ ГЄГ®Г«ГЎГҐГЄГЁ!!!
 	//{
 		//bone_spine->set_callback(BoneCallback,this);
 		//bone_head->set_callback(BoneCallback,this);
