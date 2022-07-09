@@ -746,15 +746,19 @@ public:
             void			set_inventory_disabled (bool is_disabled) { m_inventory_disabled = is_disabled; }
             bool			inventory_disabled () const { return m_inventory_disabled; }
 private:
+
+    bool					m_inventory_disabled;
 	static const float		cam_inert_value;
 	float					prev_cam_inert_value;
 public:
 	virtual void			On_SetEntity();
 	virtual void			On_LostEntity();
+	// ?.anm anims\\camera_effects
 			void 			PlayAnm(LPCSTR Section);
 
 static CPhysicsShell		*actor_camera_shell;
 
+private:
 DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 add_to_type_list(CActor)
