@@ -7,10 +7,6 @@
 // #include "../../../../xrEngine/CameraBase.h"
 //#include "../../../ActorCondition.h"
 #include "../../../HudManager.h"
-#include "ai/monsters/controlled_actor.h"
-#include <luabind/functor.hpp>
-#include "script_engine.h"
-#include "ai_space.h"
 
 
 #define TEMPLATE_SPECIALIZATION template <\
@@ -39,12 +35,6 @@ void CStateZombieVampireExecuteAbstract::initialize()
 	object->m_hits_before_vampire	= 0;
 	object->m_sufficient_hits_before_vampire_random	=	-1 + (rand()%3);
 	
-	luabind::functor<void> functor;
-	ai().script_engine().functor("xr_effects.disable_ui_anim",functor);
-	functor(1);
-	
-	Actor()->TransferInfo("bs_qte", true);
-
 
 	m_effector_activated			= false;
 }
@@ -56,11 +46,7 @@ void CStateZombieVampireExecuteAbstract::execute()
 		object->ActivateVampireEffector	();
 		m_effector_activated			= true;
 	}
-	
-	luabind::functor<void> functor;
-	ai().script_engine().functor("leer_scr.bloodsucker_qte_hud",functor);
-	functor(1);
-	
+
 	look_head							();
 
 	switch (m_action) {
@@ -137,20 +123,6 @@ void CStateZombieVampireExecuteAbstract::cleanup()
 		object->CControlledActor::release		();
 
 	object->update_vampire_pause_time();
-
-	Actor()->OnDisableInfo("bs_qte");
-	
-	if (Actor()->HasInfo("bs_qte_die"))
-	{
-		Actor()->OnDisableInfo("bs_qte_die");
-		luabind::functor<void> functor;
-		ai().script_engine().functor("xr_effects.kill_actor",functor);
-		functor(1);
-	}
-	
-	luabind::functor<void> functor;
-	ai().script_engine().functor("leer_scr.bloodsucker_qte_hud_dis",functor);
-	functor(1);
 }
 
 TEMPLATE_SPECIALIZATION
@@ -250,23 +222,8 @@ void CStateZombieVampireExecuteAbstract::execute_vampire_continue()
 	// проверить на грави удар
 	if (time_vampire_started < Device.dwTimeGlobal)
 	{
-		if(Actor()->HasInfo("bs_qte_done") )
-		{
 			cleanup();
-		
-			luabind::functor<void> functor;
-			ai().script_engine().functor("leer_scr.quick_kk",functor);
-			functor(1);
-
-			object->conditions().SetHealth(0.01f);
-		
-       			m_action = eActionCompleted;
-		
-			Actor()->OnDisableInfo("bs_qte_done");
-		}else{
-			Actor()->TransferInfo("bs_qte_die", true);
-			m_action = eActionFire;
-		} 
+       		m_action = eActionCompleted;
 	}
 }
 
