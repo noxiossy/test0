@@ -105,6 +105,9 @@ private:
 	float					m_vampire_wound;
 	float					m_vampire_gain_health;
 	float					m_vampire_distance;
+    u32 m_vampire_pause_time;
+    u32 m_vampire_pause_time_static;
+    u32 m_vampire_chance;
 	float					m_vis_state;
 	bool					m_drag_anim_jump;
 	bool					m_animated;
@@ -176,6 +179,9 @@ public:
 			u32     get_invisibility_activate_delay () { return m_invisibility_activate_delay; }
 
 			float	get_vampire_distance () const { return m_vampire_distance; }
+		    u32 get_vampire_pause_time() const { return m_vampire_pause_time; }
+			u32 get_vampire_chance() const { return m_vampire_chance; }
+		    void update_vampire_pause_time();
 
 #ifdef DEBUG
 	virtual CBaseMonster::SDebugInfo show_debug_info();

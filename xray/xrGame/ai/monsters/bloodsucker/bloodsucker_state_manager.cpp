@@ -93,7 +93,7 @@ void CStateManagerBloodsucker::execute ()
 	{
 		if ( enemy ) 
 		{
-			 if ( check_vampire() ) 
+            if (check_vampire() && !Actor()->HasInfo("lvl_3_hunter"))
 			 {
 				state_id = eStateVampire_Execute;
 			 } 

@@ -17,7 +17,7 @@
 #define VAMPIRE_TIME_HOLD		4000
 #define VAMPIRE_HIT_IMPULSE		40.f
 #define VAMPIRE_MIN_DIST		0.5f
-#define VAMPIRE_MAX_DIST		1.f
+#define VAMPIRE_MAX_DIST		1.5f
 
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::initialize()
@@ -35,6 +35,15 @@ void CStateBloodsuckerVampireExecuteAbstract::initialize()
 
 	object->m_hits_before_vampire	= 0;
 	object->m_sufficient_hits_before_vampire_random	=	-1 + (rand()%3);
+	
+	HUD().SetRenderable				(false);
+	NET_Packet			P;
+	Actor()->u_EventGen	(P, GEG_PLAYER_WEAPON_HIDE_STATE, Actor()->ID());
+	P.w_u16				(INV_STATE_BLOCK_ALL);
+	P.w_u8				(u8(true));
+	Actor()->u_EventSend(P);
+
+	Actor()->set_inventory_disabled	(true);
 
 	m_effector_activated			= false;
 }
@@ -42,7 +51,7 @@ void CStateBloodsuckerVampireExecuteAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::execute()
 {
-	if (!object->CControlledActor::is_turning() && !m_effector_activated) {
+	if (/*!object->CControlledActor::is_turning() &&*/ !m_effector_activated) {
 		object->ActivateVampireEffector	();
 		m_effector_activated			= true;
 	}
@@ -116,9 +125,17 @@ TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::cleanup()
 {
 	object->start_invisible_predator	();
+	Actor()->set_inventory_disabled	(false);
+	
+	if ( object->com_man().ta_is_active() )
+		object->com_man().ta_deactivate();
 
 	if (object->CControlledActor::is_controlling())
 		object->CControlledActor::release		();
+
+	show_hud();
+
+	object->update_vampire_pause_time();
 }
 
 TEMPLATE_SPECIALIZATION
@@ -144,8 +161,8 @@ bool CStateBloodsuckerVampireExecuteAbstract::check_start_conditions()
 //	float dist		= object->MeleeChecker.distance_to_enemy	(enemy);
 //	if ((dist > VAMPIRE_MAX_DIST) || (dist < VAMPIRE_MIN_DIST))	return false;
 
-	if ( !object->done_enough_hits_before_vampire() )
-		return false;
+//	if ( !object->done_enough_hits_before_vampire() )
+//		return false;
 
 	u32 const vertex_id	=	ai().level_graph().check_position_in_direction(object->ai_location().level_vertex_id(), 
 																		   object->Position(), 
@@ -156,12 +173,15 @@ bool CStateBloodsuckerVampireExecuteAbstract::check_start_conditions()
 	if ( !object->MeleeChecker.can_start_melee(enemy) ) 
 		return false;
 
+	if ( object->get_vampire_chance() == 0)
+		return false;
+
 	// проверить направление на врага
 	if ( !object->control().direction().is_face_target(enemy, PI_DIV_2) ) 
 		return false;
 
-	if ( !object->WantVampire() ) 
-		return false;
+//	if ( !object->WantVampire() ) 
+//		return false;
 	
 	// является ли враг актером
 	if ( !smart_cast<CActor const*>(enemy) )
@@ -177,6 +197,15 @@ bool CStateBloodsuckerVampireExecuteAbstract::check_start_conditions()
 	if ( actor->input_external_handler_installed() )
 		return false;
 
+	if (Device.dwTimeGlobal <= object->get_vampire_pause_time())
+	{
+		return false;
+	}
+	else if ((rand() & 10) > object->get_vampire_chance())  // LR_DEVS CHECK
+	{
+		object->update_vampire_pause_time();
+		return false;
+	}
 	return true;
 }
 
@@ -192,7 +221,7 @@ TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_prepare()
 {
 	object->com_man().ta_activate		(object->anim_triple_vampire);
-	time_vampire_started				= Device.dwTimeGlobal;
+	time_vampire_started				= Device.dwTimeGlobal + VAMPIRE_TIME_HOLD;
 	
 	object->sound().play(CAI_Bloodsucker::eVampireGrasp);
 }
@@ -212,7 +241,9 @@ void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_continue()
 	object->sound().play(CAI_Bloodsucker::eVampireSucking);
 
 	// проверить на грави удар
-	if (time_vampire_started + VAMPIRE_TIME_HOLD < Device.dwTimeGlobal) {
+	if (time_vampire_started < Device.dwTimeGlobal)
+	{
+		cleanup();
 		m_action = eActionFire;
 	}
 }

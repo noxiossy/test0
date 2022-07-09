@@ -218,6 +218,10 @@ void CAI_Bloodsucker::Load(LPCSTR section)
 	LoadVampirePPEffector			(pSettings->r_string(section,"vampire_effector"));
 	m_vampire_min_delay				= pSettings->r_u32(section,"Vampire_Delay");
 
+	m_vampire_pause_time = pSettings->r_u32(section, "Vampire_Pause")+Device.dwTimeGlobal;
+	m_vampire_pause_time_static = pSettings->r_u32(section, "Vampire_Pause");
+	m_vampire_chance = pSettings->r_u32(section, "Vampire_Chance");
+
 	m_visual_predator				= pSettings->r_string(section,"Predator_Visual");
 
 	m_vampire_want_speed			= pSettings->r_float(section,"Vampire_Want_Speed");
@@ -245,6 +249,11 @@ void CAI_Bloodsucker::Load(LPCSTR section)
 	m_invisibility_activate_delay        = READ_IF_EXISTS(pSettings, r_u32, section, "invisibility_activate_delay",  
 										   default_invisibility_activate_delay);
 	
+}
+
+void CZombie::update_vampire_pause_time()
+{
+	m_vampire_pause_time = m_vampire_pause_time_static+Device.dwTimeGlobal;
 }
 
 void CAI_Bloodsucker::reinit()
