@@ -115,7 +115,6 @@ public:
     u32 m_hits_before_vampire;
     u32 m_sufficient_hits_before_vampire;
     int m_sufficient_hits_before_vampire_random;
-    virtual void on_attack_on_run_hit();
     bool done_enough_hits_before_vampire();
 	
 #ifdef _DEBUG
