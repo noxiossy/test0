@@ -80,8 +80,7 @@ public:
 	//--------------------------------------------------------------------
 	// Vampire
 	//--------------------------------------------------------------------
-public:
-
+//public:
 	u32						m_vampire_min_delay;
 	static u32				m_time_last_vampire;
 	SAnimationTripleData	anim_triple_vampire;

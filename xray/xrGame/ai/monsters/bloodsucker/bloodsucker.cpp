@@ -251,7 +251,7 @@ void CAI_Bloodsucker::Load(LPCSTR section)
 	
 }
 
-void CZombie::update_vampire_pause_time()
+void CAI_Bloodsucker::update_vampire_pause_time()
 {
 	m_vampire_pause_time = m_vampire_pause_time_static+Device.dwTimeGlobal;
 }
