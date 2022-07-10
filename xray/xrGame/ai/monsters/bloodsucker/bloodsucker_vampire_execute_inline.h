@@ -124,8 +124,9 @@ void CStateBloodsuckerVampireExecuteAbstract::show_hud()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::cleanup()
 {
-	object->start_invisible_predator	();
 	Actor()->set_inventory_disabled	(false);
+
+	show_hud();
 	
 	if ( object->com_man().ta_is_active() )
 		object->com_man().ta_deactivate();
@@ -133,9 +134,8 @@ void CStateBloodsuckerVampireExecuteAbstract::cleanup()
 	if (object->CControlledActor::is_controlling())
 		object->CControlledActor::release		();
 
-	show_hud();
-
 	object->update_vampire_pause_time();
+	object->start_invisible_predator	();
 }
 
 TEMPLATE_SPECIALIZATION

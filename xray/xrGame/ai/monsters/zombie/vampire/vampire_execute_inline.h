@@ -17,7 +17,7 @@
 
 #define VAMPIRE_TIME_HOLD		4000
 #define VAMPIRE_HIT_IMPULSE		40.f
-#define VAMPIRE_MIN_DIST		0.5f
+#define VAMPIRE_MIN_DIST		1.0f
 #define VAMPIRE_MAX_DIST		1.5f
 
 TEMPLATE_SPECIALIZATION
@@ -124,14 +124,14 @@ TEMPLATE_SPECIALIZATION
 void CStateZombieVampireExecuteAbstract::cleanup()
 {
 	Actor()->set_inventory_disabled	(false);
+
+	show_hud();
 	
 	if ( object->com_man().ta_is_active() )
 		object->com_man().ta_deactivate();
 
 	if (object->CControlledActor::is_controlling())
 		object->CControlledActor::release		();
-
-	show_hud();
 
 	object->update_vampire_pause_time();
 }
