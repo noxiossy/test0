@@ -45,7 +45,7 @@ BOOL CVampirePPEffector::Process(SPPInfo& pp)
 #define DELTA_ANGLE_Y	DELTA_ANGLE_X
 #define DELTA_ANGLE_Z	DELTA_ANGLE_X
 #define ANGLE_SPEED		0.2f	
-#define BEST_DISTANCE 4.3f //0.3
+#define BEST_DISTANCE 2.0f //0.3
 CVampireCameraEffector::CVampireCameraEffector(float time, const Fvector &src, const Fvector &tgt) :
 	inherited(eCEVampire, time)
 {

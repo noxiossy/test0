@@ -17,7 +17,7 @@
 
 #define VAMPIRE_TIME_HOLD		4000
 #define VAMPIRE_HIT_IMPULSE		40.f
-#define VAMPIRE_MIN_DIST		1.0f
+#define VAMPIRE_MIN_DIST		0.5f
 #define VAMPIRE_MAX_DIST		1.5f
 
 TEMPLATE_SPECIALIZATION
@@ -36,11 +36,11 @@ void CStateZombieVampireExecuteAbstract::initialize()
 	object->m_sufficient_hits_before_vampire_random	=	-1 + (rand()%3);
 	
 	HUD().SetRenderable				(false);
-	NET_Packet			P;
+	/*NET_Packet			P;
 	Actor()->u_EventGen	(P, GEG_PLAYER_WEAPON_HIDE_STATE, Actor()->ID());
 	P.w_u16				(INV_STATE_BLOCK_ALL);
 	P.w_u8				(u8(true));
-	Actor()->u_EventSend(P);
+	Actor()->u_EventSend(P);*/
 
 	Actor()->set_inventory_disabled	(true);
 
@@ -112,12 +112,12 @@ TEMPLATE_SPECIALIZATION
 void CStateZombieVampireExecuteAbstract::show_hud()
 {
 	HUD().SetRenderable(true);
-	NET_Packet			P;
+	/*NET_Packet			P;
 
 	Actor()->u_EventGen	(P, GEG_PLAYER_WEAPON_HIDE_STATE, Actor()->ID());
 	P.w_u16				(INV_STATE_BLOCK_ALL);
 	P.w_u8				(u8(false));
-	Actor()->u_EventSend(P);
+	Actor()->u_EventSend(P);*/
 }
 
 TEMPLATE_SPECIALIZATION
@@ -253,7 +253,7 @@ void CStateZombieVampireExecuteAbstract::look_head()
 {
 	IKinematics *pK = smart_cast<IKinematics*>(object->Visual());
 	Fmatrix bone_transform;
-	bone_transform = pK->LL_GetTransform(pK->LL_BoneID("bip01_neck"));	
+	bone_transform = pK->LL_GetTransform(pK->LL_BoneID("bip01_head"));	
 
 	Fmatrix global_transform;
 	global_transform.mul_43(object->XFORM(),bone_transform);
