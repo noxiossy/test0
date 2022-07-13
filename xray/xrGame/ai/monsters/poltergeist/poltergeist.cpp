@@ -275,10 +275,10 @@ void CPoltergeist::Die(CObject* who)
 			else 
 				Position() = m_current_position;
 		}
-		else if (m_flame)
-		{
+		//else if (m_flame)
+		//{
 			//CExplosive::GenExplodeEvent(Position(),Fvector().set(0.f,1.f,0.f));
-		}
+		//}
 	}
 	else
 		m_sound_player->play(EPolterSounds::eSndDeath);
@@ -295,7 +295,7 @@ void CPoltergeist::Hit(SHit* pHDS)
 	if (state_invisible)
 	{
 		ability()->on_hit(pHDS);
-		if ( (pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != last_hit_frame) )
+		if ( m_tele && (pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != last_hit_frame) )
 		{
 			// вычислить позицию и направленность партикла
 			Fmatrix pos; 
@@ -310,7 +310,7 @@ void CPoltergeist::Hit(SHit* pHDS)
 		}
 		
 		last_hit_frame = Device.dwFrame;
-		return;
+		inherited::Hit(pHDS);
 	}
 	else
 	{
