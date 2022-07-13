@@ -69,8 +69,7 @@ void CUIEncyclopediaWnd::Init()
 	UIEncyclopediaInfoHeader	= xr_new<CUIFrameLineWnd>();UIEncyclopediaInfoHeader->SetAutoDelete(true);
 	UIEncyclopediaInfoBkg->AttachChild(UIEncyclopediaInfoHeader);
 
-#pragma todo("implement this")
-//.	UIEncyclopediaInfoHeader->UITitleText.SetEllipsis(CUIStatic::eepBegin, 20);
+	UIEncyclopediaInfoHeader->UITitleText.SetElipsis(CUIStatic::eepBegin, 20);
 	xml_init.InitFrameLine(uiXml, "left_frame_line", 0, UIEncyclopediaInfoHeader);
 
 	UIArticleHeader				= xr_new<CUIStatic>(); UIArticleHeader->SetAutoDelete(true);
@@ -107,23 +106,19 @@ void CUIEncyclopediaWnd::SendMessage(CUIWindow *pWnd, s16 msg, void* pData)
 			caption					+= "/";
 			caption					+= CStringTable().translate(A->data()->group).c_str();
 
-#pragma todo("implement this")
-//.			UIEncyclopediaInfoHeader->UITitleText.SetText(caption.c_str());
-
+			UIEncyclopediaInfoHeader->UITitleText.SetText(caption.c_str());
 			UIArticleHeader->SetTextST(*(A->data()->group));
 			SetCurrentArtice		(NULL);
 		}else
 		{
 			CEncyclopediaArticle* A = m_ArticlesDB[pTVItem->GetValue()];
-
-#pragma todo("implement this")
-/*			xr_string caption		= "# ";
+			xr_string caption		= "# ";
 			caption					+= "/";
 			caption					+= CStringTable().translate(A->data()->group).c_str();
 			caption					+= "/";
 			caption					+= CStringTable().translate(A->data()->name).c_str();
+
 			UIEncyclopediaInfoHeader->UITitleText.SetText(caption.c_str());
-*/
 			SetCurrentArtice		(pTVItem);
 			UIArticleHeader->SetTextST(*(A->data()->name));
 		}
