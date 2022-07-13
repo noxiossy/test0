@@ -38,8 +38,8 @@ void CUITaskWnd::Init()
 
 	CUIXmlInit::InitWindow			(xml, "main_wnd", 0, this);
 
-	m_background					= UIHelper::CreateFrameLine( xml, "background", this );
-	m_task_split					= UIHelper::CreateFrameLine( xml, "task_split", this );
+//	m_background					= UIHelper::CreateFrameLine( xml, "background", this );
+//	m_task_split					= UIHelper::CreateFrameLine( xml, "task_split", this );
 
 	m_pMapWnd						= xr_new<CUIMapWnd>(); 
 	m_pMapWnd->SetAutoDelete		(false);
@@ -231,11 +231,11 @@ void CUITaskWnd::Show(bool status)
 	{
 		m_second_task_wnd->Show( m_second_task_wnd_show );
 		
-		m_pStoryLineTaskItem->Show			(m_second_task_wnd_show);
-		m_pSecondaryTaskItem->Show			(m_second_task_wnd_show);
-		m_btn_focus->Show					(m_second_task_wnd_show);
-		m_btn_focus2->Show					(m_second_task_wnd_show);
-		m_second_task_index->Show			(m_second_task_wnd_show);
+		m_pStoryLineTaskItem->Show			( m_second_task_wnd_show );
+		m_pSecondaryTaskItem->Show			( m_second_task_wnd_show );
+		m_btn_focus->Show					( m_second_task_wnd_show );
+		m_btn_focus2->Show					( m_second_task_wnd_show );
+		m_second_task_index->Show			( m_second_task_wnd_show );
 	}
 	else
 	{
@@ -278,11 +278,11 @@ void CUITaskWnd::OnShowSecondTaskWnd( CUIWindow* w, void* d )
 	m_second_task_wnd_show = false;
 	m_second_task_wnd->Show( !m_second_task_wnd->IsShown() );
 	
-	m_pStoryLineTaskItem->Show			( !m_second_task_wnd->IsShown() );
-	m_pSecondaryTaskItem->Show			( !m_second_task_wnd->IsShown() );
-	m_btn_focus->Show					( !m_second_task_wnd->IsShown() );
-	m_btn_focus2->Show					( !m_second_task_wnd->IsShown() );
-	m_second_task_index->Show			( !m_second_task_wnd->IsShown() );
+	m_pStoryLineTaskItem->Show			( !m_pStoryLineTaskItem->IsShown() );
+	m_pSecondaryTaskItem->Show			( !m_pSecondaryTaskItem->IsShown() );
+	m_btn_focus->Show					( !m_btn_focus->IsShown() );
+	m_btn_focus2->Show					( !m_btn_focus2->IsShown() );
+	m_second_task_index->Show			( !m_second_task_index->IsShown() );
 }
 
 void CUITaskWnd::Show_SecondTasksWnd(bool status)
@@ -290,11 +290,11 @@ void CUITaskWnd::Show_SecondTasksWnd(bool status)
 	m_second_task_wnd->Show( status );
 	m_second_task_wnd_show = status;
 	
-	m_pStoryLineTaskItem->Show			(status);
-	m_pSecondaryTaskItem->Show			(status);
-	m_btn_focus->Show					(status);
-	m_btn_focus2->Show					(status);
-	m_second_task_index->Show			(status);
+	m_pStoryLineTaskItem->Show			( status );
+	m_pSecondaryTaskItem->Show			( status );
+	m_btn_focus->Show					( status );
+	m_btn_focus2->Show					( status );
+	m_second_task_index->Show			( status );
 }
 
 void CUITaskWnd::TaskSetTargetMap( CGameTask* task )

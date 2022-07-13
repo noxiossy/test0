@@ -21,10 +21,10 @@ class CUITaskWnd			:	public CUIWindow,
 private:
 	typedef CUIWindow		inherited;
 
-	CUIFrameLineWnd*		m_background;
+//	CUIFrameLineWnd*		m_background;
 	CUIStatic*				m_center_background;
-	CUIStatic*				m_right_bottom_background;
-	CUIFrameLineWnd*		m_task_split;
+//	CUIStatic*				m_right_bottom_background;
+//	CUIFrameLineWnd*		m_task_split;
 
 	CUIMapWnd*				m_pMapWnd;
 	CUITaskItem*			m_pStoryLineTaskItem;
