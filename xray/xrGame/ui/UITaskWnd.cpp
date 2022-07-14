@@ -232,7 +232,7 @@ void CUITaskWnd::Show(bool status)
 		ReloadTaskInfo();
 		m_second_task_wnd->Show( m_second_task_wnd_show );
 
-		if (m_second_task_wnd_show){
+		if(m_second_task_wnd->IsShown())
 			m_pStoryLineTaskItem->Show			( true );
 			m_pSecondaryTaskItem->Show			( true );
 			m_btn_focus->Show					( true );
@@ -253,7 +253,7 @@ void CUITaskWnd::Show(bool status)
 		m_second_task_wnd_show = false;
 		m_second_task_wnd->Show(false);
 	
-		if (m_second_task_wnd_show){
+		if(m_second_task_wnd->IsShown())
 			m_pStoryLineTaskItem->Show			( true );
 			m_pSecondaryTaskItem->Show			( true );
 			m_btn_focus->Show					( true );
@@ -299,7 +299,7 @@ void CUITaskWnd::OnShowSecondTaskWnd( CUIWindow* w, void* d )
 	m_second_task_wnd_show = false;
 	m_second_task_wnd->Show( !m_second_task_wnd->IsShown() );
 	
-	if (m_second_task_wnd_show){
+	if(m_second_task_wnd->IsShown())
 		m_pStoryLineTaskItem->Show			( true );
 		m_pSecondaryTaskItem->Show			( true );
 		m_btn_focus->Show					( true );
