@@ -216,7 +216,8 @@ void CUITaskWnd::ReloadTaskInfo()
 		m_second_task_index->SetVisible( false );
 		m_second_task_index->SetText( "" );
 	}
-	m_second_task_wnd->UpdateList();
+	if(m_second_task_wnd->IsShown())
+		m_second_task_wnd->UpdateList();
 }
 
 void CUITaskWnd::Show(bool status)
@@ -225,28 +226,48 @@ void CUITaskWnd::Show(bool status)
 	m_pMapWnd->Show			(status);
 	m_pMapWnd->HideCurHint	();
 	m_map_legend_wnd->Show	(false);
-	ReloadTaskInfo();
 	
 	if ( status )
 	{
+		ReloadTaskInfo();
 		m_second_task_wnd->Show( m_second_task_wnd_show );
-		
-		m_pStoryLineTaskItem->Show			( m_second_task_wnd_show );
-		m_pSecondaryTaskItem->Show			( m_second_task_wnd_show );
-		m_btn_focus->Show					( m_second_task_wnd_show );
-		m_btn_focus2->Show					( m_second_task_wnd_show );
-		m_second_task_index->Show			( m_second_task_wnd_show );
+
+		if (m_second_task_wnd_show){
+			m_pStoryLineTaskItem->Show			( true );
+			m_pSecondaryTaskItem->Show			( true );
+			m_btn_focus->Show					( true );
+			m_btn_focus2->Show					( true );
+			m_second_task_index->Show			( true );
+		}
+		else
+		{
+			m_pStoryLineTaskItem->Show			( false );
+			m_pSecondaryTaskItem->Show			( false );
+			m_btn_focus->Show					( false );
+			m_btn_focus2->Show					( false );
+			m_second_task_index->Show			( false );	
+		}
 	}
 	else
 	{
 		m_second_task_wnd_show = false;
 		m_second_task_wnd->Show(false);
-		
-		m_pStoryLineTaskItem->Show			(false);
-		m_pSecondaryTaskItem->Show			(false);
-		m_btn_focus->Show					(false);
-		m_btn_focus2->Show					(false);
-		m_second_task_index->Show			(false);
+	
+		if (m_second_task_wnd_show){
+			m_pStoryLineTaskItem->Show			( true );
+			m_pSecondaryTaskItem->Show			( true );
+			m_btn_focus->Show					( true );
+			m_btn_focus2->Show					( true );
+			m_second_task_index->Show			( true );
+		}
+		else
+		{
+			m_pStoryLineTaskItem->Show			( false );
+			m_pSecondaryTaskItem->Show			( false );
+			m_btn_focus->Show					( false );
+			m_btn_focus2->Show					( false );
+			m_second_task_index->Show			( false );	
+		}
 	}
 }
 
@@ -278,11 +299,21 @@ void CUITaskWnd::OnShowSecondTaskWnd( CUIWindow* w, void* d )
 	m_second_task_wnd_show = false;
 	m_second_task_wnd->Show( !m_second_task_wnd->IsShown() );
 	
-	m_pStoryLineTaskItem->Show			( !m_pStoryLineTaskItem->IsShown() );
-	m_pSecondaryTaskItem->Show			( !m_pSecondaryTaskItem->IsShown() );
-	m_btn_focus->Show					( !m_btn_focus->IsShown() );
-	m_btn_focus2->Show					( !m_btn_focus2->IsShown() );
-	m_second_task_index->Show			( !m_second_task_index->IsShown() );
+	if (m_second_task_wnd_show){
+		m_pStoryLineTaskItem->Show			( true );
+		m_pSecondaryTaskItem->Show			( true );
+		m_btn_focus->Show					( true );
+		m_btn_focus2->Show					( true );
+		m_second_task_index->Show			( true );
+	}
+	else
+	{
+		m_pStoryLineTaskItem->Show			( false );
+		m_pSecondaryTaskItem->Show			( false );
+		m_btn_focus->Show					( false );
+		m_btn_focus2->Show					( false );
+		m_second_task_index->Show			( false );	
+	}
 }
 
 void CUITaskWnd::Show_SecondTasksWnd(bool status)
