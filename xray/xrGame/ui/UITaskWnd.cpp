@@ -110,7 +110,8 @@ void CUITaskWnd::Update()
 	{
 		ReloadTaskInfo();
 	}
-	if !(m_second_task_wnd->IsShown())
+	
+	if ( !m_second_task_wnd->IsShown() )
 	{
 		m_pStoryLineTaskItem->Show			( false );
 		m_pSecondaryTaskItem->Show			( false );
