@@ -110,6 +110,14 @@ void CUITaskWnd::Update()
 	{
 		ReloadTaskInfo();
 	}
+	if !(m_second_task_wnd->IsShown())
+	{
+		m_pStoryLineTaskItem->Show			( false );
+		m_pSecondaryTaskItem->Show			( false );
+		m_btn_focus->Show					( false );
+		m_btn_focus2->Show					( false );
+		m_second_task_index->Show			( false );	
+	}
 
 	if ( m_pStoryLineTaskItem->show_hint && m_pStoryLineTaskItem->OwnerTask() )
 	{
