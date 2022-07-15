@@ -20,6 +20,7 @@ float _delta_rot			= 0.05f;
 bool is_attachable_item_tuning_mode()
 {
 	return	pInput->iGetAsyncKeyState(DIK_LSHIFT)	||
+			pInput->iGetAsyncKeyState(DIK_RSHIFT)	||
 			pInput->iGetAsyncKeyState(DIK_Z)		||
 			pInput->iGetAsyncKeyState(DIK_X)		||
 			pInput->iGetAsyncKeyState(DIK_C);
@@ -118,7 +119,7 @@ void attachable_hud_item::tune(Ivector values)
 		{
 			if(values.x)	diff.x = (values.x>0)?_delta_pos:-_delta_pos;
 			if(values.y)	diff.y = (values.y>0)?_delta_pos:-_delta_pos;
-			if(values.z)	diff.z = (values.z>0)?_delta_pos:-_delta_pos;
+			if(values.z)	diff.z = (values.z<0)?_delta_pos:-_delta_pos;
 			
 			Fvector							d;
 			Fmatrix							ancor_m;
@@ -229,17 +230,17 @@ void player_hud::tune(Ivector _values)
 
 		if(hud_adj_mode==1)
 		{
-			if(values.x)	diff.x = (values.x<0)?_delta_pos:-_delta_pos;
-			if(values.y)	diff.y = (values.y>0)?_delta_pos:-_delta_pos;
-			if(values.z)	diff.z = (values.z>0)?_delta_pos:-_delta_pos;
+			if(values.x)	diff.x = (values.x>0)?_delta_pos:-_delta_pos;
+			if(values.y)	diff.y = (values.y<0)?_delta_pos:-_delta_pos;
+			if(values.z)	diff.z = (values.z<0)?_delta_pos:-_delta_pos;
 
 			pos_.add		(diff);
 		}
 
 		if(hud_adj_mode==2)
 		{
-			if(values.x)	diff.x = (values.x>0)?_curr_dr:-_curr_dr;
-			if(values.y)	diff.y = (values.y>0)?_curr_dr:-_curr_dr;
+			if(values.x)	diff.y = (values.x>0)?_curr_dr:-_curr_dr;
+			if(values.y)	diff.x = (values.y>0)?_curr_dr:-_curr_dr;
 			if(values.z)	diff.z = (values.z>0)?_curr_dr:-_curr_dr;
 
 			rot_.add		(diff);
@@ -290,7 +291,8 @@ void hud_draw_adjust_mode()
 		return;
 
 	LPCSTR _text = NULL;
-	if(pInput->iGetAsyncKeyState(DIK_LSHIFT) && hud_adj_mode)
+
+	if( ( pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT) ) && hud_adj_mode)
 		_text = "press SHIFT+NUM 0-return 1-hud_pos 2-hud_rot 3-itm_pos 4-itm_rot 5-fire_point 6-fire_2_point 7-shell_point 8-pos_step 9-rot_step";
 
 	switch (hud_adj_mode)
@@ -339,7 +341,7 @@ void hud_draw_adjust_mode()
 
 void hud_adjust_mode_keyb(int dik)
 {
-	if(pInput->iGetAsyncKeyState(DIK_LSHIFT))
+	if(pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT))
 	{
 		if(dik==DIK_NUMPAD0)
 			hud_adj_mode = 0;
