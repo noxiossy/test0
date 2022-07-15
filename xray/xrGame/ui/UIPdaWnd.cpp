@@ -35,6 +35,8 @@
 #include "UIScriptWnd.h"
 #include "../../xrServerEntities/script_engine.h"
 
+using namespace luabind;
+
 #define PDA_XML		"pda.xml"
 
 u32 g_pda_info_state = 0;

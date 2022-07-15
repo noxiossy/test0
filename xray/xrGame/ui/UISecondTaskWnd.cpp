@@ -81,7 +81,8 @@ void UISecondTaskWnd::Show( bool status )
 {
 	inherited::Show( status );
 	GetMessageTarget()->SendMessage( this, PDA_TASK_HIDE_HINT, NULL );
-	UpdateList();
+	if(status)
+		UpdateList();
 }
 
 void UISecondTaskWnd::OnFocusReceive()
