@@ -9,6 +9,7 @@
 #include "../HUDManager.h"
 #include "../level.h"
 #include "../game_cl_base.h"
+#include "../UIGameCustom.h"
 
 #include "UIStatic.h"
 #include "UIFrameWindow.h"
@@ -34,6 +35,7 @@
 
 #include "UIScriptWnd.h"
 #include "../../xrServerEntities/script_engine.h"
+#include "../ai_space.h"
 
 using namespace luabind;
 
