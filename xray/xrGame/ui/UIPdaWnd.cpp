@@ -36,6 +36,8 @@
 #include "UIScriptWnd.h"
 #include "../../xrServerEntities/script_engine.h"
 #include "../ai_space.h"
+#include <luabind/functor.hpp>
+#include <luabind/detail/class_rep.hpp>
 
 using namespace luabind;
 

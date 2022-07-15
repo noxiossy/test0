@@ -249,7 +249,9 @@ void CArtefact::StartLights()
 
 	VERIFY							(m_pTrailLight == NULL);
 	m_pTrailLight					= ::Render->light_create();
-	m_pTrailLight->set_shadow		(false);
+	bool const b_light_shadow	= !!pSettings->r_bool(cNameSect(), "idle_light_shadow");
+
+	m_pTrailLight->set_shadow	(b_light_shadow);
 
 	m_pTrailLight->set_color	(m_TrailLightColor); 
 	m_pTrailLight->set_range	(m_fTrailLightRange);
@@ -508,19 +510,22 @@ void SArtefactDetectorsSupport::SetVisible(bool b)
 	else
 		m_parent->StopLights	();
 
-	LPCSTR curr				= pSettings->r_string(m_parent->cNameSect().c_str(), (b)?"det_show_particles":"det_hide_particles");
+	if(b)
+	{
+		LPCSTR curr				= pSettings->r_string(m_parent->cNameSect().c_str(), (b)?"det_show_particles":"det_hide_particles");
 
-	IKinematics* K			= smart_cast<IKinematics*>(m_parent->Visual());
-	R_ASSERT2				(K, m_parent->cNameSect().c_str());
-	LPCSTR bone				= pSettings->r_string(m_parent->cNameSect().c_str(), "particles_bone");
-	u16 bone_id				= K->LL_BoneID(bone);
-	R_ASSERT2				(bone_id!=BI_NONE, bone);
+		IKinematics* K			= smart_cast<IKinematics*>(m_parent->Visual());
+		R_ASSERT2				(K, m_parent->cNameSect().c_str());
+		LPCSTR bone				= pSettings->r_string(m_parent->cNameSect().c_str(), "particles_bone");
+		u16 bone_id				= K->LL_BoneID(bone);
+		R_ASSERT2				(bone_id!=BI_NONE, bone);
 
-	m_parent->CParticlesPlayer::StartParticles(curr,bone_id,Fvector().set(0,1,0),m_parent->ID());
+		m_parent->CParticlesPlayer::StartParticles(curr,bone_id,Fvector().set(0,1,0),m_parent->ID());
 
-	curr					= pSettings->r_string(m_parent->cNameSect().c_str(), (b)?"det_show_snd":"det_hide_snd");
-	m_sound.create			(curr, st_Effect, sg_SourceType);
-	m_sound.play_at_pos		(0, m_parent->Position(), 0);
+		curr					= pSettings->r_string(m_parent->cNameSect().c_str(), (b)?"det_show_snd":"det_hide_snd");
+		m_sound.create			(curr, st_Effect, sg_SourceType);
+		m_sound.play_at_pos		(0, m_parent->Position(), 0);
+	}
 	
 	m_parent->setVisible	(b);
 	m_parent->SwitchAfParticles(b);
