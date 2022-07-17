@@ -46,7 +46,7 @@ CSE_ALifeDynamicObject *CSE_ALifeAnomalousZone::tpfGetBestDetector()
 	return						(0);
 #endif
 }
-/*
+
 void CSE_ALifeAnomalousZone::spawn_artefacts				()
 {
 	VERIFY2					(!m_bOnline,"Cannot spawn artefacts in online!");
@@ -123,10 +123,10 @@ void CSE_ALifeAnomalousZone::spawn_artefacts				()
 			l_tpALifeItemArtefact->m_fAnomalyValue = m_maxPower*(1.f - i->o_Position.distance_to(o_Position)/m_offline_interactive_radius);
 		}
 	}
-}*/
+}
 
 void CSE_ALifeAnomalousZone::on_spawn						()
 {
 	inherited::on_spawn		();
-//	spawn_artefacts			();
+	spawn_artefacts			();
 }

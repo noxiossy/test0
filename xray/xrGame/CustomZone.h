@@ -5,6 +5,7 @@
 
 class CActor;
 class CLAItem;
+class CArtefact;
 class CParticlesObject;
 class CZoneEffector;
 
@@ -24,6 +25,8 @@ struct SZoneObjectInfo
 	//время прибывания в зоне
 	u32						dw_time_in_zone;
 	float					f_time_affected;
+	//существо померло в зоне
+	bool					death_in_zone;
 
 	bool operator == (const CGameObject* O) const {return object==O;}
 };
@@ -32,6 +35,7 @@ struct SZoneObjectInfo
 class CCustomZone :		public CSpaceRestrictor,
 						public Feel::Touch
 {
+	friend class CAnomalyZoneScript;
 private:
     typedef	CSpaceRestrictor inherited;
 
@@ -62,6 +66,7 @@ public:
 				float	effective_radius				();
 	virtual		void	net_Relcase						(CObject* O);
 	virtual		void	OnEvent							(NET_Packet& P, u16 type);
+				void	OnOwnershipTake					(u16 id);
 
 				float	GetMaxPower						()							{return m_fMaxPower;}
 				void	SetMaxPower						(float p)					{m_fMaxPower = p;}
@@ -105,6 +110,11 @@ protected:
 		eAffectPickDOF			=(1<<14),
 		eIdleLightR1			=(1<<15),
 		eBoltEntranceParticles	=(1<<16),
+		eSpawnBlowoutArtefacts	=(1<<17),
+		eBirthOnNonAlive		=(1<<18),
+		eBirthOnAlive			=(1<<19),
+		eBirthOnDead			=(1<<20),
+		eIgnoreAny				=(1<<21),
 	};
 	u32					m_owner_id;
 	u32					m_ttl;
@@ -300,14 +310,62 @@ protected:
 	Fvector					m_vPrevPos;
 	u32						m_dwLastTimeMoved;
 
+
+	//////////////////////////////////////////////////////////////////////////
+	// список артефактов
 protected:
+	virtual			void	SpawnArtefact				();
+
+	//рождение артефакта в зоне, во время ее срабатывания
+	//и присоединение его к зоне
+					void	BornArtefact				(bool forced);
+	//выброс артефактов из зоны
+					void	ThrowOutArtefact			(CArtefact* pArtefact);
+	
+					//void	PrefetchArtefacts			();
 	virtual BOOL		AlwaysTheCrow		();
+
+protected:
+	DEFINE_VECTOR(CArtefact*, ARTEFACT_VECTOR, ARTEFACT_VECTOR_IT);
+	ARTEFACT_VECTOR			m_SpawnedArtefacts;
+
+	//есть ли вообще функция выбрасывания артефактов во время срабатывания
+//	bool					m_bSpawnBlowoutArtefacts;
+	//вероятность того, что артефакт засповниться при единичном 
+	//срабатывании аномалии
+	float					m_fArtefactSpawnProbability;
+	// bak вероятность спавна при смерти в зоне
+	float					m_fArtefactSpawnOnDeathProbability;
+	
+	//величина импульса выкидывания артефакта из зоны
+	float					 m_fThrowOutPower;
+	//высота над центром зоны, где будет появляться артефакт
+	float					m_fArtefactSpawnHeight;
+
+	//имя партиклов, которые проигрываются во время и на месте рождения артефакта
+	shared_str				m_sArtefactSpawnParticles;
+	//звук рождения артефакта
+	ref_sound				m_ArtefactBornSound;
+
+	struct ARTEFACT_SPAWN
+	{
+		shared_str	section;
+		float		probability;
+	};
+
+	DEFINE_VECTOR(ARTEFACT_SPAWN, ARTEFACT_SPAWN_VECTOR, ARTEFACT_SPAWN_IT);
+	ARTEFACT_SPAWN_VECTOR	m_ArtefactSpawn;
 
 	//расстояние от зоны до текущего актера
 	float					m_fDistanceToCurEntity;
+
+	// bak / флаг для рождения артефакта
+	bool					m_bBornOnBlowoutFlag;
+	
 protected:
 	u32						m_ef_anomaly_type;
 	u32						m_ef_weapon_type;
+	bool DestroyAfterBlowout{}; //Для самоудаления мин после взрыва
 public:
 	void					CalcDistanceTo				(const Fvector& P, float& dist, float& radius);
 	virtual u32				ef_anomaly_type				() const;
