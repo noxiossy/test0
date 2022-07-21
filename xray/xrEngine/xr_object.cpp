@@ -13,7 +13,6 @@
 #include "GameFont.h"
 
 #include "mp_logging.h"
-#include "xr_collide_form.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -308,18 +307,9 @@ void CObject::UpdateCL			()
 	spatial_update				(base_spu_epsP*5,base_spu_epsR*5);
 
 	// crow
-    if (Parent == g_pGameLevel->CurrentViewEntity())
-        MakeMeCrow();
-    else if (AlwaysTheCrow())
-        MakeMeCrow();
-    else
-    {
-        float dist = Device.vCameraPosition.distance_to_sqr(Position());
-        if (dist < CROW_RADIUS*CROW_RADIUS)
-            MakeMeCrow();
-        else if ((Visual() && Visual()->getVisData().hom_frame + 2 > Device.dwFrame) && (dist < CROW_RADIUS2*CROW_RADIUS2))
-            MakeMeCrow();
-    }
+	if (Parent == g_pGameLevel->CurrentViewEntity())										MakeMeCrow	();
+	else if (AlwaysTheCrow())																MakeMeCrow	();
+	else if (Device.vCameraPosition.distance_to_sqr(Position()) < CROW_RADIUS*CROW_RADIUS)	MakeMeCrow	();
 }
 
 void CObject::shedule_Update	( u32 T )
