@@ -60,7 +60,7 @@ void  CAmebaZone::Affect(SZoneObjectInfo* O)
 
 	if(power > 0.01f) 
 	{
-		m_dwDeltaTime = 0;
+		//m_dwDeltaTime = 0;
 		position_in_bone_space.set(0.f,0.f,0.f);
 
 		CreateHit(pGameObject->ID(),ID(),hit_dir,power,power_critical,0,position_in_bone_space,impulse,m_eHitTypeBlowout);

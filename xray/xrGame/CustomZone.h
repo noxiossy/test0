@@ -35,7 +35,7 @@ struct SZoneObjectInfo
 class CCustomZone :		public CSpaceRestrictor,
 						public Feel::Touch
 {
-	friend class CAnomalyZoneScript;
+	//friend class CAnomalyZoneScript;
 private:
     typedef	CSpaceRestrictor inherited;
 
@@ -52,6 +52,9 @@ public:
 	virtual		void	net_Export						(NET_Packet& P);
 	virtual		void	Load							(LPCSTR section);
 	virtual		void	net_Destroy						();
+
+	virtual		void	save							(NET_Packet &output_packet);
+	virtual		void	load							(IReader &input_packet);
 	
 	virtual		void	UpdateCL						();
 	virtual		void	UpdateWorkload					(u32 dt);

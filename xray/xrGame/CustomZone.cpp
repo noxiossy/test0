@@ -323,7 +323,7 @@ void CCustomZone::Load(LPCSTR section)
 
 		R_ASSERT3(!fis_zero(total_probability), "The probability of artefact spawn is zero!",*cName());
 		//нормализировать вероятности
-		for(u32 i=0; i<m_ArtefactSpawn.size(); ++i)
+		for (int i = 0; i < m_ArtefactSpawn.size(); ++i)
 		{
 			m_ArtefactSpawn[i].probability = m_ArtefactSpawn[i].probability/total_probability;
 		}
@@ -1621,7 +1621,8 @@ BOOL CCustomZone::feel_touch_on_contact	(CObject *O)
 
 BOOL CCustomZone::AlwaysTheCrow()
 {
- 	if(m_zone_flags.test(eAlwaysFastmode) && IsEnabled() )
+	bool b_idle = ZoneState()==eZoneStateIdle || ZoneState()==eZoneStateDisabled;
+ 	if(!b_idle || (m_zone_flags.test(eAlwaysFastmode) && IsEnabled()) )
 		return TRUE;
  	else
  		return inherited::AlwaysTheCrow();
@@ -1720,4 +1721,22 @@ void CCustomZone::o_switch_2_slow				()
 		StopIdleLight();
 	}
 	processing_deactivate		();
+}
+
+void CCustomZone::save							(NET_Packet &output_packet)
+{
+	inherited::save			(output_packet);
+	output_packet.w_u8		(static_cast<u8>(m_eZoneState));
+}
+
+void CCustomZone::load							(IReader &input_packet)
+{
+	inherited::load			(input_packet);	
+
+	CCustomZone::EZoneState temp = static_cast<CCustomZone::EZoneState>(input_packet.r_u8());
+
+	if (temp == eZoneStateDisabled)
+		m_eZoneState = eZoneStateDisabled;
+	else
+		m_eZoneState = eZoneStateIdle;
 }
