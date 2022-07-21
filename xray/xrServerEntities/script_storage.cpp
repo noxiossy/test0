@@ -287,7 +287,7 @@ int CScriptStorage::vscript_log		(ScriptStorage::ELuaMessageType tLuaMessageType
 			break;
 		}
 		case ScriptStorage::eLuaMessageTypeMessage : {
-			S	= "[LUA] ";
+			S = "~ [LUA] ";
 			SS	= "[MESSAGE]     ";
 			break;
 		}

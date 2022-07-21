@@ -91,7 +91,6 @@ void CCustomZone::Load(LPCSTR section)
 	m_zone_flags.set(eIgnoreNonAlive,	pSettings->r_bool(section,	"ignore_nonalive"));
 	m_zone_flags.set(eIgnoreSmall,		pSettings->r_bool(section,	"ignore_small"));
 	m_zone_flags.set(eIgnoreArtefact,	pSettings->r_bool(section,	"ignore_artefacts"));
-	m_zone_flags.set(eVisibleByDetector,pSettings->r_bool(section,	"visible_by_detector"));
 	
 	// bak
 	m_zone_flags.set(eBirthOnNonAlive,READ_IF_EXISTS(pSettings, r_bool, section, "birth_on_nonalive", false));
@@ -613,11 +612,8 @@ void CCustomZone::shedule_Update(u32 dt)
 
 	UpdateOnOffState	();
 
-	if( !IsGameTypeSingle() && Local() )
-	{
-		if(Device.dwTimeGlobal > m_ttl)
-			DestroyObject ();
-	}
+	if (LastBlowoutTime && (Device.dwTimeGlobal - LastBlowoutTime) > 300)
+		DestroyObject();
 }
 
 void CCustomZone::CheckForAwaking()

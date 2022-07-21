@@ -41,6 +41,7 @@ CEffect_Rain::CEffect_Rain()
 	state							= stIdle;
 	
 	snd_Ambient.create				("ambient\\rain",st_Effect,sg_Undefined);
+	rain_volume = 0.0f;
 
 	//	Moced to p_Render constructor
 	/*
@@ -60,6 +61,7 @@ CEffect_Rain::CEffect_Rain()
 CEffect_Rain::~CEffect_Rain()
 {
 	snd_Ambient.destroy				();
+	rain_volume = 0.0f;
 
 	// Cleanup
 	p_destroy						();
@@ -168,6 +170,7 @@ void	CEffect_Rain::OnFrame	()
 		if (factor<EPS_L){
 			snd_Ambient.stop();
 			state = stIdle;
+			rain_volume = 0.0f;
 			return;
 		}
 		break;
@@ -179,7 +182,9 @@ void	CEffect_Rain::OnFrame	()
 //		Fvector					sndP;
 //		sndP.mad				(Device.vCameraPosition,Fvector().set(0,1,0),source_offset);
 //		snd_Ambient.set_position(sndP);
-		snd_Ambient.set_volume	(_max(0.1f,factor) * hemi_factor );
+		rain_volume = factor * hemi_factor;
+		clamp(rain_volume, .1f, 1.f);
+		snd_Ambient.set_volume(rain_volume);
 	}
 }
 

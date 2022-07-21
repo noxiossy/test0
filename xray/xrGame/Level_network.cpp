@@ -17,9 +17,10 @@
 #include "UIGameCustom.h"
 #include "string_table.h"
 #include "file_transfer.h"
+#include "UI/UIGameTutorial.h"
 
 const int max_objects_size			= 2*1024;
-const int max_objects_size_in_save	= 6*1024;
+const int max_objects_size_in_save	= 8*1024;
 
 extern bool	g_b_ClearGameCaptions;
 
@@ -87,12 +88,21 @@ void CLevel::remove_objects	()
 }
 
 
+extern CUISequencer * g_tutorial;
+extern CUISequencer * g_tutorial2;
+
 void CLevel::net_Stop		()
 {
 	Msg							("- Disconnect");
 
 	if(HUD().GetUI())
 		HUD().GetUI()->UIGame()->HideShownDialogs();
+
+	if(g_tutorial && !g_tutorial->Persistent())
+		g_tutorial->Stop();
+
+	if(g_tutorial2 && !g_tutorial->Persistent())
+		g_tutorial2->Stop();
 
 	bReady						= false;
 	m_bGameConfigStarted		= FALSE;

@@ -314,6 +314,7 @@ void imotion_position::move_update( )
 	VERIFY( K );
 
 	disable_update( false );
+	K->CalculateBones_Invalidate( );
 	K->CalculateBones(  );
 	disable_update( true );
 	VERIFY( shell );
@@ -340,7 +341,7 @@ void imotion_position::move_update( )
 float imotion_position::advance_animation( float dt, IKinematicsAnimated& KA )
 {
 	time_to_end -=dt;
-	KA.LL_UpdateTracks( dt, true, false );
+	KA.LL_UpdateTracks( dt, true, true );
 
 	force_calculate_bones( KA );
 

@@ -453,7 +453,7 @@ void CStalkerActionTakeCover::initialize		()
 	m_storage->set_property						(eWorldPropertyEnemyDetoured,false);
 
 #ifndef SILENT_COMBAT
-	if (object().memory().enemy().selected()->human_being()) {
+	if (object().memory().enemy().selected() && object().memory().enemy().selected()->human_being()) {
 		if (object().agent_manager().member().can_cry_noninfo_phrase())
 			if (object().Position().distance_to_sqr(object().memory().enemy().selected()->Position()) < _sqr(10.f))
 				if (object().memory().visual().visible_now(object().memory().enemy().selected()) && object().agent_manager().member().group_behaviour())
@@ -767,7 +767,7 @@ void CStalkerActionDetourEnemy::initialize		()
 	object().agent_manager().member().member(m_object).cover(0);
 
 //#ifndef SILENT_COMBAT
-	if (object().memory().enemy().selected()->human_being() && object().agent_manager().member().group_behaviour())
+	if (object().memory().enemy().selected() && object().memory().enemy().selected()->human_being() && object().agent_manager().member().group_behaviour())
 //		object().sound().play			(eStalkerSoundNeedBackup);
 		object().sound().play			(eStalkerSoundDetour);
 //#endif
@@ -996,17 +996,18 @@ void CStalkerActionSuddenAttack::execute					()
 	if (object().agent_manager().member().combat_members().size() > 1)
 		m_storage->set_property	(eWorldPropertyUseSuddenness,false);
 
-	if (!object().memory().enemy().selected())
+	const CEntityAlive *enemy = object().memory().enemy().selected();
+	if (!enemy)
 		return;
 
-	CMemoryInfo							mem_object = object().memory().memory(object().memory().enemy().selected());
+	CMemoryInfo							mem_object = object().memory().memory(enemy);
 
 	if (!mem_object.m_object)
 		return;
 
-	bool								visible_now = object().memory().visual().visible_now(object().memory().enemy().selected());
+	bool visible_now = object().memory().visual().visible_now(enemy);
 	if (visible_now)
-		object().sight().setup			(CSightAction(object().memory().enemy().selected(),true));
+		object().sight().setup(CSightAction(enemy, true));
 	else
 		object().sight().setup			(CSightAction(SightManager::eSightTypePosition,mem_object.m_object_params.m_position,true));
 

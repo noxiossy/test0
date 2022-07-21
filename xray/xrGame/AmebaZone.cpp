@@ -1,5 +1,5 @@
 #include "stdafx.h"
-/*
+
 #include "CustomZone.h"
 #include "../Include/xrRender/KinematicsAnimated.h"
 #include "ZoneVisual.h"
@@ -108,4 +108,3 @@ float CAmebaZone::distance_to_center(CObject* O)
 	Fvector OP;OP.set(O->Position());
 	return _sqrt((P.x-OP.x)*(P.x-OP.x)+(P.x-OP.x)*(P.x-OP.x));
 }
-*/
