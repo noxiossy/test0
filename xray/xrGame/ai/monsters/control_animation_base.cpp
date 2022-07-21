@@ -11,6 +11,8 @@
 #include "monster_event_manager.h"
 #include "control_jump.h"
 #include "../../sound_player.h"
+#include "../../../xrEngine/gamemtllib.h"
+#include "../../actor.h"
 
 // DEBUG purpose only
 char *dbg_action_name_table[] = {
@@ -518,6 +520,22 @@ void CControlAnimationBase::check_hit(MotionID motion, float time_perc)
 	to			= angle_normalize(my_p + params.foh.to_pitch);
 
 	if (!is_angle_between(p, from, to)) should_hit = false;
+
+	const CActor *pA = smart_cast<const CActor*>( enemy );
+	if ( should_hit && pA )
+	{
+		Fvector C, enemy_center;
+		m_object->Center( C );
+		enemy->Center( enemy_center );
+		Fvector dir;
+		dir.sub( enemy_center, C );
+		dir.normalize();
+		collide::rq_results RQR;
+		collide::ray_defs RD( C, dir, params.dist, CDB::OPT_CULL, collide::rqtBoth );
+		ray_query_param params( m_object, enemy );
+		Level().ObjectSpace.RayQuery( RQR, RD, check_hit_trace_callback, &params, NULL, m_object );
+		should_hit = params.m_can_hit_enemy;
+	}
 
 	if (should_hit) m_object->HitEntity(enemy, params.hit_power, params.impulse, params.impulse_dir);
 

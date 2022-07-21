@@ -18,10 +18,10 @@
 #include "breakableobject.h"
 #include "GamePersistent.h"
 #include "../xrEngine/Environment.h"
-
+/*
 #include "script_callback_ex.h"
 #include "game_object_space.h"
-#include "script_game_object.h"
+#include "script_game_object.h"*/
 
 #define PREFETCHED_ARTEFACTS_NUM 1	//количество предварительно проспавненых артефактов
 #define WIND_RADIUS (4*Radius())	//расстояние до актера, когда появляется ветер 
@@ -61,6 +61,8 @@ CCustomZone::CCustomZone(void)
 	m_zone_flags.set			(eBlowoutWindActive, FALSE);
 	m_zone_flags.set			(eFastMode, TRUE);
 	m_bBornOnBlowoutFlag		= false;
+
+	m_eZoneState				= eZoneStateIdle;
 }
 
 CCustomZone::~CCustomZone(void) 
@@ -1379,6 +1381,15 @@ void CCustomZone::BornArtefact(bool forced)
 	m_bBornOnBlowoutFlag = false;
 
 	SpawnArtefact();
+}
+
+void CCustomZone::PrefetchArtefacts()
+{
+	if (FALSE == m_zone_flags.test(eSpawnBlowoutArtefacts) || m_ArtefactSpawn.empty())
+		return;
+
+	for (u32 i = m_SpawnedArtefacts.size(); i < PREFETCHED_ARTEFACTS_NUM; ++i)
+		SpawnArtefact();
 }
 
 void CCustomZone::ThrowOutArtefact(CArtefact* pArtefact)

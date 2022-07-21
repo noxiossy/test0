@@ -8,7 +8,7 @@
 
 #define CStatePoltergeistAttackHiddenAbstract CStatePoltergeistAttackHidden<_Object>
 
-#define FLY_AROUND_DIST		15.f
+#define FLY_AROUND_DIST		45.f
 #define DIST_TO_PATH_END	1.5f
 
 

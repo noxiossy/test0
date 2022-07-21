@@ -221,10 +221,13 @@ void CPsyDogPhantom::Think()
 	u32 node = ai().level_graph().check_position_in_direction(ai_location().level_vertex_id(),Position(),target);
 	control().path_builder().restrictions().remove_border();
 
-	if (!ai().level_graph().valid_vertex_id(node) || !control().path_builder().accessible(node)) return;
+	
+	if ( ai().level_graph().valid_vertex_id(node) && control().path_builder().accessible(node) )
+	{
+		target.y += 1.f;
+		com_man().jump	(target);
+	}
 
-	target.y += 1.f;
-	com_man().jump	(target);
 	m_state			= eAttack;
 	
 	setVisible		(TRUE);

@@ -706,10 +706,10 @@ bool CAI_Bloodsucker::in_solid_state ()
 
 void CAI_Bloodsucker::Hit(SHit* pHDS)
 {
-	if ( state_invisible )
-	{
-		return;
-	}
+	//if ( state_invisible )
+	//{
+	//	return;
+	//}
 	if ( !collision_hit_off )
 	{
 		inherited::Hit(pHDS);

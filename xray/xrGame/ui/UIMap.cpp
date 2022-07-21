@@ -546,20 +546,20 @@ void CUIMiniMap::UpdateSpots()
 		(*it).location->UpdateMiniMap(this);
 	}
 }
-
+/*
 void  CUIMiniMap::Draw()
 {
 	u32	segments_count			= 20;
 
 	UIRender->SetShader			(*m_UIStaticItem.GetShader());
-	UIRender->StartPrimitive	(segments_count*3, IUIRender::ptTriList, UI().m_currentPointType);
+	UIRender->StartPrimitive	(segments_count*3, IUIRender::ptTriList, UI()->m_currentPointType);
 
 	u32 color					= m_UIStaticItem.GetTextureColor();
 	float angle					= GetHeading();
 
 
 
-	float kx =	UI().get_current_kx();
+	float kx =	UI()->get_current_kx();
 
 	// clip poly
 	sPoly2D					S;
@@ -620,7 +620,7 @@ bool CUIMiniMap::GetPointerTo(const Fvector2& src, float item_radius, Fvector2& 
 	direction.sub		(clip_center, src);
 	heading				= -direction.getH();
 
-	float kx			= UI().get_current_kx();
+	float kx			= UI()->get_current_kx();
 	float cosPT			= _cos(heading);
 	float sinPT			= _sin(heading);
 	pos.set				(-map_radius*sinPT*kx,		-map_radius*cosPT);
@@ -649,3 +649,4 @@ bool CUIMiniMap::IsRectVisible(Frect r)
 	float spot_radius		= r.width() / 2.0f;
 	return clip_center.distance_to(rect_center)+spot_radius < vis_radius; //assume that all minimap spots are circular
 }
+*/

@@ -54,6 +54,7 @@ namespace debug { class text_tree; }
 
 class CBaseMonster : public CCustomMonster, public CStepManager, public CInventoryOwner 
 {
+protected:
 	typedef	CCustomMonster								inherited;
 	
 public:

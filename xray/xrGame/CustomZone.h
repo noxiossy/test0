@@ -38,6 +38,7 @@ class CCustomZone :		public CSpaceRestrictor,
 	//friend class CAnomalyZoneScript;
 private:
     typedef	CSpaceRestrictor inherited;
+	virtual		void	SpawnArtefact					();
 
 public:
 	CZoneEffector*		m_actor_effector;
@@ -52,6 +53,9 @@ public:
 	virtual		void	net_Export						(NET_Packet& P);
 	virtual		void	Load							(LPCSTR section);
 	virtual		void	net_Destroy						();
+				void	OnOwnershipTake					(u16 id);
+				//выброс артефактов из зоны
+				void	ThrowOutArtefact				(CArtefact* pArtefact);
 
 	virtual		void	save							(NET_Packet &output_packet);
 	virtual		void	load							(IReader &input_packet);
@@ -69,10 +73,13 @@ public:
 				float	effective_radius				();
 	virtual		void	net_Relcase						(CObject* O);
 	virtual		void	OnEvent							(NET_Packet& P, u16 type);
-				void	OnOwnershipTake					(u16 id);
 
 				float	GetMaxPower						()							{return m_fMaxPower;}
 				void	SetMaxPower						(float p)					{m_fMaxPower = p;}
+				//рождение артефакта в зоне, во врем€ ее срабатывани€
+				//и присоединение его к зоне
+				void	BornArtefact					(bool forced);
+				void	PrefetchArtefacts				();
 
 	//вычисление силы хита в зависимости от рассто€ни€ до центра зоны
 	//относительный размер силы (от 0 до 1)
@@ -133,6 +140,35 @@ protected:
 	//размер радиуса в процентах от оригинального, 
 	//где действует зона
 	float				m_fEffectiveRadius;
+
+	//срабатывании аномалии
+	float					m_fArtefactSpawnProbability;
+	//высота над центром зоны, где будет по€вл€тьс€ артефакт
+	float					m_fArtefactSpawnHeight;
+	// bak / флаг дл€ рождени€ артефакта
+	bool					m_bBornOnBlowoutFlag;
+
+	//им€ партиклов, которые проигрываютс€ во врем€ и на месте рождени€ артефакта
+	shared_str				m_sArtefactSpawnParticles;
+	//звук рождени€ артефакта
+	ref_sound				m_ArtefactBornSound;
+
+	// bak веро€тность спавна при смерти в зоне
+	float					m_fArtefactSpawnOnDeathProbability;
+
+	//величина импульса выкидывани€ артефакта из зоны
+	float					 m_fThrowOutPower;
+
+	struct ARTEFACT_SPAWN
+	{
+		shared_str	section;
+		float		probability;
+	};
+
+	DEFINE_VECTOR(ARTEFACT_SPAWN, ARTEFACT_SPAWN_VECTOR, ARTEFACT_SPAWN_IT);
+	ARTEFACT_SPAWN_VECTOR	m_ArtefactSpawn;
+	DEFINE_VECTOR(CArtefact*, ARTEFACT_VECTOR, ARTEFACT_VECTOR_IT);
+	ARTEFACT_VECTOR			m_SpawnedArtefacts;
 
 	//тип наносимого хита
 	ALife::EHitType		m_eHitTypeBlowout;
@@ -313,58 +349,8 @@ protected:
 	Fvector					m_vPrevPos;
 	u32						m_dwLastTimeMoved;
 
-
-	//////////////////////////////////////////////////////////////////////////
-	// список артефактов
-protected:
-	virtual			void	SpawnArtefact				();
-
-	//рождение артефакта в зоне, во врем€ ее срабатывани€
-	//и присоединение его к зоне
-					void	BornArtefact				(bool forced);
-	//выброс артефактов из зоны
-					void	ThrowOutArtefact			(CArtefact* pArtefact);
-	
-					//void	PrefetchArtefacts			();
-	virtual BOOL		AlwaysTheCrow		();
-
-protected:
-	DEFINE_VECTOR(CArtefact*, ARTEFACT_VECTOR, ARTEFACT_VECTOR_IT);
-	ARTEFACT_VECTOR			m_SpawnedArtefacts;
-
-	//есть ли вообще функци€ выбрасывани€ артефактов во врем€ срабатывани€
-//	bool					m_bSpawnBlowoutArtefacts;
-	//веро€тность того, что артефакт засповнитьс€ при единичном 
-	//срабатывании аномалии
-	float					m_fArtefactSpawnProbability;
-	// bak веро€тность спавна при смерти в зоне
-	float					m_fArtefactSpawnOnDeathProbability;
-	
-	//величина импульса выкидывани€ артефакта из зоны
-	float					 m_fThrowOutPower;
-	//высота над центром зоны, где будет по€вл€тьс€ артефакт
-	float					m_fArtefactSpawnHeight;
-
-	//им€ партиклов, которые проигрываютс€ во врем€ и на месте рождени€ артефакта
-	shared_str				m_sArtefactSpawnParticles;
-	//звук рождени€ артефакта
-	ref_sound				m_ArtefactBornSound;
-
-	struct ARTEFACT_SPAWN
-	{
-		shared_str	section;
-		float		probability;
-	};
-
-	DEFINE_VECTOR(ARTEFACT_SPAWN, ARTEFACT_SPAWN_VECTOR, ARTEFACT_SPAWN_IT);
-	ARTEFACT_SPAWN_VECTOR	m_ArtefactSpawn;
-
 	//рассто€ние от зоны до текущего актера
-	float					m_fDistanceToCurEntity;
-
-	// bak / флаг дл€ рождени€ артефакта
-	bool					m_bBornOnBlowoutFlag;
-	
+	float					m_fDistanceToCurEntity;	
 protected:
 	u32						m_ef_anomaly_type;
 	u32						m_ef_weapon_type;
@@ -378,6 +364,7 @@ public:
 
 	// optimization FAST/SLOW mode
 public:	
+	virtual BOOL			AlwaysTheCrow				();
 	void					o_switch_2_fast				();
 	void					o_switch_2_slow				();
 
