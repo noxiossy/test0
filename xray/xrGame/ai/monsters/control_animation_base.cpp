@@ -520,7 +520,7 @@ void CControlAnimationBase::check_hit(MotionID motion, float time_perc)
 	to			= angle_normalize(my_p + params.foh.to_pitch);
 
 	if (!is_angle_between(p, from, to)) should_hit = false;
-
+/* 
 	const CActor *pA = smart_cast<const CActor*>( enemy );
 	if ( should_hit && pA )
 	{
@@ -535,7 +535,7 @@ void CControlAnimationBase::check_hit(MotionID motion, float time_perc)
 		ray_query_param params( m_object, enemy );
 		Level().ObjectSpace.RayQuery( RQR, RD, check_hit_trace_callback, &params, NULL, m_object );
 		should_hit = params.m_can_hit_enemy;
-	}
+	} */
 
 	if (should_hit) m_object->HitEntity(enemy, params.hit_power, params.impulse, params.impulse_dir);
 
