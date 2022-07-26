@@ -251,7 +251,7 @@
     <Link>
       <GenerateMapFile>false</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>lua51.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

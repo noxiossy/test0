@@ -125,7 +125,7 @@ void xrDebug::gather_info		(const char *expression, const char *description, con
 
 	if (!strstr(GetCommandLine(),"-no_call_stack_assert")) {
 		if (shared_str_initialized)
-			Msg			("stack trace:");
+            Msg("stack trace:\n");
 
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
 		buffer			+= sprintf(buffer,"stack trace:%s%s",endline,endline);

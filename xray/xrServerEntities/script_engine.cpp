@@ -393,7 +393,7 @@ void CScriptEngine::process_file_if_exists	(LPCSTR file_name, bool warn_if_not_e
 		}
         //#ifndef MASTER_GOLD
 		if (Core.ParamFlags.test(Core.lr_fulllog))
-            Msg("* loading script %s", S1);
+			Msg("* loading script %s.script", file_name);
         //#endif // MASTER_GOLD
 		m_reload_modules	= false;
 		load_file_into_namespace(S,*file_name ? file_name : "_G");
