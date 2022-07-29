@@ -26,6 +26,10 @@ void CActor::attach_Vehicle(CHolderCustom* vehicle)
 	if(!vehicle) return;
 
 	if(m_holder) return;
+	CCar* car = smart_cast<CCar*>(vehicle);
+	if (!car)
+		return;
+
 	PickupModeOff		();
 	m_holder=vehicle;
 
@@ -124,5 +128,8 @@ bool CActor::use_Vehicle(CHolderCustom* object)
 void CActor::on_requested_spawn(CObject *object)
 {
 	CCar * car= smart_cast<CCar*>(object);
+
+	if (!car) return;
+
 	attach_Vehicle(car);
 }

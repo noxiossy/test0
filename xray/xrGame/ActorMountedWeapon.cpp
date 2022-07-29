@@ -8,7 +8,7 @@
 
 bool CActor::use_MountedWeapon(CHolderCustom* object)
 {
-/*
+
 	CHolderCustom* wpn	=object;
 	if(m_holder){
 		if(!wpn||(m_holder==wpn)){
@@ -35,6 +35,6 @@ bool CActor::use_MountedWeapon(CHolderCustom* object)
 			}
 		}
 	}
-*/
+
 	return false;
 }

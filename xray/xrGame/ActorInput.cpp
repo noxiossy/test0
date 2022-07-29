@@ -47,7 +47,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
 			if( (mstate_wishful & mcLookout) && !IsGameTypeSingle() ) return;
 
 			u32 slot = inventory().GetActiveSlot();
-			if(inventory().ActiveItem() && (slot==RIFLE_SLOT || slot==PISTOL_SLOT) )
+			if(inventory().ActiveItem() && (slot==RIFLE_SLOT || slot==PISTOL_SLOT || slot==KNIFE_SLOT) )
 				mstate_wishful &=~mcSprint;
 			//-----------------------------
 			if (OnServer())
@@ -65,6 +65,40 @@ void CActor::IR_OnKeyboardPress(int cmd)
 
 	if (!g_Alive()) return;
 
+	switch (cmd)
+	{
+		case kNIGHT_VISION:
+		{
+			SwitchNightVision();
+			break;
+		};
+		case kQUICK_USE_1:
+		case kQUICK_USE_2:
+		case kQUICK_USE_3:
+		case kQUICK_USE_4:
+		{
+			const shared_str& item_name		= g_quick_use_slots[cmd-kQUICK_USE_1];
+			if(item_name.size())
+			{
+				PIItem itm = inventory().GetAny(item_name.c_str());
+
+				if(itm)
+				{
+					inventory().Eat				(itm);
+					
+					SDrawStaticStruct* _s		= HUD().GetUI()->UIGame()->AddCustomStatic("item_used", true);
+					_s->m_endTime				= Device.fTimeGlobal+3.0f;
+					string1024					str;
+					strconcat					(sizeof(str),str,*CStringTable().translate("st_item_used"),": ", itm->NameItem());
+					_s->wnd()->SetText			(str);
+					
+					//HUD().GetUI()->UIGame()->ActorMenu().m_pQuickSlot->ReloadReferences(this);
+				}
+			}
+		}break;
+	};
+	
+	
 	if(m_holder && kUSE != cmd)
 	{
 		m_holder->OnKeyboardPress			(cmd);
@@ -96,11 +130,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
 	case kCAM_1:	cam_Set			(eacFirstEye);				break;
 	case kCAM_2:	cam_Set			(eacLookAt);				break;
 	case kCAM_3:	cam_Set			(eacFreeLook);				break;
-	case kNIGHT_VISION:
-		{
-			SwitchNightVision();
-			break;
-		}
 	case kTORCH:
 		{
 			SwitchTorch();
@@ -170,33 +199,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
 			}
 		}break;
 		
-	case kQUICK_USE_1:
-	case kQUICK_USE_2:
-	case kQUICK_USE_3:
-	case kQUICK_USE_4:
-		{
-			const shared_str& item_name		= g_quick_use_slots[cmd-kQUICK_USE_1];
-			if(item_name.size())
-			{
-				PIItem itm = inventory().GetAny(item_name.c_str());
-
-				if(itm)
-				{
-					if (IsGameTypeSingle())
-					{
-						inventory().Eat				(itm);
-					}
-					
-					SDrawStaticStruct* _s		= HUD().GetUI()->UIGame()->AddCustomStatic("item_used", true);
-					_s->m_endTime				= Device.fTimeGlobal+3.0f;
-					string1024					str;
-					strconcat					(sizeof(str),str,*CStringTable().translate("st_item_used"),": ", itm->NameItem());
-					_s->wnd()->SetText			(str);
-					
-					//HUD().GetUI()->UIGame()->ActorMenu().m_pQuickSlot->ReloadReferences(this);
-				}
-			}
-		}break;
 	}
 }
 
