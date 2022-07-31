@@ -95,6 +95,11 @@ bool CZoneCampfire::is_on()
 
 void CZoneCampfire::shedule_Update(u32	dt	)
 {
+	if (!IsEnabled() && m_turn_time)
+	{
+		UpdateWorkload	(dt);
+	}
+
 	if (m_pIdleParticles)
 	{
 		Fvector vel;

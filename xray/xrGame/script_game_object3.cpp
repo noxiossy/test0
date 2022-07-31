@@ -110,7 +110,7 @@ void CScriptGameObject::ChangeTeam(u8 team, u8 squad, u8 group)
 CScriptGameObject *CScriptGameObject::GetEnemy() const
 {
 	CCustomMonster		*l_tpCustomMonster = smart_cast<CCustomMonster*>(&object());
-	if (l_tpCustomMonster) {
+	if (l_tpCustomMonster && l_tpCustomMonster->g_Alive() ) {
 		if (l_tpCustomMonster->GetCurrentEnemy() && !l_tpCustomMonster->GetCurrentEnemy()->getDestroy()) return (l_tpCustomMonster->GetCurrentEnemy()->lua_game_object());
 		else return (0);
 	} else {
