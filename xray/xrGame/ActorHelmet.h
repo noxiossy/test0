@@ -48,8 +48,7 @@ public:
 	virtual BOOL			net_Spawn				(CSE_Abstract* DC);
 	virtual void			net_Export				(NET_Packet& P);
 	virtual void			net_Import				(NET_Packet& P);
-	void					ReloadBonesProtection	();
-	void					AddBonesProtection		(LPCSTR bones_section);
+			void			ReloadBonesProtection	(CActor* pActor);
 
 protected:
 	virtual bool			install_upgrade_impl	( LPCSTR section, bool test );

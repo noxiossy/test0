@@ -57,7 +57,7 @@ CTorch::CTorch(void)
 	m_light_color.set			(1, 1, 1, 1);
 }
 
-CTorch::~CTorch(void) 
+CTorch::~CTorch() 
 {
 	light_render.destroy	();
 	light_omni.destroy		();
@@ -156,14 +156,14 @@ void CTorch::SwitchNightVision(bool vision_on)
 		if(!pp){
 			if(pHelmet && pHelmet->m_NightVisionSect.size())
 			{
-				AddEffector(pA,effNightvision, pCO->m_NightVisionSect);
+				AddEffector(pA,effNightvision, pHelmet->m_NightVisionSect);
 				m_sounds.PlaySound("NightVisionOnSnd", pA->Position(), pA, bPlaySoundFirstPerson);
 				m_sounds.PlaySound("NightVisionIdleSnd", pA->Position(), pA, bPlaySoundFirstPerson, true);
 				return;
 			}
 			else if(pOutfit && pOutfit->m_NightVisionSect.size())
 			{				
-				AddEffector(pA,effNightvision, pCO->m_NightVisionSect);
+				AddEffector(pA,effNightvision, pOutfit->m_NightVisionSect);
 				m_sounds.PlaySound("NightVisionOnSnd", pA->Position(), pA, bPlaySoundFirstPerson);
 				m_sounds.PlaySound("NightVisionIdleSnd", pA->Position(), pA, bPlaySoundFirstPerson, true);
 				return;
