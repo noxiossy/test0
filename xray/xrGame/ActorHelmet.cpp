@@ -24,8 +24,7 @@ CHelmet::~CHelmet()
 
 BOOL CHelmet::net_Spawn(CSE_Abstract* DC)
 {
-	CActor* pActor = smart_cast<CActor*>( Level().CurrentViewEntity() );
-	ReloadBonesProtection( pActor );
+	ReloadBonesProtection();
 
 	BOOL res = inherited::net_Spawn(DC);
 	return					(res);
@@ -88,13 +87,13 @@ void CHelmet::Load(LPCSTR section)
 
 }
 
-void CHelmet::ReloadBonesProtection( CActor* pActor )
+void CHelmet::ReloadBonesProtection()
 {
-	if ( !pActor || !pActor->Visual() || m_BonesProtectionSect.size() == 0 )
-	{
-		return;
-	}
-	m_boneProtection->reload( m_BonesProtectionSect, smart_cast<IKinematics*>( pActor->Visual() ) );
+	CObject* parent = H_Parent();
+	parent = smart_cast<CObject*>(Level().CurrentViewEntity());
+
+	if(parent && parent->Visual() && m_BonesProtectionSect.size())
+		m_boneProtection->reload( m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
 }
 
 void CHelmet::Hit(float hit_power, ALife::EHitType hit_type)
@@ -158,7 +157,7 @@ float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add
 
 void CHelmet::OnMoveToSlot(EItemPlace prev)
 {
-	//inherited::OnMoveToSlot		(prev);
+	inherited::OnMoveToSlot		(prev);
 	if (m_pInventory && (prev==eItemPlaceSlot))
 	{
 		CActor* pActor = smart_cast<CActor*>( m_pInventory->GetOwner() );
@@ -166,7 +165,7 @@ void CHelmet::OnMoveToSlot(EItemPlace prev)
 		{
 			CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
 			if(pTorch && pTorch->GetNightVisionStatus())
-				pTorch->SwitchNightVision(true);
+				pTorch->SwitchNightVision(true, false);
 		}
 	}
 }
@@ -187,8 +186,8 @@ void CHelmet::OnH_B_Independent(bool just_before_destroy)
 
 void CHelmet::OnMoveToRuck(EItemPlace prev)
 {
-	//inherited::OnMoveToRuck		(prev);
-	if (m_pInventory && prev == eItemPlaceSlot)
+	inherited::OnMoveToRuck		(prev);
+	if (m_pInventory && (prev == eItemPlaceSlot))
 	{
 		CActor* pActor = smart_cast<CActor*> (m_pInventory->GetOwner());
 		if (pActor)
@@ -216,23 +215,24 @@ bool CHelmet::install_upgrade_impl( LPCSTR section, bool test )
 	result |= process_if_exists( section, "physic_strike_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypePhysicStrike], test );
 
 	LPCSTR str;
-	bool result2 = process_if_exists_set( section, "bones_koeff_protection", &CInifile::r_string, str, test );
-	if ( result2 && !test )
-	{
-		m_BonesProtectionSect._set( str );
-		CActor* pActor = smart_cast<CActor*>( Level().CurrentViewEntity() );
-		ReloadBonesProtection( pActor );
-	}
-	result |= result2;
-
-	//result |= process_if_exists( section, "nearest_enemies_show_dist",  &CInifile::r_float, m_fShowNearestEnemiesDistance,  test );
-
-	result2 = process_if_exists_set( section, "nightvision_sect", &CInifile::r_string, str, test );
+	bool result2 = process_if_exists_set( section, "nightvision_sect", &CInifile::r_string, str, test );
 	if ( result2 && !test )
 	{
 		m_NightVisionSect._set( str );
 	}
 	result |= result2;
+
+	//result |= process_if_exists( section, "nearest_enemies_show_dist",  &CInifile::r_float, m_fShowNearestEnemiesDistance,  test );
+
+	result2 = process_if_exists_set( section, "bones_koeff_protection", &CInifile::r_string, str, test );
+	if ( result2 && !test )
+	{
+		m_BonesProtectionSect	= str;
+		ReloadBonesProtection	();
+	}
+	result2 = process_if_exists_set( section, "bones_koeff_protection_add", &CInifile::r_string, str, test );
+	if ( result2 && !test )
+		AddBonesProtection	(str);
 
 	result |= process_if_exists( section, "health_restore_speed",    &CInifile::r_float, m_fHealthRestoreSpeed,    test );
 	result |= process_if_exists( section, "radiation_restore_speed", &CInifile::r_float, m_fRadiationRestoreSpeed, test );
@@ -244,4 +244,13 @@ bool CHelmet::install_upgrade_impl( LPCSTR section, bool test )
 	clamp( m_fPowerLoss, 0.0f, 1.0f );
 
 	return result;
+}
+
+void CHelmet::AddBonesProtection(LPCSTR bones_section)
+{
+	CObject* parent = H_Parent();
+		parent = smart_cast<CObject*>(Level().CurrentViewEntity());
+
+	if ( parent && parent->Visual() && m_BonesProtectionSect.size() )
+		m_boneProtection->add(bones_section, smart_cast<IKinematics*>( parent->Visual() ) );
 }

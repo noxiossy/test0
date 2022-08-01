@@ -33,8 +33,7 @@ CCustomOutfit::~CCustomOutfit()
 
 BOOL CCustomOutfit::net_Spawn(CSE_Abstract* DC)
 {
-	CActor* pActor = smart_cast<CActor*>( Level().CurrentViewEntity() );
-	ReloadBonesProtection( pActor );
+	ReloadBonesProtection();
 
 	BOOL res = inherited::net_Spawn(DC);
 	return					(res);
@@ -111,13 +110,13 @@ void CCustomOutfit::Load(LPCSTR section)
 	//ReloadBonesProtection( pActor );
 }
 
-void CCustomOutfit::ReloadBonesProtection( CActor* pActor )
+void CCustomOutfit::ReloadBonesProtection()
 {
-	if ( !pActor || !pActor->Visual() || m_BonesProtectionSect.size() == 0 )
-	{
-		return;
-	}
-	m_boneProtection->reload( m_BonesProtectionSect, smart_cast<IKinematics*>( pActor->Visual() ) );
+	CObject* parent = H_Parent();
+	parent = smart_cast<CObject*>(Level().CurrentViewEntity());
+
+	if(parent && parent->Visual() && m_BonesProtectionSect.size())
+		m_boneProtection->reload( m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
 }
 
 void CCustomOutfit::Hit(float hit_power, ALife::EHitType hit_type)
@@ -197,7 +196,7 @@ void	CCustomOutfit::OnMoveToSlot		(EItemPlace prev)
 			{
 				CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
 				if(pTorch && pTorch->GetNightVisionStatus())
-					pTorch->SwitchNightVision(true);
+					pTorch->SwitchNightVision(true, false);
 			}
 			PIItem pHelmet = pActor->inventory().ItemFromSlot(HELMET_SLOT);
 			if(pHelmet && !bIsHelmetAvaliable)
@@ -313,22 +312,25 @@ bool CCustomOutfit::install_upgrade_impl( LPCSTR section, bool test )
 	result |= process_if_exists( section, "physic_strike_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypePhysicStrike], test );
 
 	LPCSTR str;
-	bool result2 = process_if_exists_set( section, "bones_koeff_protection", &CInifile::r_string, str, test );
-	if ( result2 && !test )
-	{
-		m_BonesProtectionSect._set( str );
-		CActor* pActor = smart_cast<CActor*>( Level().CurrentViewEntity() );
-		ReloadBonesProtection( pActor );
-	}
-	result |= result2;
-	result |= process_if_exists( section, "hit_fraction_actor", &CInifile::r_float, m_boneProtection->m_fHitFracActor, test );
-	
-	result2 = process_if_exists_set( section, "nightvision_sect", &CInifile::r_string, str, test );
+	bool result2 = process_if_exists_set( section, "nightvision_sect", &CInifile::r_string, str, test );
 	if ( result2 && !test )
 	{
 		m_NightVisionSect._set( str );
 	}
 	result |= result2;
+
+	result2 = process_if_exists_set( section, "bones_koeff_protection", &CInifile::r_string, str, test );
+	if ( result2 && !test )
+	{
+		m_BonesProtectionSect	= str;
+		ReloadBonesProtection	();
+	}
+	result2 = process_if_exists_set( section, "bones_koeff_protection_add", &CInifile::r_string, str, test );
+	if ( result2 && !test )
+		AddBonesProtection	(str);
+
+	result |= result2;
+	result |= process_if_exists( section, "hit_fraction_actor", &CInifile::r_float, m_boneProtection->m_fHitFracActor, test );
 	
 	result |= process_if_exists( section, "additional_inventory_weight",  &CInifile::r_float,  m_additional_weight,  test );
 	result |= process_if_exists( section, "additional_inventory_weight2", &CInifile::r_float,  m_additional_weight2, test );
@@ -346,4 +348,13 @@ bool CCustomOutfit::install_upgrade_impl( LPCSTR section, bool test )
 	clamp( m_artefact_count, (u32)0, (u32)5 );
 
 	return result;
+}
+
+void CCustomOutfit::AddBonesProtection(LPCSTR bones_section)
+{
+	CObject* parent = H_Parent();
+	parent = smart_cast<CObject*>(Level().CurrentViewEntity());
+
+	if ( parent && parent->Visual() && m_BonesProtectionSect.size() )
+		m_boneProtection->add(bones_section, smart_cast<IKinematics*>( parent->Visual() ) );
 }
