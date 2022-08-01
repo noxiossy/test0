@@ -26,8 +26,6 @@
 #include "location_manager.h"
 #include "gametask.h"
 #include "gametaskmanager.h"
-#include "ActorHelmet.h"
-#include "Inventory.h"
 
 CMapLocation::CMapLocation(LPCSTR type, u16 object_id)
 {

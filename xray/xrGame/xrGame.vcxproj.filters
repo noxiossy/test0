@@ -5967,9 +5967,6 @@
     <ClInclude Include="medkit.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Food &amp; Drugs</Filter>
     </ClInclude>
-    <ClInclude Include="ActorHelmet.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClInclude>
     <ClInclude Include="BoneProtections.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
@@ -9541,9 +9538,6 @@
     </ClCompile>
     <ClCompile Include="medkit.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Food &amp; Drugs</Filter>
-    </ClCompile>
-    <ClCompile Include="ActorHelmet.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
     <ClCompile Include="BoneProtections.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>

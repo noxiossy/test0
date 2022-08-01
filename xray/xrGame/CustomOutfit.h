@@ -8,8 +8,8 @@ class CCustomOutfit: public CInventoryItemObject {
 private:
     typedef	CInventoryItemObject inherited;
 public:
-							CCustomOutfit		();
-	virtual					~CCustomOutfit		();
+							CCustomOutfit		(void);
+	virtual					~CCustomOutfit		(void);
 
 	virtual void			Load				(LPCSTR section);
 	
@@ -31,11 +31,10 @@ public:
 
 	virtual void			OnMoveToSlot		();
 	virtual void			OnMoveToRuck		(EItemPlace prev);
-	virtual void			OnH_A_Chield		();
-	virtual void 			OnH_B_Independent	(bool just_before_destroy);
 
 protected:
 	HitImmunity::HitTypeSVec		m_HitTypeProtection;
+	float							m_fPowerLoss;
 
 	shared_str				m_ActorVisual;
 	shared_str				m_full_icon_name;
@@ -45,7 +44,6 @@ protected:
 	u32						m_artefact_count;
 
 public:
-	float					m_fPowerLoss;
 	float					m_additional_weight;
 	float					m_additional_weight2;
 
@@ -55,10 +53,8 @@ public:
 	float					m_fPowerRestoreSpeed;
 	float					m_fBleedingRestoreSpeed;
 
-	shared_str				m_BonesProtectionSect;
 	shared_str				m_NightVisionSect;
-
-	bool					bIsHelmetAvaliable;
+	shared_str				m_BonesProtectionSect;
 
 	virtual u32				ef_equipment_type		() const;
 	virtual	BOOL			BonePassBullet			(int boneID);
@@ -69,8 +65,7 @@ public:
 	virtual void			net_Export				(NET_Packet& P);
 	virtual void			net_Import				(NET_Packet& P);
 			void			ApplySkinModel			(CActor* pActor, bool bDress, bool bHUDOnly);
-			void			ReloadBonesProtection	();
-			void			AddBonesProtection		(LPCSTR bones_section);
+			void			ReloadBonesProtection	(CActor* pActor);
 
 protected:
 	virtual bool			install_upgrade_impl( LPCSTR section, bool test );

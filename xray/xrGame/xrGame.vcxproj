@@ -476,7 +476,6 @@
     <ClInclude Include="ActorAnimation.h" />
     <ClInclude Include="ActorCondition.h" />
     <ClInclude Include="ActorEffector.h" />
-    <ClInclude Include="ActorHelmet.h" />
     <ClInclude Include="ActorFollowers.h" />
     <ClInclude Include="actor_anim_defs.h" />
     <ClInclude Include="actor_defs.h" />
@@ -2437,7 +2436,6 @@
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="ActorHelmet.cpp" />
     <ClCompile Include="ActorFollowers.cpp" />
     <ClCompile Include="ActorInput.cpp" />
     <ClCompile Include="ActorMountedWeapon.cpp" />

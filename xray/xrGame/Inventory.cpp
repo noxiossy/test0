@@ -1156,13 +1156,6 @@ bool CInventory::CanPutInSlot(PIItem pIItem) const
 
 	if( !GetOwner()->CanPutInSlot(pIItem, pIItem->GetSlot() ) ) return false;
 
-	if(pIItem->GetSlot() == HELMET_SLOT)	//if(m_slots[pIItem->GetSlot()].m_pIItem == HELMET_SLOT)
-	{
-		CCustomOutfit* pOutfit = m_pOwner->GetOutfit();
-		if(pOutfit && !pOutfit->bIsHelmetAvaliable)
-			return false;
-	}
-	
 	if(pIItem->GetSlot() < m_slots.size() && 
 		m_slots[pIItem->GetSlot()].m_pIItem == NULL )
 		return true;
