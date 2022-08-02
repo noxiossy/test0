@@ -31,6 +31,8 @@ public:
 
 	virtual void			OnMoveToSlot		();
 	virtual void			OnMoveToRuck		(EItemPlace prev);
+	//virtual void			OnH_A_Chield		();
+	//virtual void 			OnH_B_Independent	(bool just_before_destroy);
 
 protected:
 	HitImmunity::HitTypeSVec		m_HitTypeProtection;
@@ -55,6 +57,8 @@ public:
 
 	shared_str				m_NightVisionSect;
 	shared_str				m_BonesProtectionSect;
+
+	bool					bIsHelmetAvaliable;
 
 	virtual u32				ef_equipment_type		() const;
 	virtual	BOOL			BonePassBullet			(int boneID);
