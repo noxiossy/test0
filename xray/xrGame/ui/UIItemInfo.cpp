@@ -22,6 +22,7 @@
 #include "UIOutfitInfo.h"
 #include "../Weapon.h"
 #include "../CustomOutfit.h"
+#include "../ActorHelmet.h"
 
 extern const LPCSTR g_inventory_upgrade_xml;
 
@@ -322,12 +323,20 @@ void CUIItemInfo::TryAddArtefactInfo	(const shared_str& af_section)
 void CUIItemInfo::TryAddOutfitInfo( CInventoryItem& pInvItem, CInventoryItem* pCompareItem )
 {
 	CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&pInvItem);
+	CHelmet* helmet = smart_cast<CHelmet*>(&pInvItem);
 	if ( outfit && UIOutfitInfo )
 	{
 		CCustomOutfit* comp_outfit = smart_cast<CCustomOutfit*>(pCompareItem);
 		UIOutfitInfo->UpdateInfo( outfit, comp_outfit );
 		UIDesc->AddWindow( UIOutfitInfo, false );
 	}
+	if ( helmet && UIOutfitInfo )
+	{
+		CHelmet* comp_helmet = smart_cast<CHelmet*>(pCompareItem);
+		UIOutfitInfo->UpdateInfo( helmet, comp_helmet );
+		UIDesc->AddWindow( UIOutfitInfo, false );
+	}
+
 }
 
 void CUIItemInfo::TryAddUpgradeInfo( CInventoryItem& pInvItem )
