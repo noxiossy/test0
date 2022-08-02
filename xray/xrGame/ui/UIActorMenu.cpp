@@ -15,6 +15,7 @@
 #include "../Weapon.h"
 #include "../WeaponMagazinedWGrenade.h"
 #include "../WeaponAmmo.h"
+#include "../ActorHelmet.h"
 #include "../CustomOutfit.h"
 
 #include "UIProgressBar.h"
@@ -294,6 +295,7 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pInventoryAutomaticList)	return iActorSlot;
 	if(l==m_pInventoryPistolList)		return iActorSlot;
 	if(l==m_pInventoryOutfitList)		return iActorSlot;
+	if(l==m_pInventoryHelmetList)		return iActorSlot;
 	if(l==m_pInventoryDetectorList)		return iActorSlot;
 	
 
@@ -650,6 +652,7 @@ void CUIActorMenu::ClearAllLists()
 	
 	m_pInventoryBeltList->ClearAll				(true);
 	m_pInventoryOutfitList->ClearAll			(true);
+	m_pInventoryHelmetList->ClearAll			(true);
 	m_pInventoryDetectorList->ClearAll			(true);
 	m_pInventoryPistolList->ClearAll			(true);
 	m_pInventoryAutomaticList->ClearAll			(true);
@@ -888,9 +891,9 @@ void CUIActorMenu::UpdateConditionProgressBars()
 	else
 		m_Outfit_progress->SetProgressPos(0);
 
-	/*itm = m_pActorInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
+	itm = m_pActorInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
 	if(itm)
 		m_Helmet_progress->SetProgressPos(iCeil(itm->GetCondition()*15.0f)/15.0f);
 	else
-		m_Helmet_progress->SetProgressPos(0);*/
+		m_Helmet_progress->SetProgressPos(0);
 }

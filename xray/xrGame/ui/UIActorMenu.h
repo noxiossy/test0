@@ -90,6 +90,7 @@ protected:
 	CUIDragDropListEx*			m_pInventoryPistolList;
 	CUIDragDropListEx*			m_pInventoryAutomaticList;
 	CUIDragDropListEx*			m_pInventoryOutfitList;
+	CUIDragDropListEx*			m_pInventoryHelmetList;
 	CUIDragDropListEx*			m_pInventoryDetectorList;
 	CUIDragDropListEx*			m_pInventoryBagList;
 
@@ -103,6 +104,7 @@ protected:
 	CUIDragDropListEx*			m_pTrashList;
 	enum						{e_af_count = 5};
 	CUIStatic*					m_belt_list_over[e_af_count];
+	CUIStatic*					m_HelmetOver;
 
 	CUIInventoryUpgradeWnd*		m_pUpgradeWnd;
 	
@@ -126,7 +128,7 @@ protected:
 	
 	CUIProgressBar*				m_WeaponSlot1_progress;
 	CUIProgressBar*				m_WeaponSlot2_progress;
-	//CUIProgressBar*				m_Helmet_progress;
+	CUIProgressBar*				m_Helmet_progress;
 	CUIProgressBar*				m_Outfit_progress;
 	// bottom ---------------------------------
 	CUIStatic*					m_ActorBottomInfo;

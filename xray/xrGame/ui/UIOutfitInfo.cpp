@@ -5,6 +5,7 @@
 #include "UIDoubleProgressBar.h"
 
 #include "..\CustomOutfit.h"
+#include "..\ActorHelmet.h"
 #include "..\string_table.h"
 #include "..\actor.h"
 #include "..\ActorCondition.h"
@@ -174,7 +175,52 @@ void CUIOutfitInfo::UpdateInfo( CCustomOutfit* cur_outfit, CCustomOutfit* slot_o
 
 		float cur = cur_outfit->GetBoneArmor( spine_bone );
 		float slot = (slot_outfit)? slot_outfit->GetBoneArmor( spine_bone ) : cur;
-		
+
 		m_items[ALife::eHitTypeFireWound]->SetProgressValue( cur, slot );
 	}
+}
+
+
+void CUIOutfitInfo::UpdateInfo( CHelmet* cur_helmet, CHelmet* slot_helmet )
+{
+	CActor* actor = smart_cast<CActor*>( Level().CurrentViewEntity() );
+	if ( !actor || !cur_helmet )
+	{
+		return;
+	}
+
+	for ( u32 i = 0; i < max_count; ++i )
+	{
+		if ( i == ALife::eHitTypeStrike || i == ALife::eHitTypeExplosion || i == ALife::eHitTypeFireWound )
+		{
+			continue;
+		}
+		
+		ALife::EHitType hit_type = (ALife::EHitType)i;
+		float max_power = actor->conditions().GetZoneMaxPower( hit_type );
+
+		float cur = cur_helmet->GetDefHitTypeProtection( hit_type );
+		cur /= max_power; // = 0..1
+		float slot = cur;
+		
+		if ( slot_helmet )
+		{
+			slot = slot_helmet->GetDefHitTypeProtection( hit_type );
+			slot /= max_power; //  = 0..1
+		}
+		m_items[i]->SetProgressValue( cur, slot );
+	}
+
+	if ( m_items[ALife::eHitTypeFireWound] )
+	{
+		IKinematics* ikv = smart_cast<IKinematics*>( actor->Visual() );
+		VERIFY( ikv );
+		u16 spine_bone = ikv->LL_BoneID( "bip01_head" );
+
+		float cur = cur_helmet->GetBoneArmor( spine_bone );
+		float slot = (slot_helmet)? slot_helmet->GetBoneArmor( spine_bone ) : cur;
+
+		m_items[ALife::eHitTypeFireWound]->SetProgressValue( cur, slot );
+	}
+
 }
