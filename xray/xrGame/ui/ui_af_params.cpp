@@ -162,7 +162,7 @@ void CUIArtefactParams::SetInfo( shared_str const& af_section )
 	for ( u32 i = 0; i < 9; ++i )
 	{
 		shared_str const& sect = pSettings->r_string( af_section, "hit_absorbation_sect" );
-		val = READ_IF_EXISTS(pSettings, r_float, sect, af_immunity_section_names[i], 0.f);
+		val	= pSettings->r_float( sect, af_immunity_section_names[i] );
 		if ( fis_zero(val) )
 		{
 			continue;
