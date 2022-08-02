@@ -17,7 +17,6 @@
 #include "UIGameCustom.h"
 #include "actorEffector.h"
 #include "CustomOutfit.h"
-#include "ActorHelmet.h"
 
 static const float		TIME_2_HIDE					= 5.f;
 static const float		TORCH_INERTION_CLAMP		= PI_DIV_6;
@@ -134,41 +133,21 @@ void CTorch::SwitchNightVision(bool vision_on)
 		}
 	}
 
-	CHelmet* pHelmet	= smart_cast<CHelmet*>(pA->inventory().m_slots[HELMET_SLOT].m_pIItem);
-	CCustomOutfit* pOutfit	= smart_cast<CCustomOutfit*>(pA->inventory().m_slots[OUTFIT_SLOT].m_pIItem);
-//	CCustomOutfit* pCO=pA->GetOutfit();
-
-	if(pHelmet && pHelmet->m_NightVisionSect.size() && !b_allow)
-	{
+	CCustomOutfit* pCO=pA->GetOutfit();
+	if(pCO&&pCO->m_NightVisionSect.size()&&!b_allow){
 		m_sounds.PlaySound("NightVisionBrokenSnd", pA->Position(), pA, bPlaySoundFirstPerson);
-		//m_night_vision->OnDisabled(pA);
-		return;
-	}
-	else if(pOutfit && pOutfit->m_NightVisionSect.size() && !b_allow)
-	{
-		m_sounds.PlaySound("NightVisionBrokenSnd", pA->Position(), pA, bPlaySoundFirstPerson);
-		//m_night_vision->OnDisabled(pA);
 		return;
 	}
 
 	if(m_bNightVisionOn){
 		CEffectorPP* pp = pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision);
 		if(!pp){
-			if(pHelmet && pHelmet->m_NightVisionSect.size())
+			if (pCO&&pCO->m_NightVisionSect.size())
 			{
-				AddEffector(pA,effNightvision, pHelmet->m_NightVisionSect);
+				AddEffector(pA,effNightvision, pCO->m_NightVisionSect);
 				m_sounds.PlaySound("NightVisionOnSnd", pA->Position(), pA, bPlaySoundFirstPerson);
 				m_sounds.PlaySound("NightVisionIdleSnd", pA->Position(), pA, bPlaySoundFirstPerson, true);
-				return;
 			}
-			else if(pOutfit && pOutfit->m_NightVisionSect.size())
-			{				
-				AddEffector(pA,effNightvision, pOutfit->m_NightVisionSect);
-				m_sounds.PlaySound("NightVisionOnSnd", pA->Position(), pA, bPlaySoundFirstPerson);
-				m_sounds.PlaySound("NightVisionIdleSnd", pA->Position(), pA, bPlaySoundFirstPerson, true);
-				return;
-			}
-			m_bNightVisionOn = false; // in case if there is no nightvision in helmet and outfit
 		}
 	}else{
  		CEffectorPP* pp = pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision);
