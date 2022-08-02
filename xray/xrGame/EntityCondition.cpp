@@ -10,6 +10,7 @@
 #include "../Include/xrRender/KinematicsAnimated.h"
 #include "../Include/xrRender/Kinematics.h"
 #include "object_broker.h"
+#include "ActorHelmet.h"
 #include "actor.h"
 
 #define MAX_HEALTH 1.0f
@@ -311,31 +312,60 @@ float CEntityCondition::HitOutfitEffect( float hit_power, ALife::EHitType hit_ty
 	if(!pInvOwner)					return hit_power;
 
 	CCustomOutfit* pOutfit			= (CCustomOutfit*)pInvOwner->inventory().m_slots[OUTFIT_SLOT].m_pIItem;
-	if(!pOutfit)					return hit_power;
+	CHelmet* pHelmet = (CHelmet*)pInvOwner->inventory().m_slots[HELMET_SLOT].m_pIItem;
+	if(!pOutfit && !pHelmet)
+		return hit_power;
 
 	//VERIFY( m_object != (CEntityAlive*)Actor() );
 
 	float new_hit_power				= hit_power;
-
-	if ( hit_type == ALife::eHitTypeFireWound )
+	
+	if(pOutfit)
 	{
-		new_hit_power				= pOutfit->HitThroughArmor( hit_power, element, ap, add_wound );
-	}
-	else
-	{
-		float one					= 0.1f;	// == void CRadioactiveZone::Affect(SZoneObjectInfo* O)
-		if ( hit_type == ALife::eHitTypeWound || hit_type == ALife::eHitTypeWound_2 || hit_type == ALife::eHitTypeExplosion )
+		if ( hit_type == ALife::eHitTypeFireWound )
 		{
-			one = 1.0f;
+			new_hit_power				= pOutfit->HitThroughArmor( hit_power, element, ap, add_wound );
 		}
+		else
+		{
+			float one					= 0.1f;	// == void CRadioactiveZone::Affect(SZoneObjectInfo* O)
+			if ( hit_type == ALife::eHitTypeWound || hit_type == ALife::eHitTypeWound_2 || hit_type == ALife::eHitTypeExplosion )
+			{
+				one = 1.0f;
+			}
 
-		float protect				= pOutfit->GetHitTypeProtection(hit_type,element);
-		new_hit_power				-= protect * one;
-		if( new_hit_power < 0.0f ) { new_hit_power = 0.0f; }
+			float protect				= pOutfit->GetHitTypeProtection(hit_type,element);
+			new_hit_power				-= protect * one;
+			if( new_hit_power < 0.0f ) { new_hit_power = 0.0f; }
 		
-		//увеличить изношенность костюма
-		pOutfit->Hit				(new_hit_power, hit_type);
+			//увеличить изношенность костюма
+			pOutfit->Hit				(new_hit_power, hit_type);
+		}
 	}
+	
+	if(pHelmet)
+	{
+		if ( hit_type == ALife::eHitTypeFireWound )
+		{
+			new_hit_power = pHelmet->HitThroughArmor(new_hit_power, element, ap, add_wound);
+		}
+		else
+		{
+			float one					= 0.1f;	// == void CRadioactiveZone::Affect(SZoneObjectInfo* O)
+			if ( hit_type == ALife::eHitTypeWound || hit_type == ALife::eHitTypeWound_2 || hit_type == ALife::eHitTypeExplosion )
+			{
+				one = 1.0f;
+			}
+
+			float protect				= pHelmet->GetHitTypeProtection(hit_type,element);
+			new_hit_power				-= protect * one;
+			if( new_hit_power < 0.0f ) { new_hit_power = 0.0f; }
+		
+			//увеличить изношенность костюма
+			pHelmet->Hit				(new_hit_power, hit_type);
+		}
+	}
+	
 	if( bDebug )	Msg( "new_hit_power = %.3f  hit_type = %s  ap = %.3f", new_hit_power, ALife::g_cafHitType2String(hit_type), ap );
 
 	return							new_hit_power;
