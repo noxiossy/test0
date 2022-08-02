@@ -65,6 +65,7 @@
 #include "../Include/xrRender/UIRender.h"
 #include "ai_object_location.h"
 #include "embedded_editor/embedded_editor_prop.h"
+#include "ActorHelmet.h"
 
 const u32		patch_frames	= 50;
 const float		respawn_delay	= 1.f;
@@ -1584,21 +1585,23 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
 		}
 	}
 	CCustomOutfit* outfit = GetOutfit();
-	if ( outfit )
+	CHelmet* pHelmet = smart_cast<CHelmet*>(inventory().m_slots[HELMET_SLOT].m_pIItem);
+	
+	if (!outfit && !pHelmet)
 	{
-		conditions().ChangeBleeding		(outfit->m_fBleedingRestoreSpeed  * f_update_time);
-		conditions().ChangeHealth		(outfit->m_fHealthRestoreSpeed    * f_update_time);
-		conditions().ChangePower		(outfit->m_fPowerRestoreSpeed     * f_update_time);
-		conditions().ChangeSatiety		(outfit->m_fSatietyRestoreSpeed   * f_update_time);
-		conditions().ChangeRadiation	(outfit->m_fRadiationRestoreSpeed * f_update_time);
-	}
-	else
-	{
-		CTorch* pTorch = smart_cast<CTorch*>( inventory().ItemFromSlot(TORCH_SLOT) );
+		/*CTorch* pTorch = smart_cast<CTorch*>( inventory().ItemFromSlot(TORCH_SLOT) );
 		if ( pTorch && pTorch->GetNightVisionStatus() )
 		{
 			pTorch->SwitchNightVision(false);
-		}
+		}*/
+	}
+	else
+	{
+		conditions().ChangeBleeding(((outfit ? outfit->m_fBleedingRestoreSpeed : 0.f) + (pHelmet ? pHelmet->m_fBleedingRestoreSpeed : 0.f))  * f_update_time);
+		conditions().ChangeHealth(((outfit ? outfit->m_fHealthRestoreSpeed : 0.f) + (pHelmet ? pHelmet->m_fHealthRestoreSpeed : 0.f))    * f_update_time);
+		conditions().ChangePower(((outfit ? outfit->m_fPowerRestoreSpeed : 0.f) + (pHelmet ? pHelmet->m_fPowerRestoreSpeed : 0.f))     * f_update_time);
+		conditions().ChangeSatiety(((outfit ? outfit->m_fSatietyRestoreSpeed : 0.f) + (pHelmet ? pHelmet->m_fSatietyRestoreSpeed : 0.f))   * f_update_time);
+		conditions().ChangeRadiation(((outfit ? outfit->m_fRadiationRestoreSpeed : 0.f) + (pHelmet ? pHelmet->m_fRadiationRestoreSpeed : 0.f)) * f_update_time);
 	}
 }
 
