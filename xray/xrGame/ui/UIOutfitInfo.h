@@ -5,7 +5,6 @@
 #include "..\..\xrServerEntities\alife_space.h"
 
 class CCustomOutfit;
-class CHelmet;
 class CUIStatic;
 class CUIDoubleProgressBar;
 class CUIXml;
@@ -37,7 +36,6 @@ public:
 
 			void 	InitFromXml			( CUIXml& xml_doc );
 			void 	UpdateInfo			( CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit = NULL );	
-			void 	UpdateInfo			( CHelmet* cur_helmet, CHelmet* slot_helmet = NULL );	
 protected:
 	/*enum
 	{

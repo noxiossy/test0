@@ -30,7 +30,6 @@
 #include "../ActorCondition.h"
 #include "../EntityCondition.h"
 #include "../CustomOutfit.h"
-#include "../ActorHelmet.h"
 #include "../Inventory.h"
 #include "../Artefact.h"
 #include "../string_table.h"
@@ -113,8 +112,6 @@ void ui_actor_state_wnd::UpdateActorInfo( CInventoryOwner* owner )
 	// -----------------------------------------------------------------------------------
 
 	CCustomOutfit* outfit = actor->GetOutfit();
-	PIItem itm = actor->inventory().ItemFromSlot(HELMET_SLOT);
-	CHelmet* helmet = smart_cast<CHelmet*>(itm);
 
 	m_state[stt_fire]->set_progress(0.0f);
 	m_state[stt_radia]->set_progress(0.0f);
@@ -160,27 +157,8 @@ void ui_actor_state_wnd::UpdateActorInfo( CInventoryOwner* owner )
 		VERIFY(ikv);
 		u16 spine_bone = ikv->LL_BoneID("bip01_spine");
 		fwou_value += outfit->GetBoneArmor(spine_bone)*outfit->GetCondition();					
-		if(!outfit->bIsHelmetAvaliable)
-		{
-			u16 spine_bone = ikv->LL_BoneID("bip01_head");
-			fwou_value += outfit->GetBoneArmor(spine_bone)*outfit->GetCondition();
-		}
 	}
-	if(helmet)
-	{
-		burn_value += helmet->GetDefHitTypeProtection(ALife::eHitTypeBurn);
-		radi_value += helmet->GetDefHitTypeProtection(ALife::eHitTypeRadiation);
-		cmbn_value += helmet->GetDefHitTypeProtection(ALife::eHitTypeChemicalBurn);
-		tele_value += helmet->GetDefHitTypeProtection(ALife::eHitTypeTelepatic);
-		woun_value += helmet->GetDefHitTypeProtection(ALife::eHitTypeWound);
-		shoc_value += helmet->GetDefHitTypeProtection(ALife::eHitTypeShock);
 
-		IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
-		VERIFY(ikv);
-		u16 spine_bone = ikv->LL_BoneID("bip01_head");
-		fwou_value += helmet->GetBoneArmor(spine_bone)*helmet->GetCondition();
-	}
-	
 //fire burn protection progress bar
 	{
 		burn_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeBurn);
@@ -244,11 +222,8 @@ void ui_actor_state_wnd::UpdateActorInfo( CInventoryOwner* owner )
 void ui_actor_state_wnd::update_round_states( CActor* actor, ALife::EHitType hit_type, EStateType stt_type )
 {
 	CCustomOutfit* outfit = actor->GetOutfit();
-	PIItem itm = actor->inventory().ItemFromSlot(HELMET_SLOT);
-	CHelmet* helmet = smart_cast<CHelmet*>(itm);
 	float value = (outfit)? outfit->GetDefHitTypeProtection( hit_type ) : 0.0f;
 	value += actor->GetProtection_ArtefactsOnBelt( hit_type );
-	value += helmet?helmet->GetDefHitTypeProtection(ALife::eHitTypeShock):0.0f;
 	
 	float max_power = actor->conditions().GetZoneMaxPower( hit_type );
 	value = value / max_power; //  = 0..1
