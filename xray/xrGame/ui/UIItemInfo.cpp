@@ -295,7 +295,8 @@ void CUIItemInfo::TryAddConditionInfo( CInventoryItem& pInvItem, CInventoryItem*
 {
 	CWeapon*		weapon = smart_cast<CWeapon*>( &pInvItem );
 	CCustomOutfit*	outfit = smart_cast<CCustomOutfit*>( &pInvItem );
-	if ( weapon || outfit )
+	CHelmet* 		helmet = smart_cast<CHelmet*>(&pInvItem);
+	if ( weapon || outfit || helmet )
 	{
 		UIConditionWnd->SetInfo( pCompareItem, pInvItem );
 		UIDesc->AddWindow( UIConditionWnd, false );

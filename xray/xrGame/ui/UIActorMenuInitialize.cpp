@@ -104,7 +104,41 @@ void CUIActorMenu::Construct()
 	m_PartnerBottomInfo->AdjustWidthToText();
 	m_PartnerWeight_end_x = m_PartnerWeight->GetWndPos().x;
 
+/*	m_InvSlot2Highlight			= UIHelper::CreateStatic(uiXml, "inv_slot2_highlight", this);
+	m_InvSlot2Highlight			->Show(false);
+	m_InvSlot3Highlight			= UIHelper::CreateStatic(uiXml, "inv_slot3_highlight", this);
+	m_InvSlot3Highlight			->Show(false);
+	m_HelmetSlotHighlight		= UIHelper::CreateStatic(uiXml, "helmet_slot_highlight", this);
+	m_HelmetSlotHighlight		->Show(false);
+	m_OutfitSlotHighlight		= UIHelper::CreateStatic(uiXml, "outfit_slot_highlight", this);
+	m_OutfitSlotHighlight		->Show(false);
+	m_DetectorSlotHighlight		= UIHelper::CreateStatic(uiXml, "detector_slot_highlight", this);
+	m_DetectorSlotHighlight		->Show(false);
+	m_QuickSlotsHighlight[0]	= UIHelper::CreateStatic(uiXml, "quick_slot_highlight", this);
+	m_QuickSlotsHighlight[0]	->Show(false);
+	m_ArtefactSlotsHighlight[0]	= UIHelper::CreateStatic(uiXml, "artefact_slot_highlight", this);
+	m_ArtefactSlotsHighlight[0]	->Show(false);
 
+	Fvector2 pos;
+	pos								= m_QuickSlotsHighlight[0]->GetWndPos();
+	float dx						= uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dx", 24.0f);
+	for(u8 i=1;i<4;i++)
+	{
+		pos.x						+= dx;
+		m_QuickSlotsHighlight[i]	= UIHelper::CreateStatic(uiXml, "quick_slot_highlight", this);
+		m_QuickSlotsHighlight[i]	->SetWndPos(pos);
+		m_QuickSlotsHighlight[i]	->Show(false);
+	}
+	pos								= m_ArtefactSlotsHighlight[0]->GetWndPos();
+	dx								= uiXml.ReadAttribFlt("artefact_slot_highlight", 0, "dx", 24.0f);
+	for(u8 i=1;i<e_af_count;i++)
+	{
+		pos.x						+= dx;
+		m_ArtefactSlotsHighlight[i]	= UIHelper::CreateStatic(uiXml, "artefact_slot_highlight", this);
+		m_ArtefactSlotsHighlight[i]	->SetWndPos(pos);
+		m_ArtefactSlotsHighlight[i]	->Show(false);
+	}
+*/
 	m_pInventoryBagList			= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_bag", this);
 	m_pInventoryBeltList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_belt", this);
 	m_pInventoryOutfitList		= UIHelper::CreateDragDropListEx(uiXml, "dragdrop_outfit", this);
@@ -280,6 +314,7 @@ void CUIActorMenu::Construct()
 	m_actor_trade						= NULL;
 	m_partner_trade						= NULL;
 	m_repair_mode						= false;
+	m_highlight_clear				= true;
 
 	DeInitInventoryMode					();
 	DeInitTradeMode						();

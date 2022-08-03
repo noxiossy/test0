@@ -131,6 +131,7 @@ public:
 			void			ClearAll			(bool bDestroy);	
 			void			Compact				();
 			bool			IsOwner				(CUICellItem* itm);
+			void			clear_select_armament();
 			Ivector2		PickCell			(const Fvector2& abs_pos);
 			CUICell&		GetCellAt			(const Ivector2& pos);
 
@@ -194,4 +195,7 @@ protected:
 				void			Grow				();
 				void			Shrink				();
 				void			ClearAll			(bool bDestroy);
+				void			clear_select_armament();
+
+
 };
